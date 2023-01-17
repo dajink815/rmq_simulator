@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenario name="test scenario">
+    <send class="Message">
+        <message class="Header">
+            <field name="type" type="str" value="DIALOG_START_REQ"/>
+            <field name="tId" type="str" value="[tId]"/>
+            <field name="msgFrom" type="str" value="MRFC"/>
+            <field name="reasonCode" type="int" value="200"/>
+            <field name="reason" type="str" value="success"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+        </message>
+        <message class="DialogStartReq">
+            <field name="dialogId" type="str" value="[call_id]"/>
+            <field name="sdp" type="str" value="v\u003d0\r\no\u003damf 0 0 IN IP4 100.100.100.57\r\ns\u003d-\r\nc\u003dIN IP4 192.168.7.34\r\nt\u003d0 0\r\nm\u003daudio 10022 RTP/AVP 97 99\r\na\u003drtpmap:97 AMR-WB/16000/1\r\na\u003dfmtp:97 octet-align\u003d1; mode-set\u003d7\r\na\u003drtpmap:99 telephone-event/8000\r\na\u003dfmtp:99 0-16\r\na\u003dptime:20\r\na\u003dsendrecv\r\na\u003ddirection:active\r\n"/>
+            <field name="fromNo" type="str" value="010-1111-2222"/>
+            <field name="toNo" type="str" value="010-3333-4444"/>
+        </message>
+    </send>
+
+    <recv class="Message">
+        <message class="DialogStartRes"/>
+    </recv>
+
+    <send class="Message">
+        <message class="Header">
+            <field name="type" type="str" value="DIALOG_SETUP_REQ"/>
+            <field name="tId" type="str" value="[tId]"/>
+            <field name="msgFrom" type="str" value="[last_msgFrom]"/>
+            <field name="reasonCode" type="int" value="200"/>
+            <field name="reason" type="str" value="success"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+        </message>
+        <message class="DialogSetupReq">
+            <field name="dialogId" type="str" value="[call_id]"/>
+            <field name="sdp" type="str" value="[last_sdp]"/>
+        </message>
+    </send>
+
+    <recv class="Message">
+        <message class="DialogSetupRes"/>
+    </recv>
+
+    <pause milliseconds="4000"/>
+
+    <send class="Message">
+        <message class="Header">
+            <field name="type" type="str" value="DIALOG_STOP_REQ"/>
+            <field name="tId" type="str" value="[tId]"/>
+            <field name="msgFrom" type="str" value="[last_msgFrom]"/>
+            <field name="reasonCode" type="int" value="200"/>
+            <field name="reason" type="str" value="success"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+        </message>
+        <message class="DialogStopReq">
+            <field name="dialogId" type="str" value="[call_id]"/>
+            <field name="record" type="int" value="0"/>
+        </message>
+    </send>
+
+    <recv class="Message">
+        <message class="DialogStopRes"/>
+    </recv>
+</scenario>
