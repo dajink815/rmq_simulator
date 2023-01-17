@@ -2,8 +2,10 @@ package com.uangel;
 
 import com.uangel.command.CommandInfo;
 import com.uangel.executor.UScheduledExecutorService;
+import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
+import com.uangel.service.AppInstance;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -17,11 +19,15 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 @Slf4j
 public class ScenarioRunner {
 
+    private final AppInstance instance = AppInstance.getInstance();
+
     private CommandInfo cmdInfo;
     private String name;
     private Scenario scenario;
 
     private UScheduledExecutorService scheduledExecutorService;
+
+    private RmqManager rmqManager;
 
 
 
@@ -58,6 +64,9 @@ public class ScenarioRunner {
             log.debug("{}", cmdInfo);
             log.debug("{}", scenario);
 
+            instance.setCmdInfo(cmdInfo);
+            instance.setScenario(scenario);
+
             // Statistics
 
 
@@ -70,20 +79,26 @@ public class ScenarioRunner {
             this.scheduledExecutorService = new UScheduledExecutorService(threadSize,
                     new BasicThreadFactory.Builder()
                             .namingPattern(this.name + "-%d")
-                            //.daemon(true)
                             .priority(Thread.MAX_PRIORITY)
                             .build());
             log.info("Scenario Runner Start (CorePool:{})", threadSize);
 
             // Load RMQ
-
-
+            rmqManager = RmqManager.getInstance();
+            rmqManager.start();
 
             // Scenario Run
 
 
 
+            // Screen
+
+
+
             // Remove Ended Call
+
+
+            // Check if the scenario is over and clean up resources when the scenario is over
 
 
 
@@ -92,4 +107,10 @@ public class ScenarioRunner {
         }
 
     }
+
+    public synchronized void stop() {
+
+        if (rmqManager != null) rmqManager.stop();
+    }
+
 }

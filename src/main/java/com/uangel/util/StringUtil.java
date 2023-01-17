@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2018. Uangel Corp. All rights reserved.
- *
- */
-
 package com.uangel.util;
 
 import java.util.ArrayList;

@@ -1,13 +1,12 @@
 package com.uangel.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author dajin kim
  */
+@Slf4j
 public class SleepUtil {
-    static final Logger log = LoggerFactory.getLogger(SleepUtil.class);
 
     private SleepUtil() {
         // Do Nothing

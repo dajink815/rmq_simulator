@@ -9,10 +9,10 @@ import org.w3c.dom.Node;
  * @author dajin kim
  */
 @ToString
-public class MsgPhase {
+public abstract class MsgPhase {
     private final int idx;
 
-    public MsgPhase(Node xmlNode, int idx) {
+    protected MsgPhase(Node xmlNode, int idx) {
         this.idx = idx;
         NamedNodeMap attr = xmlNode.getAttributes();
     }
