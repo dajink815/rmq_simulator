@@ -1,5 +1,6 @@
 package com.uangel.scenario;
 
+import com.uangel.scenario.type.AttrName;
 import com.uangel.scenario.phases.*;
 import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
@@ -61,7 +62,7 @@ public class ScenarioBuilder {
     public static Scenario fromXMLDocument(Document doc) {
         Element scenario = doc.getDocumentElement();
         NamedNodeMap attr = scenario.getAttributes();
-        Node nameAttr = attr.getNamedItem("name");
+        Node nameAttr = attr.getNamedItem(AttrName.NAME.getValue());
         String name = "Unnamed Scenario";
         if (nameAttr != null) {
             // TODO - verify that the name doesn't contain special characters

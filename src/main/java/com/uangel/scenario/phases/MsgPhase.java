@@ -1,5 +1,7 @@
 package com.uangel.scenario.phases;
 
+import com.uangel.scenario.type.AttrName;
+import com.uangel.scenario.type.NodeName;
 import com.uangel.util.XmlUtil;
 import lombok.ToString;
 import org.w3c.dom.NamedNodeMap;
@@ -17,16 +19,24 @@ public abstract class MsgPhase {
         NamedNodeMap attr = xmlNode.getAttributes();
     }
 
-    public String getStrAttrValue(Node node, String name) {
+    protected String getClassAttrValue(Node node) {
+        return getStrAttrValue(node, AttrName.CLASS.getValue());
+    }
+    protected String getStrAttrValue(Node node, String name) {
         NamedNodeMap attr = node.getAttributes();
         return XmlUtil.getStrParam(attr.getNamedItem(name));
     }
 
-    public String getStrAttrValue(NamedNodeMap attr, String name) {
+    protected String getStrAttrValue(NamedNodeMap attr, String name) {
         return XmlUtil.getStrParam(attr.getNamedItem(name));
     }
 
-    public boolean isElementNode(Node node) {
+    protected boolean isElementNode(Node node) {
         return node.getNodeType() == Node.ELEMENT_NODE;
+    }
+
+    protected boolean isBodyNode(Node node) {
+        NodeName nodeName = NodeName.getNodeName(node.getNodeName());
+        return NodeName.BODY.equals(nodeName);
     }
 }
