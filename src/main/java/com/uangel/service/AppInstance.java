@@ -1,6 +1,8 @@
 package com.uangel.service;
 
 import com.uangel.command.CommandInfo;
+import com.uangel.model.SimType;
+import com.uangel.reflection.JarReflection;
 import com.uangel.scenario.Scenario;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +24,7 @@ public class AppInstance {
     // RMQ
     private BlockingQueue<byte[]> rmqQueue;
 
+    private JarReflection jarReflection;
 
     private AppInstance() {
         // nothing
@@ -34,4 +37,10 @@ public class AppInstance {
 
         return instance;
     }
+
+    public boolean isProtoType() {
+        if (cmdInfo != null) SimType.PROTO.equals(cmdInfo.getType());
+        return false;
+    }
+
 }

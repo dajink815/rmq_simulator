@@ -1,7 +1,6 @@
 package com.uangel.rmq.handler;
 
 import com.uangel.command.CommandInfo;
-import com.uangel.model.SimType;
 import com.uangel.service.AppInstance;
 import com.uangel.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class RmqConsumer implements Runnable {
-    private final CommandInfo config = AppInstance.getInstance().getCmdInfo();
+    private final AppInstance instance = AppInstance.getInstance();
+    private final CommandInfo config = instance.getCmdInfo();
     private final BlockingQueue<byte[]> rmqQueue;
     private boolean isQuit = false;
 
@@ -48,7 +48,7 @@ public class RmqConsumer implements Runnable {
     }
 
     private void messageProcessing(byte[] msg) {
-        if (SimType.PROTO.equals(config.getType())) {
+        if (instance.isProtoType()) {
 
         } else {
 
