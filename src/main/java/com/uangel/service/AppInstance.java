@@ -1,6 +1,7 @@
 package com.uangel.service;
 
 import com.uangel.command.CommandInfo;
+import com.uangel.executor.UScheduledExecutorService;
 import com.uangel.model.SimType;
 import com.uangel.reflection.JarReflection;
 import com.uangel.scenario.Scenario;
@@ -21,6 +22,10 @@ public class AppInstance {
     private CommandInfo cmdInfo;
     // Scenario
     private Scenario scenario;
+    private boolean isTestEnded;
+
+    // Thread
+    private UScheduledExecutorService executorService;
     // RMQ
     private BlockingQueue<byte[]> rmqQueue;
 
@@ -39,8 +44,13 @@ public class AppInstance {
     }
 
     public boolean isProtoType() {
-        if (cmdInfo != null) SimType.PROTO.equals(cmdInfo.getType());
+        if (cmdInfo != null)
+            return SimType.PROTO.equals(cmdInfo.getType());
         return false;
+    }
+
+    public int getScenarioSize() {
+        return this.scenario.phases().size();
     }
 
 }

@@ -18,10 +18,14 @@ public class CommandInfo {
     // Service
     private final String service;
     private final String scenarioFile;
+    private final String fieldKeyword;
     private final SimType type;
     // Proto
     private final String protoFile;
     private final String protoPkg;
+    private String msgClass;
+
+    // todo User Command Exec
 
     // RMQ
     private final String rmqLocal;
@@ -58,6 +62,7 @@ public class CommandInfo {
         // Service
         this.service = cmd.getOptionValue("s", "service");
         this.scenarioFile = cmd.getOptionValue("sf");
+        this.fieldKeyword = cmd.getOptionValue("k");
         String mode = cmd.getOptionValue("t", "json");
         this.type = SimType.getTypeEnum(mode);
         // Proto
@@ -94,6 +99,10 @@ public class CommandInfo {
 
     }
 
+    public void setMsgClass(String msgClass) {
+        this.msgClass = msgClass;
+    }
+
     public static Options createOptions() {
         if(opts != null) return opts;
         opts = new Options();
@@ -104,6 +113,8 @@ public class CommandInfo {
 
         // Scenario File options
         opts.addOption(Option.builder("sf").argName("file").hasArg().desc("The XML scenario file").build());
+
+        opts.addOption(Option.builder("k").argName("field_keyword").hasArg().desc("Field keyword").build());
 
         // Simulator Type
         opts.addOption(Option.builder("t").argName("simulator_type").hasArg().desc("Simulator Mode [json/proto]").build());

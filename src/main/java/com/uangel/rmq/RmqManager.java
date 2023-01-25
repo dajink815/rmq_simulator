@@ -58,6 +58,7 @@ public class RmqManager {
     private void startRmqConsumer() {
         if (executorRmqService != null) return;
 
+        // UScheduler
         executorRmqService = Executors.newFixedThreadPool(config.getRmqThreadSize(),
                 new BasicThreadFactory.Builder()
                         .namingPattern("[" + instance.getScenario().getName() + "] RmqConsumer-%d")

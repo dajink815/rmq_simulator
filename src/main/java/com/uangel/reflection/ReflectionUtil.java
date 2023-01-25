@@ -2,6 +2,7 @@ package com.uangel.reflection;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.expr.*;
+import com.uangel.util.StringUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -13,15 +14,24 @@ import java.util.stream.IntStream;
  * @author kangmoo Heo
  */
 public class ReflectionUtil {
-    
+
     public static void main(String[] args) throws Exception {
         //System.out.println(exec("java.time.LocalDateTime.now()"));
         //System.out.println(exec("java.time.format.DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss.SSS\")"));
 
         System.out.println(exec("java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss.SSS\"))"));
         System.out.println(exec("java.util.UUID.randomUUID().toString()"));
-        System.out.println(exec("lib.java.handler.sip.Utils.getInstance()"));
-        System.out.println(exec("lib.java.handler.sip.Utils.getInstance().generateCallIdentifier(\"127.0.0.1\")"));
+    }
+
+    public String getExecResult(String execCmd) throws Exception {
+        if (StringUtil.isNull(execCmd))
+            return null;
+
+        TypeValuePair typeValuePair = exec(execCmd);
+        if (typeValuePair == null || typeValuePair.value == null)
+            return null;
+
+        return typeValuePair.value.toString();
     }
 
     public static TypeValuePair exec(String expression) throws Exception {

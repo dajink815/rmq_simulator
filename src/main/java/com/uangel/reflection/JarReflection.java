@@ -1,6 +1,7 @@
 package com.uangel.reflection;
 
-import com.uangel.util.StringUtil;
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -8,6 +9,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dajin kim
@@ -20,7 +23,7 @@ public class JarReflection {
 
     public JarReflection(String jarPath) {
         this.jarPath = jarPath;
-    }ㅔ
+    }
 
     public boolean loadJarFile() {
         boolean result = false;
@@ -207,19 +210,15 @@ public class JarReflection {
         return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 
-    public String getJsonElementName(String className) {
-        return className.substring(0, 1).toLowerCase() + className.substring(1);
-    }
+    public Map<String, String> getAllFieldsMap(Object msgObj) throws InvalidProtocolBufferException {
+        Map<Descriptors.FieldDescriptor, Object> fields = (Map<Descriptors.FieldDescriptor, Object>) getAllFields(msgObj);
 
-    public String getExecResult(String execCmd) throws Exception {
-        if (StringUtil.isNull(execCmd))
-            return null;
-
-        ReflectionUtil.TypeValuePair typeValuePair = ReflectionUtil.exec(execCmd);
-        if (typeValuePair == null || typeValuePair.value == null)
-            return null;
-
-        return typeValuePair.value.toString();
+        Map<String, String> result = new HashMap<>();
+        for (Object value : fields.values()) {
+            Map<String, String> valueMap = ProtoUtil.parse(ProtoUtil.buildProto(value), HashMap.class);
+            result.putAll(valueMap);
+        }
+        return result;
     }
 
 }

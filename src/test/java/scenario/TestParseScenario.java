@@ -20,7 +20,7 @@ public class TestParseScenario {
     @Test
     public void parseScenario() throws IOException, SAXException {
         String filePath = "./src/main/resources/scenario/mrfc_basic.xml";
-        Scenario scenario = ScenarioBuilder.fromXMLFilename(filePath);
+        Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
         System.out.println(scenario);
     }
 
@@ -44,7 +44,7 @@ public class TestParseScenario {
     @Test
     public void testMsgInfoManager() throws IOException, SAXException {
         String filePath = "./src/main/resources/scenario/mrfc_basic.xml";
-        Scenario scenario = ScenarioBuilder.fromXMLFilename(filePath);
+        Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
         log.debug("{}", scenario);
 
         AppInstance instance = AppInstance.getInstance();

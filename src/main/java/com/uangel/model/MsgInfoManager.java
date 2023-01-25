@@ -41,7 +41,7 @@ public class MsgInfoManager {
 
             return;
         }
-        List<MsgPhase> phases = scenario.getPhases();
+        List<MsgPhase> phases = scenario.phases();
         for (MsgPhase msgPhase : phases) {
             if (msgPhase instanceof SendPhase) {
                 SendPhase sendPhase = (SendPhase) msgPhase;

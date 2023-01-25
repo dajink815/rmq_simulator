@@ -1,7 +1,10 @@
 package com.uangel.scenario;
 
+import com.uangel.command.CommandInfo;
 import com.uangel.scenario.type.AttrName;
 import com.uangel.scenario.phases.*;
+import com.uangel.service.AppInstance;
+import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,17 +31,17 @@ public class ScenarioBuilder {
         // nothing
     }
 
-    public static Node parseXMLSnippet(String s) throws SAXException, IOException {
-        Document doc = parseXML(s);
-        if (doc != null) return doc.getFirstChild();
-        return null;
-    }
-
     public static Document parseXML(String s) throws SAXException, IOException {
         if (DOCUMENT_BUILDER == null) return null;
         synchronized (DOCUMENT_BUILDER) {
             return DOCUMENT_BUILDER.parse(new InputSource(new StringReader(s)));
         }
+    }
+
+    public static Node parseXMLSnippet(String s) throws SAXException, IOException {
+        Document doc = parseXML(s);
+        if (doc != null) return doc.getFirstChild();
+        return null;
     }
 
     public static Scenario fromXMLString(String xmlString) throws IOException, SAXException {
@@ -48,7 +51,7 @@ public class ScenarioBuilder {
     }
 
     // 파일 이름
-    public static Scenario fromXMLFilename(String filename) throws SAXException, IOException {
+    public static Scenario fromXMLFileName(String filename) throws SAXException, IOException {
         if (DOCUMENT_BUILDER == null) return null;
 
         File fXmlFile = new File(filename);
@@ -73,10 +76,14 @@ public class ScenarioBuilder {
         for (Node m = scenario.getFirstChild(); m != null; m = m.getNextSibling()) {
             switch (m.getNodeName()) {
                 case "recv":
-                    msgPhases.add(new RecvPhase(m, idx++));
+                    RecvPhase recvPhase = new RecvPhase(m, idx++);
+                    msgPhases.add(recvPhase);
+                    //setMsgClassPath(recvPhase.getClassName());
                     break;
                 case "send":
-                    msgPhases.add(new SendPhase(m, idx++));
+                    SendPhase sendPhase = new SendPhase(m, idx++);
+                    msgPhases.add(sendPhase);
+                    //setMsgClassPath(sendPhase.getClassName());
                     break;
                 case "pause":
                     msgPhases.add(new PausePhase(m, idx++));
@@ -105,6 +112,13 @@ public class ScenarioBuilder {
         } catch (Exception e) {
             log.warn("Fail to build DocumentBuilder", e);
             return null;
+        }
+    }
+
+    private static void setMsgClassPath(String msgClass) {
+        CommandInfo config = AppInstance.getInstance().getCmdInfo();
+        if (StringUtil.isNull(config.getMsgClass())) {
+            config.setMsgClass(msgClass);
         }
     }
 
