@@ -78,12 +78,12 @@ public class ScenarioBuilder {
                 case "recv":
                     RecvPhase recvPhase = new RecvPhase(m, idx++);
                     msgPhases.add(recvPhase);
-                    //setMsgClassPath(recvPhase.getClassName());
+                    setMsgClassPath(recvPhase.getClassName());
                     break;
                 case "send":
                     SendPhase sendPhase = new SendPhase(m, idx++);
                     msgPhases.add(sendPhase);
-                    //setMsgClassPath(sendPhase.getClassName());
+                    setMsgClassPath(sendPhase.getClassName());
                     break;
                 case "pause":
                     msgPhases.add(new PausePhase(m, idx++));
@@ -116,6 +116,7 @@ public class ScenarioBuilder {
     }
 
     private static void setMsgClassPath(String msgClass) {
+        if (AppInstance.getInstance().getCmdInfo() == null) return;
         CommandInfo config = AppInstance.getInstance().getCmdInfo();
         if (StringUtil.isNull(config.getMsgClass())) {
             config.setMsgClass(msgClass);

@@ -23,7 +23,7 @@ public class ReflectionUtil {
         System.out.println(exec("java.util.UUID.randomUUID().toString()"));
     }
 
-    public String getExecResult(String execCmd) throws Exception {
+    public static String getExecResult(String execCmd) throws Exception {
         if (StringUtil.isNull(execCmd))
             return null;
 

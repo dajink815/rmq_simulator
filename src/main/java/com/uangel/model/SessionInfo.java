@@ -59,8 +59,11 @@ public class SessionInfo {
         this.sessionId = sessionId;
     }
 
-    public void addFieldValue(Map<String, String> addFields) {
+    public void addFields(Map<String, String> addFields) {
         fields.putAll(addFields);
+    }
+    public void addField(String fieldName, String value) {
+        fields.put(fieldName, value);
     }
 
     public String getFieldValue(String key) {
@@ -98,18 +101,18 @@ public class SessionInfo {
                 phaseCounter.incrementAndGet();
                 MsgPhase phase = scenario.phases().get(step);
                 if (phase instanceof SendPhase) {
-                    //log.debug("({}) SEND Phase Start [{}]", callInfo.getCallId(), phase.getIdx());
+                    log.debug("({}) SEND Phase Start [{}]", sessionId, phase.getIdx());
                     procSendPhase.run(phase);
                 } else if (phase instanceof RecvPhase) {
-                    //log.debug("({}) RECV Phase Start [{}]", callInfo.getCallId(), phase.getIdx());
+                    log.debug("({}) RECV Phase Start [{}]", sessionId, phase.getIdx());
                     procRecvPhase.run(phase);
                 }  else if (phase instanceof PausePhase) {
-                    //log.debug("({}) PAUSE Phase Start [{}] [{}]", callInfo.getCallId(), phase.getIdx(), ((Pause) phase).getMillisecnods());
+                    log.debug("({}) PAUSE Phase Start [{}] [{}]", sessionId, phase.getIdx(), ((PausePhase) phase).getMilliSeconds());
                     procPausePhase.run(phase);
                 }
                 lastExecTime = System.currentTimeMillis();
             } catch (Exception e) {
-                //log.warn("({}) Err Occurs while exec call phase.", callInfo.getCallId(), e);
+                log.warn("({}) Err Occurs while exec call phase.", sessionId, e);
                 stop("Exception Occurs while execute call phase. " + e);
             }
         });

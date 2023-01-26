@@ -49,7 +49,7 @@ public class ProcRecvPhase extends ProcMsgPhase {
             }
         }
 
-        sessionInfo.addFieldValue(fields);
+        sessionInfo.addFields(fields);
         sessionInfo.execPhase(sessionInfo.increaseCurIdx());
 
         return true;

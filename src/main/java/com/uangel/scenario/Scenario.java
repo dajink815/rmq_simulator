@@ -1,9 +1,6 @@
 package com.uangel.scenario;
 
 import com.uangel.scenario.phases.MsgPhase;
-import com.uangel.scenario.phases.RecvPhase;
-import com.uangel.scenario.phases.SendPhase;
-import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,21 +36,5 @@ public class Scenario {
     public String getName() {
         return this.name;
     }
-
-/*    private void setMsgNameList() {
-        for (MsgPhase msgPhase : phases) {
-            if (msgPhase instanceof SendPhase) {
-                SendPhase sendPhase = (SendPhase) msgPhase;
-                msgNameList.add(sendPhase.getMsgName());
-            } else if (msgPhase instanceof RecvPhase) {
-
-            } else {
-
-            }
-        }
-
-    }*/
-
-
 
 }

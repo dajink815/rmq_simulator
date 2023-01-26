@@ -107,6 +107,10 @@ public class RmqManager {
         return result;
     }
 
+    public RmqClient getDefaultClient() {
+        return rmqClientMap.get(config.getRmqTarget());
+    }
+
     public RmqClient getRmqClient(String queueName) {
         return rmqClientMap.get(queueName);
     }

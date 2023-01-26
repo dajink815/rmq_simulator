@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author dajin kim
@@ -51,6 +52,10 @@ public class AppInstance {
 
     public int getScenarioSize() {
         return this.scenario.phases().size();
+    }
+
+    public void schedule(Runnable command, long delay) {
+        this.executorService.schedule(command, delay, TimeUnit.MILLISECONDS);
     }
 
 }
