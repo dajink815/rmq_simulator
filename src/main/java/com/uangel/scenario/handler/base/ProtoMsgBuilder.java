@@ -3,11 +3,11 @@ package com.uangel.scenario.handler.base;
 import com.uangel.model.SessionInfo;
 import com.uangel.reflection.JarReflection;
 import com.uangel.reflection.ReflectionUtil;
+import com.uangel.scenario.Scenario;
 import com.uangel.scenario.model.FieldInfo;
 import com.uangel.scenario.model.HeaderBodyInfo;
 import com.uangel.scenario.phases.SendPhase;
 import com.uangel.scenario.type.FieldType;
-import com.uangel.service.AppInstance;
 import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,21 +19,20 @@ import java.util.List;
 @Slf4j
 public class ProtoMsgBuilder implements MsgBuilder {
 
-    private final AppInstance instance = AppInstance.getInstance();
-    private final JarReflection jarReflection = instance.getJarReflection();
+    private final JarReflection jarReflection;
     private final SessionInfo sessionInfo;
+    private final Scenario scenario;
 
     public ProtoMsgBuilder(SessionInfo sessionInfo) {
         this.sessionInfo = sessionInfo;
+        this.scenario = sessionInfo.getScenario();
+        this.jarReflection = scenario.getJarReflection();
     }
 
     @Override
     public byte[] build(SendPhase sendPhase) {
         try {
-            String pkgBase = instance.getCmdInfo().getProtoPkg();
-            if (!pkgBase.endsWith(".")) {
-                pkgBase += ".";
-            }
+            String pkgBase = scenario.getCmdInfo().getProtoPkg();
 
             // get Builder
             String msgClassName = pkgBase + sendPhase.getClassName();
@@ -81,7 +80,7 @@ public class ProtoMsgBuilder implements MsgBuilder {
                 }
 
                 // Keyword
-                KeywordMapper keywordMapper = KeywordMapper.getInstance();
+                KeywordMapper keywordMapper = scenario.getKeywordMapper();
                 value = keywordMapper.replaceKeyword(sessionInfo, value);
 
                 // Type 별 세팅

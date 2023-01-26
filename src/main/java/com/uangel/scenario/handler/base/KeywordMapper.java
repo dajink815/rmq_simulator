@@ -14,19 +14,11 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class KeywordMapper {
-    private static KeywordMapper keywordMapper = null;
-
     public static final Pattern keyPattern = Pattern.compile("\\[(.*?)\\]");
     private final Map<String, String> execCmdMap = new HashMap<>();
 
-    private KeywordMapper() {
+    public KeywordMapper() {
         // nothing
-    }
-
-    public static KeywordMapper getInstance() {
-        if (keywordMapper == null)
-             keywordMapper = new KeywordMapper();
-        return keywordMapper;
     }
 
     public void addUserCmd(String cmd, String execStr) {
@@ -40,6 +32,7 @@ public class KeywordMapper {
     }
 
     public String replaceKeyword(SessionInfo sessionInfo, String keyword) {
+        String before = keyword;
         Matcher m = keyPattern.matcher(keyword);
 
         // [] 포함돼 있는 모든 단어 처리
@@ -47,6 +40,7 @@ public class KeywordMapper {
             String result = getValue(sessionInfo, m.group(1));   // 중괄호 제외한 값
             if (result != null) keyword = keyword.replace(m.group(0), result);
         }
+        if (!before.equals(keyword)) log.debug("ReplaceKeyword [{} -> {}]", before, keyword);
         return keyword;
     }
 

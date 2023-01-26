@@ -9,7 +9,6 @@ import com.uangel.scenario.phases.MsgPhase;
 import com.uangel.scenario.phases.PausePhase;
 import com.uangel.scenario.phases.RecvPhase;
 import com.uangel.scenario.phases.SendPhase;
-import com.uangel.service.AppInstance;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,13 +23,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Getter
 public class SessionInfo {
-    private static final AppInstance instance = AppInstance.getInstance();
 
     private final UScheduledExecutorService executorService;
-    private final Scenario scenario = instance.getScenario();
 
     private String sessionId;
-    private int sessionNum;
+    private final int sessionNum;
+    private final Scenario scenario;
 
     // todo 무슨 차이?
     private final AtomicInteger currentIdx = new AtomicInteger();
@@ -45,11 +43,12 @@ public class SessionInfo {
 
     private boolean isSessionEnded = false;
 
-    public SessionInfo(int sessionNum) {
+    public SessionInfo(int sessionNum, Scenario scenario) {
         this.sessionNum = sessionNum + 1;
         // 중복 체크?
         this.sessionId = UUID.randomUUID() + "_" + this.sessionNum;
-        this.executorService = instance.getExecutorService();
+        this.scenario = scenario;
+        this.executorService = scenario.getExecutorService();
         this.procSendPhase = new ProcSendPhase(this);
         this.procRecvPhase = new ProcRecvPhase(this);
         this.procPausePhase = new ProcPausePhase(this);
@@ -90,7 +89,7 @@ public class SessionInfo {
     }
 
     public void execPhase(int step) {
-        if (step >= instance.getScenarioSize()) {
+        if (step >= scenario.getScenarioSize()) {
             stop("End Of Scenario");
             return;
         }

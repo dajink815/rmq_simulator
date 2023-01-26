@@ -16,60 +16,71 @@ public class CommandInfo {
     private static Options opts;
 
     // Service
-    private final String service;
-    private final String scenarioFile;
-    private final String fieldKeyword;
-    private final SimType type;
+    private  String service;
+    private  String scenarioFile;
+    private  String fieldKeyword;
+    private  SimType type;
     // Proto
-    private final String protoFile;
-    private final String protoPkg;
-    private String msgClass;
+    private  String protoFile;
+    private  String protoPkg;
 
     // todo User Command Exec
 
     // RMQ
-    private final String rmqLocal;
-    private final String rmqHost;
-    private final String rmqUser;
-    private final int rmqPort;
-    private final String rmqPass;
+    private  String rmqLocal;
+    private  String rmqHost;
+    private  String rmqUser;
+    private  int rmqPort;
+    private  String rmqPass;
 
-    private final String rmqTarget;
-    private final String rmqTargetHost;
-    private final String rmqTargetUser;
-    private final int rmqTargetPort;
-    private final String rmqTargetPass;
+    private  String rmqTarget;
+    private  String rmqTargetHost;
+    private  String rmqTargetUser;
+    private  int rmqTargetPort;
+    private  String rmqTargetPass;
 
-    private final int rmqThreadSize;
-    private final int rmqQueueSize;
+    private  int rmqThreadSize;
+    private  int rmqQueueSize;
 
     // Performance
-    private final int threadSize;
+    private  int threadSize;
 
-    private final int rate;
-    private final int ratePeriod;
-    private final int duration;
-    private final int limit;
-    private final double rateIncrease;
-    private final double rateMax;
-    private final int maxCall;
+    private  int rate;
+    private  int ratePeriod;
+    private  int duration;
+    private  int limit;
+    private  double rateIncrease;
+    private  double rateMax;
+    private  int maxCall;
 
 
     // Command Line UDP Port
 
 
     public CommandInfo(CommandLine cmd) {
-        // Service
+        loadServiceConfig(cmd);
+        loadProtoConfig(cmd);
+        loadRmqConfig(cmd);
+        loadPerfConfig(cmd);
+    }
+
+    public void loadServiceConfig(CommandLine cmd) {
         this.service = cmd.getOptionValue("s", "service");
         this.scenarioFile = cmd.getOptionValue("sf");
         this.fieldKeyword = cmd.getOptionValue("k");
         String mode = cmd.getOptionValue("t", "json");
         this.type = SimType.getTypeEnum(mode);
-        // Proto
+    }
+
+    public void loadProtoConfig(CommandLine cmd) {
         this.protoFile = cmd.getOptionValue("pf");
         this.protoPkg = cmd.getOptionValue("pkg");
+        if (!protoPkg.endsWith(".")) {
+            protoPkg += ".";
+        }
+    }
 
-        // RMQ
+    public void loadRmqConfig(CommandLine cmd) {
         this.rmqLocal = cmd.getOptionValue("rl");
         this.rmqHost = cmd.getOptionValue("rh");
         this.rmqUser = cmd.getOptionValue("ru");
@@ -84,23 +95,23 @@ public class CommandInfo {
 
         this.rmqThreadSize = Integer.parseInt(cmd.getOptionValue("rts", "10"));
         this.rmqQueueSize = Integer.parseInt(cmd.getOptionValue("rqs", "1000"));
-
-        // Performance
-        this.threadSize = Integer.parseInt(cmd.getOptionValue("ts", "10"));
-
-        // todo calculate
-        this.rate = Integer.parseInt(cmd.getOptionValue("r", "10"));
-        this.ratePeriod = Integer.parseInt(cmd.getOptionValue("rp", "1000"));
-        this.duration = Integer.parseInt(cmd.getOptionValue("d", "0"));
-        this.limit = Integer.parseInt(cmd.getOptionValue("l", Integer.toString(3 * rate * (duration == 0 ? 1 : duration))));
-        this.rateIncrease = Double.parseDouble(cmd.getOptionValue("rate_increase", "0"));
-        this.rateMax = Double.parseDouble(cmd.getOptionValue("rate_max", "100"));
-        this.maxCall = Integer.parseInt(cmd.getOptionValue("m", "0"));
-
     }
 
-    public void setMsgClass(String msgClass) {
-        this.msgClass = msgClass;
+    public void loadPerfConfig(CommandLine cmd) {
+        try {
+            this.threadSize = Integer.parseInt(cmd.getOptionValue("ts", "10"));
+
+            // todo calculate
+            this.maxCall = Integer.parseInt(cmd.getOptionValue("m", "0"));
+            this.rate = Integer.parseInt(cmd.getOptionValue("r", "10"));
+            this.ratePeriod = Integer.parseInt(cmd.getOptionValue("rp", "1000"));
+            this.duration = Integer.parseInt(cmd.getOptionValue("d", "0"));
+            this.limit = Integer.parseInt(cmd.getOptionValue("l", Integer.toString(3 * rate * (duration == 0 ? 1 : duration))));
+            this.rateIncrease = Double.parseDouble(cmd.getOptionValue("rate_increase", "0"));
+            this.rateMax = Double.parseDouble(cmd.getOptionValue("rate_max", "100"));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
     }
 
     public static Options createOptions() {

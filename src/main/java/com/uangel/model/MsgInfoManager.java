@@ -1,11 +1,11 @@
 package com.uangel.model;
 
-import com.uangel.scenario.Scenario;
 import com.uangel.scenario.phases.MsgPhase;
 import com.uangel.scenario.phases.RecvPhase;
 import com.uangel.scenario.phases.SendPhase;
 import com.uangel.scenario.type.PhaseType;
-import com.uangel.service.AppInstance;
+import com.uangel.util.StringUtil;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -17,38 +17,33 @@ import java.util.List;
  * @author dajin kim
  */
 @Slf4j
+@Getter
 public class MsgInfoManager {
-    private static MsgInfoManager manager = null;
-    private final List<MsgInfo> msgInfoList = new ArrayList<>();
+    protected final List<MsgInfo> msgInfoList = new ArrayList<>();
+    protected String msgClassName;
 
-    private MsgInfoManager() {
+    protected MsgInfoManager() {
         // nothing
-    }
-
-    public static MsgInfoManager getInstance() {
-        if (manager == null)
-            manager= new MsgInfoManager();
-        return manager;
     }
 
     public List<MsgInfo> getMsgInfoList() {
         return msgInfoList;
     }
 
-    public void initList() {
-        Scenario scenario = AppInstance.getInstance().getScenario();
-        if (scenario == null) {
-
+    protected void initList(List<MsgPhase> phases) {
+        if (phases == null || phases.isEmpty()) {
             return;
         }
-        List<MsgPhase> phases = scenario.phases();
+
         for (MsgPhase msgPhase : phases) {
             if (msgPhase instanceof SendPhase) {
                 SendPhase sendPhase = (SendPhase) msgPhase;
                 createMsgInfo(sendPhase.getMsgName(), PhaseType.SEND);
+                setMsgClassName(sendPhase.getClassName());
             } else if (msgPhase instanceof RecvPhase) {
                 RecvPhase recvPhase = (RecvPhase) msgPhase;
                 createMsgInfo(recvPhase.getMsgName(), PhaseType.RECV);
+                setMsgClassName(recvPhase.getClassName());
             } else {
                 createMsgInfo(PhaseType.PAUSE.getValue(), PhaseType.PAUSE);
             }
@@ -56,11 +51,16 @@ public class MsgInfoManager {
     }
 
     // MsgInfo List 는 초기 생성 후 추가 & 삭제 데이터 변동 없음
-    public void createMsgInfo(String msgName, PhaseType phaseType) {
+    private void createMsgInfo(String msgName, PhaseType phaseType) {
         synchronized (msgInfoList) {
             MsgInfo msgInfo = new MsgInfo(msgName, phaseType);
             msgInfoList.add(msgInfo);
         }
+    }
+
+    private void setMsgClassName(String name) {
+        if (StringUtil.isNull(msgClassName))
+            msgClassName = name;
     }
 
     public MsgInfo getMsgInfo(int idx) {

@@ -27,7 +27,7 @@ public class ProcSendPhase extends ProcMsgPhase {
         try {
             // create
             MsgBuilder builder;
-            if (instance.isProtoType()) {
+            if (scenario.isProtoType()) {
                 builder = new ProtoMsgBuilder(sessionInfo);
             } else {
                 builder = new JsonMsgBuilder();
@@ -35,7 +35,7 @@ public class ProcSendPhase extends ProcMsgPhase {
             byte[] msg = builder.build(sendPhase);
 
             // send
-            RmqClient rmqClient = RmqManager.getInstance().getDefaultClient();
+            RmqClient rmqClient = scenario.getRmqManager().getDefaultClient();
             rmqClient.send(msg);
         } catch (Exception e) {
             log.error("ProcSendPhase.run.Exception ", e);

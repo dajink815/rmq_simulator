@@ -1,6 +1,6 @@
 package com.uangel.rmq.handler;
 
-import com.uangel.service.AppInstance;
+import com.uangel.scenario.Scenario;
 import com.uangel.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,12 +12,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class RmqConsumer implements Runnable {
-    private final AppInstance instance = AppInstance.getInstance();
+    private final Scenario scenario;
     private final BlockingQueue<byte[]> rmqQueue;
     private boolean isQuit = false;
 
-    public RmqConsumer(BlockingQueue<byte[]> queue) {
+    public RmqConsumer(BlockingQueue<byte[]> queue, Scenario scenario) {
         this.rmqQueue = queue;
+        this.scenario = scenario;
     }
 
     @Override
@@ -46,11 +47,11 @@ public class RmqConsumer implements Runnable {
     }
 
     private void msgProcessing(byte[] msg) {
-        if (instance.isProtoType()) {
-            RmqProtoConsumer protoConsumer = new RmqProtoConsumer();
+        if (scenario.isProtoType()) {
+            RmqProtoConsumer protoConsumer = new RmqProtoConsumer(scenario);
             protoConsumer.protoMsgProcessing(msg);
         } else {
-            RmqJsonConsumer jsonConsumer = new RmqJsonConsumer();
+            RmqJsonConsumer jsonConsumer = new RmqJsonConsumer(scenario);
             jsonConsumer.jsonMsgProcessing(msg);
         }
 

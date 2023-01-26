@@ -4,46 +4,53 @@ import com.uangel.command.CommandInfo;
 import com.uangel.rmq.handler.RmqConsumer;
 import com.uangel.rmq.module.RmqClient;
 import com.uangel.rmq.module.RmqServer;
-import com.uangel.service.AppInstance;
+import com.uangel.scenario.Scenario;
 import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author dajin kim
  */
 @Slf4j
 public class RmqManager {
-    private static RmqManager rmqManager = null;
-    private final AppInstance instance = AppInstance.getInstance();
-    private final CommandInfo config = instance.getCmdInfo();
+    private final Scenario scenario;
+    private final CommandInfo config;
     private ExecutorService executorRmqService;
-
+    private BlockingQueue<byte[]> rmqQueue;
     private RmqServer rmqServer;
     private final ConcurrentHashMap<String, RmqClient> rmqClientMap = new ConcurrentHashMap<>();
 
-    private RmqManager() {
-        // nothing
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
+
+    public RmqManager(Scenario scenario) {
+        this.scenario = scenario;
+        this.config = scenario.getCmdInfo();
     }
 
-    public static RmqManager getInstance() {
-        if (rmqManager == null) {
-            rmqManager = new RmqManager();
+    public boolean start() {
+        if (isRunning.get()) {
+            log.warn("[{}] RmqManager is already started", scenario.getName());
+            return false;
         }
-        return rmqManager;
-    }
-
-    public void start() {
-        log.info("[{}] RmqManager Start", instance.getScenario().getName());
+        isRunning.set(true);
+        log.info("[{}] RmqManager Start", scenario.getName());
         startRmqConsumer();
-        startRmqClient();
-        startRmqServer();
+        boolean clientResult = startRmqClient();
+        boolean serverResult = startRmqServer();
+        return clientResult && serverResult;
     }
 
     public void stop() {
-        log.info("[{}] RmqManager Stop", instance.getScenario().getName());
+        if (!isRunning.get()) {
+            log.info("[{}] RmqManager is already stopped", scenario.getName());
+            return;
+        }
+        isRunning.set(false);
+        log.info("[{}] RmqManager Stop", scenario.getName());
         if (rmqServer != null) {
             rmqServer.stop();
         }
@@ -61,27 +68,27 @@ public class RmqManager {
         // UScheduler
         executorRmqService = Executors.newFixedThreadPool(config.getRmqThreadSize(),
                 new BasicThreadFactory.Builder()
-                        .namingPattern("[" + instance.getScenario().getName() + "] RmqConsumer-%d")
+                        .namingPattern("[" + scenario.getName() + "] RmqConsumer-%d")
                         //.namingPattern("RmqConsumer-%d")
                         .build());
-        BlockingQueue<byte[]> rmqQueue = new ArrayBlockingQueue<>(config.getRmqQueueSize());
-        instance.setRmqQueue(rmqQueue);
+        rmqQueue = new ArrayBlockingQueue<>(config.getRmqQueueSize());
 
         for (int i = 0; i < config.getRmqThreadSize(); i++) {
-            executorRmqService.execute(new RmqConsumer(rmqQueue));
+            executorRmqService.execute(new RmqConsumer(rmqQueue, scenario));
         }
     }
 
-    private void startRmqClient() {
+    private boolean startRmqClient() {
         String target = config.getRmqTarget();
         String host = config.getRmqTargetHost();
         String user = config.getRmqTargetUser();
         String pass = config.getRmqTargetPass();
         int port = config.getRmqTargetPort();
-        addClient(target, host, user, pass, port);
+        return addClient(target, host, user, pass, port);
     }
 
-    private void startRmqServer() {
+    private boolean startRmqServer() {
+        boolean result = false;
         if (rmqServer == null) {
             String target = config.getRmqLocal();
             String host = config.getRmqHost();
@@ -89,11 +96,12 @@ public class RmqManager {
             String pass = config.getRmqPass();
             int port = config.getRmqPort();
 
-            RmqServer server = new RmqServer(host, user, pass, target, port);
-            boolean result = server.start();
+            RmqServer server = new RmqServer(host, user, pass, target, port, rmqQueue);
+            result = server.start();
             if (result) this.rmqServer = server;
             log.info("RabbitMQ Server Start {}. [{}], [{}], [{}]", StringUtil.getSucFail(result), target, host, user);
         }
+        return result;
     }
 
     private boolean addClient(String target, String host, String user, String pass, int port) {

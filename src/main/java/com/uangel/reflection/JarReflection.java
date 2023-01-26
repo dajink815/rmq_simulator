@@ -32,6 +32,7 @@ public class JarReflection {
             URL classURL = new URL("jar:" + jarFile.toURI().toURL() + "!/");
             classLoader = new URLClassLoader(new URL[]{classURL});
             result = true;
+            log.info("JarReflection loadJarFile Success [{}]", jarPath);
         } catch (Exception e) {
             log.error("JarReflection.Exception ", e);
         }

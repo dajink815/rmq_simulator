@@ -2,13 +2,12 @@ package com.uangel;
 
 import com.uangel.command.CommandInfo;
 import com.uangel.executor.UScheduledExecutorService;
-import com.uangel.model.MsgInfoManager;
 import com.uangel.model.SessionManager;
 import com.uangel.reflection.JarReflection;
 import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
-import com.uangel.service.AppInstance;
+import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.util.SleepUtil;
 import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +25,14 @@ import java.util.List;
 @Slf4j
 public class ScenarioRunner {
 
-    private final AppInstance instance = AppInstance.getInstance();
-
     private CommandInfo cmdInfo;
+    private Scenario scenario;
     private String name;
 
     private SessionManager sessionManager;
     private UScheduledExecutorService scheduledExecutorService;
 
-    private RmqManager rmqManager;
+    public RmqManager rmqManager;
 
     //private boolean isShutdown = false;
 
@@ -43,7 +41,7 @@ public class ScenarioRunner {
         // nothing
     }
 
-    public void run(String[] args) {
+    public String run(String[] args) {
 
         // Parse Command Line -> 별도 모듈로 분리
         CommandLineParser parser = new DefaultParser();
@@ -53,7 +51,7 @@ public class ScenarioRunner {
             if (cmd.hasOption("h") || (cmdInfo.getScenarioFile() == null)) {
                 // todo
                 new HelpFormatter().printHelp("sipp.jar [OPTIONS] remotehost[:port]", CommandInfo.createOptions());
-                return;
+                return null;
             }
             // mode, proto jar file
 
@@ -64,44 +62,45 @@ public class ScenarioRunner {
         } catch (Exception e) {
             log.error("[{}] ScenarioRunner.run.CommandLine.Exception ", this.name, e);
             new HelpFormatter().printHelp("sipp.jar [OPTIONS] remotehost[:port]", CommandInfo.createOptions());
-            return;
+            return null;
         }
 
         try {
-            instance.setCmdInfo(cmdInfo);
+            // Scenario Setting
+            scenario = ScenarioBuilder.fromXMLFileName(cmdInfo.getScenarioFile());
+            if (scenario == null) {
+                log.error("ScenarioRunner Scenario Build Fail");
+                return null;
+            }
+            scenario.setCmdInfo(cmdInfo);
+            log.debug("{}", cmdInfo);
+            log.debug("{}", scenario.getMsgNameList());
 
-            if (instance.isProtoType()) {
+            if (scenario.isProtoType()) {
                 JarReflection jarReflection = new JarReflection(cmdInfo.getProtoFile());
                 // Load Proto jar file & Check Proto base package name
                 if (!jarReflection.loadJarFile() || StringUtil.isNull(cmdInfo.getProtoPkg())) {
                     log.error("Check Proto jar file, base package path ({}, {})", cmdInfo.getProtoFile(), cmdInfo.getProtoPkg());
-                    return;
+                    return null;
                 }
-                instance.setJarReflection(jarReflection);
+                scenario.setJarReflection(jarReflection);
             }
 
             // User Defined Command (Reflection)
+            KeywordMapper keywordMapper = new KeywordMapper();
+            scenario.setKeywordMapper(keywordMapper);
 
-
-            // Scenario Setting
-            Scenario scenario = ScenarioBuilder.fromXMLFileName(cmdInfo.getScenarioFile());
-            instance.setScenario(scenario);
+            // addUserCmd
+            keywordMapper.addUserCmd("tId", "java.util.UUID.randomUUID().toString()");
+            keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
 
             // Scenario Validity
 
 
-            log.debug("{}", cmdInfo);
-            log.debug("{}", scenario);
-
-            // MsgInfoManager
-            MsgInfoManager msgInfoManager = MsgInfoManager.getInstance();
-            msgInfoManager.initList();
-            log.debug("{}", msgInfoManager.getMsgNameList());
 
             // Statistics
 
 
-            // todo name 수정
             this.name = scenario.getName() + "@" + hashCode();
             Thread.currentThread().setName(name);
 
@@ -114,14 +113,20 @@ public class ScenarioRunner {
                             .priority(Thread.MAX_PRIORITY)
                             .build());
             log.info("Scenario Runner Start (CorePool:{})", threadSize);
-            instance.setExecutorService(scheduledExecutorService);
+            scenario.setExecutorService(scheduledExecutorService);
 
             // Load RMQ
-            rmqManager = RmqManager.getInstance();
-            rmqManager.start();
+            rmqManager = new RmqManager(scenario);
+            boolean rmqResult = rmqManager.start();
+            if (!rmqResult) {
+                log.error("ScenarioRunner Stop. Fail to RmqManager.start()");
+                return null;
+            }
+            scenario.setRmqManager(rmqManager);
 
             // Scenario Run
-            sessionManager = SessionManager.getInstance();
+            sessionManager = new SessionManager(scenario);
+            scenario.setSessionManager(sessionManager);
             sessionManager.createSessionByRate();
 
             // Remove Ended Session
@@ -132,7 +137,7 @@ public class ScenarioRunner {
 
             // Check if the scenario is over and clean up resources
             // when the scenario is over
-            while (!instance.isTestEnded()) {
+            while (!scenario.isTestEnded()) {
                 if (this.cmdInfo.getMaxCall() > 0
                         && sessionManager.getSessionCnt() >= this.cmdInfo.getMaxCall()
                         && sessionManager.isSessionEmpty()) {
@@ -147,13 +152,14 @@ public class ScenarioRunner {
         } catch (Exception e) {
             log.error("ScenarioRunner.run.Exception ", e);
         }
+        return null;
 
     }
 
     // todo 테스트 종료 조건 추가
     public synchronized void stop() {
-        if (instance.isTestEnded()) return;
-        instance.setTestEnded(true);
+        if (scenario == null || scenario.isTestEnded()) return;
+        scenario.setTestEnded(true);
 
         if (rmqManager != null) rmqManager.stop();
 

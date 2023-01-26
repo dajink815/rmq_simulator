@@ -1,28 +1,44 @@
 package com.uangel.scenario;
 
+import com.uangel.command.CommandInfo;
+import com.uangel.executor.UScheduledExecutorService;
+import com.uangel.model.MsgInfoManager;
+import com.uangel.model.SessionManager;
+import com.uangel.model.SimType;
+import com.uangel.reflection.JarReflection;
+import com.uangel.rmq.RmqManager;
+import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.scenario.phases.MsgPhase;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author dajin kim
  */
 @Slf4j
-@ToString
-public class Scenario {
+@Getter
+@Setter
+public class Scenario extends MsgInfoManager {
 
     private final String name;
     private final List<MsgPhase> phases;
-    private final List<String> msgNameList = new ArrayList<>();
+    private CommandInfo cmdInfo;
+    private SessionManager sessionManager;
+    private RmqManager rmqManager;
+    private UScheduledExecutorService executorService;
+    private JarReflection jarReflection;
+    private KeywordMapper keywordMapper;
+    private boolean isTestEnded;
 
     public Scenario(String name, List<MsgPhase> phases) {
         this.name = name;
         this.phases = phases;
-        //this.setMsgNameList();
+        super.initList(phases);
     }
 
     public List<MsgPhase> phases() {
@@ -33,8 +49,29 @@ public class Scenario {
         return this.phases.get(idx);
     }
 
+    public int getScenarioSize() {
+        return phases.size();
+    }
+
     public String getName() {
         return this.name;
     }
 
+    public boolean isProtoType() {
+        if (cmdInfo != null)
+            return SimType.PROTO.equals(cmdInfo.getType());
+        return false;
+    }
+
+    public void schedule(Runnable command, long delay) {
+        this.executorService.schedule(command, delay, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public String toString() {
+        return "Scenario{" +
+                "name='" + name + '\'' +
+                ", phases=" + phases +
+                '}';
+    }
 }

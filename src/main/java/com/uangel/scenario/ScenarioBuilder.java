@@ -1,10 +1,7 @@
 package com.uangel.scenario;
 
-import com.uangel.command.CommandInfo;
 import com.uangel.scenario.type.AttrName;
 import com.uangel.scenario.phases.*;
-import com.uangel.service.AppInstance;
-import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -78,12 +75,10 @@ public class ScenarioBuilder {
                 case "recv":
                     RecvPhase recvPhase = new RecvPhase(m, idx++);
                     msgPhases.add(recvPhase);
-                    setMsgClassPath(recvPhase.getClassName());
                     break;
                 case "send":
                     SendPhase sendPhase = new SendPhase(m, idx++);
                     msgPhases.add(sendPhase);
-                    setMsgClassPath(sendPhase.getClassName());
                     break;
                 case "pause":
                     msgPhases.add(new PausePhase(m, idx++));
@@ -112,14 +107,6 @@ public class ScenarioBuilder {
         } catch (Exception e) {
             log.warn("Fail to build DocumentBuilder", e);
             return null;
-        }
-    }
-
-    private static void setMsgClassPath(String msgClass) {
-        if (AppInstance.getInstance().getCmdInfo() == null) return;
-        CommandInfo config = AppInstance.getInstance().getCmdInfo();
-        if (StringUtil.isNull(config.getMsgClass())) {
-            config.setMsgClass(msgClass);
         }
     }
 

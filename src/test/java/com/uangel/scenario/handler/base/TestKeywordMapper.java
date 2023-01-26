@@ -1,9 +1,14 @@
 package com.uangel.scenario.handler.base;
 
 import com.uangel.model.SessionInfo;
+import com.uangel.scenario.Scenario;
+import com.uangel.scenario.ScenarioBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 
 /**
  * @author dajin kim
@@ -11,15 +16,18 @@ import org.junit.Test;
 @Slf4j
 public class TestKeywordMapper {
 
-    private final KeywordMapper keywordMapper = KeywordMapper.getInstance();
-    private final SessionInfo sessionInfo = new SessionInfo(0);
+    private final KeywordMapper keywordMapper = new KeywordMapper();
+    private SessionInfo sessionInfo;
 
     @Before
-    public void prepareUserCmd() {
+    public void prepareUserCmd() throws IOException, SAXException {
         keywordMapper.addUserCmd("tId", "java.util.UUID.randomUUID().toString()");
         keywordMapper.addUserCmd("timestamp", "java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss.SSS\"))");
         //keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
 
+        String filePath = "./src/main/resources/scenario/mrfc_basic.xml";
+        Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
+        sessionInfo = new SessionInfo(0, scenario);
         sessionInfo.addField("tId" ,"TEST_TID");
     }
 

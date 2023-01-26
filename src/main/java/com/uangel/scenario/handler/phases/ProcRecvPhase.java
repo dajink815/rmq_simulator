@@ -30,7 +30,7 @@ public class ProcRecvPhase extends ProcMsgPhase {
         // 테스트 끝난 세션 skip
         if (this.sessionInfo.isSessionEnded() || !sessionManager.checkIndex(sessionInfo)) return false;
 
-        MsgPhase curPhase = instance.getScenario().getPhase(sessionInfo.getCurIdx());
+        MsgPhase curPhase = scenario.getPhase(sessionInfo.getCurIdx());
         // Optional 처리?
         // 현재 단계가 Recv 아니라면 skip
         if (!(curPhase instanceof RecvPhase)) return false;

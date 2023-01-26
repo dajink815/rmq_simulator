@@ -2,7 +2,6 @@ package com.uangel.rmq.module;
 
 import com.uangel.rmq.module.transport.RmqReceiver;
 import com.uangel.rmq.util.PasswdDecryptor;
-import com.uangel.service.AppInstance;
 import com.uangel.service.ServiceDefine;
 import com.uangel.util.Suppress;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +22,13 @@ public class RmqServer {
     private final String queueName;
     private final int port;
 
-    public RmqServer(String host, String user, String pass, String queueName, int port) {
+    public RmqServer(String host, String user, String pass, String queueName, int port, BlockingQueue<byte[]> rmqQueue) {
         this.host = host;
         this.user = user;
         this.pass = pass;
         this.queueName = queueName;
         this.port = port;
-        this.queue = AppInstance.getInstance().getRmqQueue();
+        this.queue = rmqQueue;
     }
 
     public boolean start() {
@@ -78,6 +77,7 @@ public class RmqServer {
 
             // if (rmqMsg == null) return;
 
+            log.debug("Received MSG [{}]", new String(msg));
 
             try {
                 queue.put(msg);

@@ -2,8 +2,8 @@ package com.uangel.model;
 
 import com.uangel.command.CommandInfo;
 import com.uangel.executor.UScheduledExecutorService;
+import com.uangel.scenario.Scenario;
 import com.uangel.scenario.handler.phases.ProcRecvPhase;
-import com.uangel.service.AppInstance;
 import com.uangel.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class SessionManager {
-    private static SessionManager sessionManager = null;
 
     // 처리 중인 세션 관리
     private final Set<SessionInfo> sessionList = ConcurrentHashMap.newKeySet();
@@ -29,22 +28,17 @@ public class SessionManager {
     // 처리한 총 세션 개수
     private final AtomicInteger sessionCnt = new AtomicInteger();
 
-    private final AppInstance instance = AppInstance.getInstance();
+    private final Scenario scenario;
 
-    public SessionManager() {
+    public SessionManager(Scenario scenario) {
         // nothing
-    }
-
-    public static SessionManager getInstance() {
-        if (sessionManager == null)
-            sessionManager = new SessionManager();
-        return sessionManager;
+        this.scenario = scenario;
     }
 
     public void createSessionByRate() {
-        UScheduledExecutorService executorService = instance.getExecutorService();
+        UScheduledExecutorService executorService = scenario.getExecutorService();
         if (executorService == null) return;
-        CommandInfo cmdInfo = instance.getCmdInfo();
+        CommandInfo cmdInfo = scenario.getCmdInfo();
 
         // RatePeriod 간격으로 Rate 개수만큼 new Session 생성
         executorService.scheduleAtFixedRate(() -> {
@@ -58,7 +52,7 @@ public class SessionManager {
 
     public void removeEndedSession() {
         // 시뮬레이터 동작 1초 후부터 매 1초마다 종료된 세션 삭제
-        UScheduledExecutorService executorService = instance.getExecutorService();
+        UScheduledExecutorService executorService = scenario.getExecutorService();
         if (executorService == null) return;
 
 
@@ -79,7 +73,7 @@ public class SessionManager {
 
     private void createSessionInfo() {
         // shutdown 체크?
-        CommandInfo cmdInfo = instance.getCmdInfo();
+        CommandInfo cmdInfo = scenario.getCmdInfo();
         if (sessionList.size() >= cmdInfo.getLimit() || (cmdInfo.getMaxCall() > 0
                 && getSessionCnt() >= cmdInfo.getMaxCall())) {
             // log
@@ -87,7 +81,7 @@ public class SessionManager {
         }
 
         try {
-            SessionInfo sessionInfo = new SessionInfo(getSessionCnt());
+            SessionInfo sessionInfo = new SessionInfo(getSessionCnt(), scenario);
             sessionList.add(sessionInfo);
             sessionMap.put(sessionInfo.getSessionId(), sessionInfo);
             sessionInfo.start();
@@ -135,7 +129,7 @@ public class SessionManager {
     }
 
     public boolean checkIndex(SessionInfo sessionInfo) {
-        return sessionInfo.getCurIdx() < instance.getScenarioSize();
+        return sessionInfo.getCurIdx() < scenario.getScenarioSize();
 
     }
 }
