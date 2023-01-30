@@ -75,7 +75,7 @@ public class CommandInfo {
     public void loadProtoConfig(CommandLine cmd) {
         this.protoFile = cmd.getOptionValue("pf");
         this.protoPkg = cmd.getOptionValue("pkg");
-        if (!protoPkg.endsWith(".")) {
+        if (protoPkg != null && !protoPkg.endsWith(".")) {
             protoPkg += ".";
         }
     }

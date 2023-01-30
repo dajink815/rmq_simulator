@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenario name="mrfc_basic_flow">
+
+    <send class="Message">
+        <header class="header">
+            <field name="type" type="str" value="DIALOG_START_REQ"/>
+            <field name="tId" type="str" value="[tId]"/>
+            <field name="msgFrom" type="str" value="MRFC"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+            <field name="dialogId" type="str" value="[call_id]"/>
+        </header>
+        <body class="DialogStartReq">
+            <field name="sdp" type="str" value="v\u003d0\r\no\u003damf 0 0 IN IP4 100.100.100.57\r\ns\u003d-\r\nc\u003dIN IP4 192.168.7.34\r\nt\u003d0 0\r\nm\u003daudio 10022 RTP/AVP 97 99\r\na\u003drtpmap:97 AMR-WB/16000/1\r\na\u003dfmtp:97 octet-align\u003d1; mode-set\u003d7\r\na\u003drtpmap:99 telephone-event/8000\r\na\u003dfmtp:99 0-16\r\na\u003dptime:20\r\na\u003dsendrecv\r\na\u003ddirection:active\r\n"/>
+            <field name="fromNo" type="str" value="010-1111-2222"/>
+            <field name="toNo" type="str" value="010-3333-4444"/>
+        </body>
+    </send>
+
+    <recv class="Message">
+        <body class="DialogStartRes"/>
+    </recv>
+
+    <pause milliseconds="4000"/>
+
+    <send class="Message">
+        <header class="header">
+            <field name="type" type="str" value="DIALOG_SETUP_REQ"/>
+            <field name="tId" type="str" value="[tId]"/>
+            <field name="msgFrom" type="str" value="MRFC"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+            <field name="dialogId" type="str" value="[last_dialogId]"/>
+        </header>
+        <body class="DialogSetupReq">
+            <field name="sdp" type="str" value="[last_sdp]"/>
+        </body>
+    </send>
+
+    <recv class="Message">
+        <body class="DialogSetupRes"/>
+    </recv>
+
+    <pause milliseconds="4000"/>
+
+    <send class="Message">
+        <header class="header">
+            <field name="type" type="str" value="DIALOG_STOP_REQ"/>
+            <field name="tId" type="str" value="[tId]"/>
+            <field name="msgFrom" type="str" value="MRFC"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+            <field name="dialogId" type="str" value="[last_dialogId]"/>
+        </header>
+        <body class="DialogStopReq">
+            <field name="record" type="int" value="1"/>
+        </body>
+    </send>
+
+    <recv class="Message">
+        <body class="DialogStopRes"/>
+    </recv>
+</scenario>

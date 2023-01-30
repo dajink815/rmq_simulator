@@ -1,7 +1,6 @@
 package com.uangel.scenario.handler.phases;
 
 import com.uangel.model.SessionInfo;
-import com.uangel.rmq.RmqManager;
 import com.uangel.rmq.module.RmqClient;
 import com.uangel.scenario.handler.base.JsonMsgBuilder;
 import com.uangel.scenario.handler.base.MsgBuilder;
@@ -30,13 +29,15 @@ public class ProcSendPhase extends ProcMsgPhase {
             if (scenario.isProtoType()) {
                 builder = new ProtoMsgBuilder(sessionInfo);
             } else {
-                builder = new JsonMsgBuilder();
+                builder = new JsonMsgBuilder(sessionInfo);
             }
             byte[] msg = builder.build(sendPhase);
 
             // send
             RmqClient rmqClient = scenario.getRmqManager().getDefaultClient();
             rmqClient.send(msg);
+
+            sessionInfo.execPhase(sessionInfo.increaseCurIdx());
         } catch (Exception e) {
             log.error("ProcSendPhase.run.Exception ", e);
         }

@@ -51,6 +51,7 @@ public class RmqConsumer implements Runnable {
             RmqProtoConsumer protoConsumer = new RmqProtoConsumer(scenario);
             protoConsumer.protoMsgProcessing(msg);
         } else {
+            // Json 은 byte 바로 String 변환해서 사용 : String msg = new String(msg, UTF_8);
             RmqJsonConsumer jsonConsumer = new RmqJsonConsumer(scenario);
             jsonConsumer.jsonMsgProcessing(msg);
         }

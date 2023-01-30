@@ -1,19 +1,17 @@
 package com.uangel;
 
-import com.uangel.executor.UScheduledExecutorService;
-import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.util.SleepUtil;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.junit.Before;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author dajin kim
  */
+@Slf4j
 public class TestScenarioRunner {
 
     private final List<String> uac = new ArrayList<>();
@@ -26,7 +24,7 @@ public class TestScenarioRunner {
     }
 
     @Test
-    public void testMRFExternalBasicFlow() {
+    public void testMRFExternalBasicFlow() throws ExecutionException, InterruptedException {
         String uacQueue = "T_MRFC";
         String uasQueue = "T_MRFP";
         String host = "192.168.7.34";
@@ -58,29 +56,16 @@ public class TestScenarioRunner {
         addCommonArgs("rts", "2");
         addCommonArgs("rqs", "5");
         addCommonArgs("ts", "5");
-        addCommonArgs( "m", "1");
+        addCommonArgs( "m", "2");
 
-        //CompletableFuture<String> f = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUasArgs()));
-        //CompletableFuture<String> f2 = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUacArgs()));
+        // MRFP
+        CompletableFuture<String> f = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUasArgs()));
+        SleepUtil.trySleep(2000);
+        // MRFC
+        CompletableFuture<String> f2 = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUacArgs()));
 
-        //System.out.println(f);
-        //System.out.println(f2);
-
-        //CompletableFuture<String> f = new CompletableFuture<>();
-
-        UScheduledExecutorService UasExecutor = new UScheduledExecutorService(1,
-                new BasicThreadFactory.Builder()
-                        .namingPattern("UasExecutor" + "-%d")
-                        .priority(Thread.MAX_PRIORITY)
-                        .build());
-        UScheduledExecutorService UacExecutor = new UScheduledExecutorService(1,
-                new BasicThreadFactory.Builder()
-                        .namingPattern("UacExecutor" + "-%d")
-                        .priority(Thread.MAX_PRIORITY)
-                        .build());
-        CompletableFuture<String> f = (CompletableFuture<String>) UasExecutor.submit(() -> new ScenarioRunner().run(getUasArgs()));
-        SleepUtil.trySleep(500);
-        CompletableFuture<String> f2 = (CompletableFuture<String>) UacExecutor.submit(() -> new ScenarioRunner().run(getUacArgs()));
+        log.debug("f : [{}]", f.get());
+        log.debug("f2 : [{}]", f2.get());
 
         SleepUtil.trySleep(30000);
     }

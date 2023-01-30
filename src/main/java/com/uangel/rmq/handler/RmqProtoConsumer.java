@@ -35,13 +35,13 @@ public class RmqProtoConsumer {
         try {
             // Byte Array -> Object
             String className = config.getProtoPkg() + scenario.getMsgClassName();
-            log.debug("RmqProtoConsumer ClassName [{}]", className);
+            //log.debug("RmqProtoConsumer ClassName [{}]", className);
             Object msgObj = jarReflection.parseFrom(className, msg);
             log.debug("RmqProtoConsumer RecvMsg [{}]", msgObj);
 
             // Object -> Pretty Json
             String json = ProtoUtil.buildProto(msgObj);
-            log.debug("RmqProtoConsumer PrettyJson [{}]", json);
+            //log.debug("RmqProtoConsumer PrettyJson [{}]", json);
 
             // Parse KeyWord
             Map<String, String> fields = jarReflection.getAllFieldsMap(msgObj);

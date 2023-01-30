@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenario name="mrfp_basic_flow">
+
+    <recv class="Message">
+        <body class="DialogStartReq"/>
+    </recv>
+
+    <send class="Message">
+        <header class="header">
+            <field name="type" type="str" value="DIALOG_START_RES"/>
+            <field name="tId" type="str" value="[last_tId]"/>
+            <field name="msgFrom" type="str" value="MRFP"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+            <field name="dialogId" type="str" value="[last_dialogId]"/>
+        </header>
+        <body class="DialogStartRes">
+            <field name="sdp" type="str" value="[last_sdp]"/>
+            <field name="reasonCode" type="int" value="200"/>
+            <field name="reason" type="str" value="success"/>
+        </body>
+    </send>
+
+    <recv class="Message">
+        <body class="DialogSetupReq"/>
+    </recv>
+
+    <send class="Message">
+        <header class="header">
+            <field name="type" type="str" value="DIALOG_SETUP_RES"/>
+            <field name="tId" type="str" value="[last_tId]"/>
+            <field name="msgFrom" type="str" value="MRFP"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+            <field name="dialogId" type="str" value="[last_dialogId]"/>
+        </header>
+        <body class="DialogSetupRes">
+            <field name="reasonCode" type="int" value="200"/>
+            <field name="reason" type="str" value="success"/>
+        </body>
+    </send>
+
+    <recv class="Message">
+        <body class="DialogStopReq"/>
+    </recv>
+
+    <send class="Message">
+        <header class="header">
+            <field name="type" type="str" value="DIALOG_STOP_RES"/>
+            <field name="tId" type="str" value="[last_tId]"/>
+            <field name="msgFrom" type="str" value="MRFP"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+            <field name="dialogId" type="str" value="[last_dialogId]"/>
+        </header>
+        <body class="DialogStopRes">
+            <field name="recordResult" type="int" value="1"/>
+            <field name="recordFile" type="str" value="recordFile.wav"/>
+            <field name="reasonCode" type="int" value="200"/>
+            <field name="reason" type="str" value="success"/>
+        </body>
+    </send>
+
+</scenario>

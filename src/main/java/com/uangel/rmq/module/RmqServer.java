@@ -77,7 +77,7 @@ public class RmqServer {
 
             // if (rmqMsg == null) return;
 
-            log.debug("Received MSG [{}]", new String(msg));
+            //log.debug("Received MSG [{}]", new String(msg));
 
             try {
                 queue.put(msg);

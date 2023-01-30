@@ -43,13 +43,13 @@ public class ScenarioRunner {
 
     public String run(String[] args) {
 
-        // Parse Command Line -> 별도 모듈로 분리
+        // Parse Command Line -> todo 별도 모듈로 분리
         CommandLineParser parser = new DefaultParser();
         try {
             CommandLine cmd = parser.parse(CommandInfo.createOptions(), args);
             this.cmdInfo = new CommandInfo(cmd);
             if (cmd.hasOption("h") || (cmdInfo.getScenarioFile() == null)) {
-                // todo
+                // todo cmdLineSyntax 수정
                 new HelpFormatter().printHelp("sipp.jar [OPTIONS] remotehost[:port]", CommandInfo.createOptions());
                 return null;
             }
@@ -73,7 +73,7 @@ public class ScenarioRunner {
                 return null;
             }
             scenario.setCmdInfo(cmdInfo);
-            log.debug("{}", cmdInfo);
+            //log.debug("{}", cmdInfo);
             log.debug("{}", scenario.getMsgNameList());
 
             if (scenario.isProtoType()) {

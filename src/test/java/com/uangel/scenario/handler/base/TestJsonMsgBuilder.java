@@ -2,7 +2,6 @@ package com.uangel.scenario.handler.base;
 
 import com.uangel.command.CommandInfo;
 import com.uangel.model.SessionInfo;
-import com.uangel.reflection.JarReflection;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
 import com.uangel.scenario.phases.SendPhase;
@@ -19,8 +18,7 @@ import java.io.IOException;
 /**
  * @author dajin kim
  */
-public class TestProtoMsgBuilder {
-
+public class TestJsonMsgBuilder {
     private final KeywordMapper keywordMapper = new KeywordMapper();
     private Scenario scenario;
     private SessionInfo sessionInfo;
@@ -29,9 +27,8 @@ public class TestProtoMsgBuilder {
     public void prepareUserCmd() throws ParseException, IOException, SAXException {
         // CommandInfo
         String localIp = "127.0.0.1";
-        String[] args = {"-sf", "./src/main/resources/scenario/mrfc_basic.xml",
-                "-t", "proto", "-pf", "./src/main/resources/proto/mrfp-external-msg-1.0.3.jar",
-                "-pkg", "com.uangel.protobuf.mrfp.external",
+        String[] args = {"-sf", "./src/main/resources/scenario/mrfc_basic_json.xml",
+                "-t", "json",
                 "-rl", "local_queue", "-rh", localIp,
                 "-rp", "5672", "-m", "1"};
 
@@ -49,21 +46,17 @@ public class TestProtoMsgBuilder {
 
         // KeywordMapper
         keywordMapper.addUserCmd("tId", "java.util.UUID.randomUUID().toString()");
-        keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
-        scenario.setKeywordMapper(keywordMapper);
+        //keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
+        keywordMapper.addUserCmd("timestamp", "java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss.SSS\"))");
 
-        // Jar
-        String jarPath = cmdInfo.getProtoFile();
-        JarReflection jarReflection = new JarReflection(jarPath);
-        jarReflection.loadJarFile();
-        scenario.setJarReflection(jarReflection);
+        scenario.setKeywordMapper(keywordMapper);
     }
 
     @Test
-    public void protoMsgBuild() {
+    public void jsonMsgBuild() {
         SendPhase sendPhase = (SendPhase) scenario.getPhase(0);
-        ProtoMsgBuilder msgBuilder = new ProtoMsgBuilder(sessionInfo);
+        JsonMsgBuilder msgBuilder = new JsonMsgBuilder(sessionInfo);
         byte[] msg = msgBuilder.build(sendPhase);
-        System.out.println("Msg : " + msg);
+        System.out.println("Msg : " + new String(msg));
     }
 }
