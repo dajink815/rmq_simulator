@@ -25,14 +25,12 @@ import java.util.List;
 @Slf4j
 public class ScenarioRunner {
 
-    private CommandInfo cmdInfo;
     private Scenario scenario;
     private String name;
 
-    private SessionManager sessionManager;
     private UScheduledExecutorService scheduledExecutorService;
 
-    public RmqManager rmqManager;
+    private RmqManager rmqManager;
 
     //private boolean isShutdown = false;
 
@@ -45,12 +43,12 @@ public class ScenarioRunner {
 
         // Parse Command Line -> todo 별도 모듈로 분리
         CommandLineParser parser = new DefaultParser();
+        CommandInfo cmdInfo;
         try {
             CommandLine cmd = parser.parse(CommandInfo.createOptions(), args);
-            this.cmdInfo = new CommandInfo(cmd);
+            cmdInfo = new CommandInfo(cmd);
             if (cmd.hasOption("h") || (cmdInfo.getScenarioFile() == null)) {
-                // todo cmdLineSyntax 수정
-                new HelpFormatter().printHelp("sipp.jar [OPTIONS] remotehost[:port]", CommandInfo.createOptions());
+                new HelpFormatter().printHelp("urmqgen.jar [OPTIONS] (see -h options)", CommandInfo.createOptions());
                 return null;
             }
             // mode, proto jar file
@@ -61,7 +59,7 @@ public class ScenarioRunner {
 
         } catch (Exception e) {
             log.error("[{}] ScenarioRunner.run.CommandLine.Exception ", this.name, e);
-            new HelpFormatter().printHelp("sipp.jar [OPTIONS] remotehost[:port]", CommandInfo.createOptions());
+            new HelpFormatter().printHelp("urmqgen.jar [OPTIONS] (see -h options)", CommandInfo.createOptions());
             return null;
         }
 
@@ -105,8 +103,8 @@ public class ScenarioRunner {
             Thread.currentThread().setName(name);
 
             // Create Thread Pool
-            int threadSize = this.cmdInfo.getThreadSize() <= 0 ?
-                    Runtime.getRuntime().availableProcessors() : this.cmdInfo.getThreadSize();
+            int threadSize = cmdInfo.getThreadSize() <= 0 ?
+                    Runtime.getRuntime().availableProcessors() : cmdInfo.getThreadSize();
             this.scheduledExecutorService = new UScheduledExecutorService(threadSize,
                     new BasicThreadFactory.Builder()
                             .namingPattern(this.name + "-%d")
@@ -125,7 +123,7 @@ public class ScenarioRunner {
             scenario.setRmqManager(rmqManager);
 
             // Scenario Run
-            sessionManager = new SessionManager(scenario);
+            SessionManager sessionManager = new SessionManager(scenario);
             scenario.setSessionManager(sessionManager);
             sessionManager.createSessionByRate();
 
@@ -138,8 +136,8 @@ public class ScenarioRunner {
             // Check if the scenario is over and clean up resources
             // when the scenario is over
             while (!scenario.isTestEnded()) {
-                if (this.cmdInfo.getMaxCall() > 0
-                        && sessionManager.getSessionCnt() >= this.cmdInfo.getMaxCall()
+                if (cmdInfo.getMaxCall() > 0
+                        && sessionManager.getSessionCnt() >= cmdInfo.getMaxCall()
                         && sessionManager.isSessionEmpty()) {
                     stop(); // "Scenario Ended"
                 }/* else if (isShutdown && sipCallList.isEmpty()) {

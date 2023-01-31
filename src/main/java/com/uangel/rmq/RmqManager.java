@@ -106,7 +106,7 @@ public class RmqManager {
 
     private boolean addClient(String target, String host, String user, String pass, int port) {
         boolean result = false;
-        if (rmqClientMap.get(target) == null) {
+        if (StringUtil.notNull(target) && rmqClientMap.get(target) == null) {
             RmqClient client = new RmqClient(host, user, pass, target, port);
             result = client.start();
             if (result) rmqClientMap.put(target, client);

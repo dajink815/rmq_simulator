@@ -1,5 +1,6 @@
 package com.uangel.rmq.util;
 
+import com.uangel.service.ServiceDefine;
 import org.apache.commons.lang3.StringUtils;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.EnvironmentPBEConfig;
@@ -20,8 +21,11 @@ public class PasswdDecryptor {
     }
 
     public static void main(String[] args) throws Exception {
-        PasswdDecryptor decryptor = new PasswdDecryptor("skt_acs", "PBEWITHMD5ANDDES");
+        PasswdDecryptor decryptor = new PasswdDecryptor(ServiceDefine.U_RMQ.getStr(), ServiceDefine.PW_ALG.getStr());
         String tt = decryptor.encrypt("acs.123");
+        System.out.println(tt);
+        System.out.println(decryptor.decrypt0(tt));
+        tt = decryptor.encrypt("mrfp.123");
         System.out.println(tt);
         System.out.println(decryptor.decrypt0(tt));
     }

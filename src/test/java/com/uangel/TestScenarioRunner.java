@@ -60,14 +60,12 @@ public class TestScenarioRunner {
 
         // MRFP
         CompletableFuture<String> f = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUasArgs()));
-        SleepUtil.trySleep(2000);
+        SleepUtil.trySleep(1000);
         // MRFC
         CompletableFuture<String> f2 = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUacArgs()));
 
         log.debug("f : [{}]", f.get());
         log.debug("f2 : [{}]", f2.get());
-
-        SleepUtil.trySleep(30000);
     }
 
     public void addUacArgs(String option, String value) {

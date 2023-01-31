@@ -65,6 +65,10 @@ public class KeywordMapper {
                     return sessionInfo.getSessionId();
                 case "call_number" :
                     return Integer.toString(sessionInfo.getSessionNum());
+                case "rmq_local" :
+                    return sessionInfo.getScenario().getCmdInfo().getRmqLocal();
+                case "rmq_target" :
+                    return sessionInfo.getScenario().getCmdInfo().getRmqTarget();
                 default:
                     break;
             }
