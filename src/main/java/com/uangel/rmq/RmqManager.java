@@ -7,7 +7,6 @@ import com.uangel.rmq.module.RmqServer;
 import com.uangel.scenario.Scenario;
 import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,8 +18,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RmqManager {
     private final Scenario scenario;
     private final CommandInfo config;
-    private ExecutorService executorRmqService;
     private BlockingQueue<byte[]> rmqQueue;
+    private RmqConsumer rmqConsumer;
     private RmqServer rmqServer;
     private final ConcurrentHashMap<String, RmqClient> rmqClientMap = new ConcurrentHashMap<>();
 
@@ -57,25 +56,14 @@ public class RmqManager {
         if (!rmqClientMap.isEmpty()) {
             rmqClientMap.forEach((key, client) -> client.closeSender());
         }
-        if (executorRmqService != null) {
-            executorRmqService.shutdown();
-        }
+
     }
 
     private void startRmqConsumer() {
-        if (executorRmqService != null) return;
+        if (rmqConsumer != null) return;
 
-        // UScheduler
-        executorRmqService = Executors.newFixedThreadPool(config.getRmqThreadSize(),
-                new BasicThreadFactory.Builder()
-                        .namingPattern("[" + scenario.getName() + "] RmqConsumer-%d")
-                        //.namingPattern("RmqConsumer-%d")
-                        .build());
         rmqQueue = new ArrayBlockingQueue<>(config.getRmqQueueSize());
-
-        for (int i = 0; i < config.getRmqThreadSize(); i++) {
-            executorRmqService.execute(new RmqConsumer(rmqQueue, scenario));
-        }
+        rmqConsumer = new RmqConsumer(rmqQueue, scenario).run();
     }
 
     private boolean startRmqClient() {

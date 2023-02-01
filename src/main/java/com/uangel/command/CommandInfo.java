@@ -39,7 +39,6 @@ public class CommandInfo {
     private  int rmqTargetPort;
     private  String rmqTargetPass;
 
-    private  int rmqThreadSize;
     private  int rmqQueueSize;
 
     // Performance
@@ -93,7 +92,7 @@ public class CommandInfo {
         this.rmqTargetPort = Integer.parseInt(cmd.getOptionValue("rtp", "5672"));
         this.rmqTargetPass = cmd.getOptionValue("rtpw");
 
-        this.rmqThreadSize = Integer.parseInt(cmd.getOptionValue("rts", "10"));
+        // todo performance default value 체크
         this.rmqQueueSize = Integer.parseInt(cmd.getOptionValue("rqs", "1000"));
     }
 
@@ -145,10 +144,7 @@ public class CommandInfo {
         opts.addOption(Option.builder("rtp").argName("rmq_target_port").hasArg().desc("RMQ Target port").build());
         opts.addOption(Option.builder("rtpw").argName("rmq_target_pass").hasArg().desc("RMQ Target password").build());
 
-        opts.addOption(Option.builder("rts").argName("rmq_thread_size").hasArg().desc("RMQ Thread size").build());
         opts.addOption(Option.builder("rqs").argName("rmq_queue_size").hasArg().desc("RMQ Queue size").build());
-
-
         opts.addOption(Option.builder("ts").argName("thread_size").hasArg().desc("Thread size. (default : (limit / 20) + 10)").build());
 
         // Call behavior options

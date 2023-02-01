@@ -82,6 +82,7 @@ public class SessionManager {
 
         try {
             SessionInfo sessionInfo = new SessionInfo(getSessionCnt(), scenario);
+            log.debug("Created SessionInfo [{}]", sessionInfo.getSessionId());
             sessionList.add(sessionInfo);
             sessionMap.put(sessionInfo.getSessionId(), sessionInfo);
             sessionInfo.start();
@@ -93,6 +94,7 @@ public class SessionManager {
     }
 
     private void deleteSessionInfo(SessionInfo sessionInfo) {
+        log.debug("Deleted SessionInfo [{}]", sessionInfo.getSessionId());
         sessionList.remove(sessionInfo);
     }
 

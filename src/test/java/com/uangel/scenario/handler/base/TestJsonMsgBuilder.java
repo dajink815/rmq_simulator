@@ -14,12 +14,14 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author dajin kim
  */
 public class TestJsonMsgBuilder {
-    private final KeywordMapper keywordMapper = new KeywordMapper();
+
     private Scenario scenario;
     private SessionInfo sessionInfo;
 
@@ -45,6 +47,7 @@ public class TestJsonMsgBuilder {
         sessionInfo.addField("tId" ,"TEST_TID");
 
         // KeywordMapper
+        KeywordMapper keywordMapper = new KeywordMapper(scenario);
         keywordMapper.addUserCmd("tId", "java.util.UUID.randomUUID().toString()");
         //keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
         keywordMapper.addUserCmd("timestamp", "java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss.SSS\"))");
@@ -57,6 +60,48 @@ public class TestJsonMsgBuilder {
         SendPhase sendPhase = (SendPhase) scenario.getPhase(0);
         JsonMsgBuilder msgBuilder = new JsonMsgBuilder(sessionInfo);
         byte[] msg = msgBuilder.build(sendPhase);
-        System.out.println("Msg : " + new String(msg));
+        String strMsg = new String(msg);
+        System.out.println("Msg : " + strMsg);
+
+    }
+
+    private void parseJsonStr(String json) {
+
+        Pattern keyPattern = Pattern.compile("\\{(.*?)\\}");
+        Matcher m = keyPattern.matcher(json);
+
+        while (m.find()) {
+            System.out.println("group : " + m.group());
+            System.out.println("group 0 : " + m.group(0));
+        }
+
+        if (json.startsWith("{")) {
+            json = json.substring(1);
+        }
+        if (json.endsWith("}")) {
+            json = json.substring(0, json.length() - 1);
+        }
+        System.out.println(json);
+    }
+
+    @Test
+    public void parseJson() {
+        String json = "{\n" +
+                "  \"header\": {\n" +
+                "    \"msgFrom\": \"MRFC\",\n" +
+                "    \"type\": \"DIALOG_START_REQ\",\n" +
+                "    \"dialogId\": \"420cd67a-40f4-4f87-84b2-af0a53efb028_1\",\n" +
+                "    \"tId\": \"32cc8969-0915-4d32-b95b-303b7e21f0b5\",\n" +
+                "    \"timestamp\": \"2023-01-31 08:32:03.796\"\n" +
+                "  },\n" +
+                "  \"DialogStartReq\": {\n" +
+                "    \"fromNo\": \"010-1111-2222\",\n" +
+                "    \"toNo\": \"010-3333-4444\",\n" +
+                "    \"sdp\": \"v\\\\u003d0\\\\r\\\\no\\\\u003damf 0 0 IN IP4 100.100.100.57\\\\r\\\\ns\\\\u003d-\\\\r\\\\nc\\\\u003dIN IP4 192.168.7.34\\\\r\\\\nt\\\\u003d0 0\\\\r\\\\nm\\\\u003daudio 10022 RTP/AVP 97 99\\\\r\\\\na\\\\u003drtpmap:97 AMR-WB/16000/1\\\\r\\\\na\\\\u003dfmtp:97 octet-align\\\\u003d1; mode-set\\\\u003d7\\\\r\\\\na\\\\u003drtpmap:99 telephone-event/8000\\\\r\\\\na\\\\u003dfmtp:99 0-16\\\\r\\\\na\\\\u003dptime:20\\\\r\\\\na\\\\u003dsendrecv\\\\r\\\\na\\\\u003ddirection:active\\\\r\\\\n\"\n" +
+                "  }\n" +
+                "}";
+
+        System.out.println(json);
+        parseJsonStr(json);
     }
 }

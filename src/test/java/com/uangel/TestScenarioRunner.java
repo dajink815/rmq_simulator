@@ -53,10 +53,9 @@ public class TestScenarioRunner {
         addCommonArgs("rtu", user);
         addCommonArgs("rtp", port);
         addCommonArgs("rtpw", pass);
-        addCommonArgs("rts", "2");
         addCommonArgs("rqs", "5");
         addCommonArgs("ts", "5");
-        addCommonArgs( "m", "2");
+        addCommonArgs( "m", "1");
 
         // MRFP
         CompletableFuture<String> f = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUasArgs()));
