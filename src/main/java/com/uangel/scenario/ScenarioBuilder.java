@@ -60,8 +60,8 @@ public class ScenarioBuilder {
     }
 
     public static Scenario fromXMLDocument(Document doc) {
-        Element scenario = doc.getDocumentElement();
-        NamedNodeMap attr = scenario.getAttributes();
+        Element scenarioEle = doc.getDocumentElement();
+        NamedNodeMap attr = scenarioEle.getAttributes();
         Node nameAttr = attr.getNamedItem(AttrName.NAME.getValue());
         String name = "Unnamed Scenario";
         if (nameAttr != null) {
@@ -69,25 +69,40 @@ public class ScenarioBuilder {
             name = nameAttr.getTextContent();
         }
         List<MsgPhase> msgPhases = new ArrayList<>();
+        List<LoopPhase> loopPhases = new ArrayList<>();
         int idx = 0;
-        for (Node m = scenario.getFirstChild(); m != null; m = m.getNextSibling()) {
+        for (Node m = scenarioEle.getFirstChild(); m != null; m = m.getNextSibling()) {
             switch (m.getNodeName()) {
-                case "recv":
-                    RecvPhase recvPhase = new RecvPhase(m, idx++);
-                    msgPhases.add(recvPhase);
+                case "recv" :
+                    msgPhases.add(new RecvPhase(m, idx++));
                     break;
-                case "send":
-                    SendPhase sendPhase = new SendPhase(m, idx++);
-                    msgPhases.add(sendPhase);
+                case "send" :
+                    msgPhases.add(new SendPhase(m, idx++));
                     break;
-                case "pause":
+                case "pause" :
                     msgPhases.add(new PausePhase(m, idx++));
                     break;
-                default:
+                case "loop" :
+                    loopPhases.add(new LoopPhase(m, 0));
+
+                    // xml test (consume loop phase's next phase)
+/*                    m = m.getNextSibling().getNextSibling();
+                    System.out.println("Loop Next Phase : " + m.getNodeName());*/
+
+                    /*LoopPhase loopPhase = new LoopPhase(m, 0);
+                    System.out.println(loopPhase.getMsgName());*/
+/*                    SendPhase sendPhase = new SendPhase(m, 0);
+                    System.out.println(sendPhase.getMsgName());*/
+                    break;
+                    // todo label phase
+                default :
+                    //System.out.println("Default Phase :" + m.getNodeName());
                     break;
             }
         }
-        return new Scenario(name, msgPhases);
+        Scenario scenario = new Scenario(name, msgPhases);
+        scenario.setLoopPhases(loopPhases);
+        return scenario;
     }
 
     private static DocumentBuilder getDefaultDocumentBuilder() {

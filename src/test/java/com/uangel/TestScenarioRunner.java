@@ -2,6 +2,7 @@ package com.uangel;
 
 import com.uangel.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Before;
 import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,17 +15,14 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class TestScenarioRunner {
 
+    private static final String MRFC_SCENARIO = "mrfc_basic_hb.xml";
+    private static final String MRFP_SCENARIO = "mrfp_basic_hb.xml";
+    private static final String CALL_NUM = "1";
     private final List<String> uac = new ArrayList<>();
     private final List<String> uas = new ArrayList<>();
 
-    @Test
-    public void testHelpCommandInfo() {
-        String[] args = {"-h"};
-        new ScenarioRunner().run(args);
-    }
-
-    @Test
-    public void testMRFExternalBasicFlow() throws ExecutionException, InterruptedException {
+    @Before
+    public void prepareOptions() {
         String uacQueue = "T_MRFC";
         String uasQueue = "T_MRFP";
         String host = "192.168.7.34";
@@ -33,11 +31,11 @@ public class TestScenarioRunner {
         String pass = "/0Un3ig1ynr9ZHdEPM/22w==";
 
         // Uac
-        addUacArgs("sf", "./src/main/resources/scenario/mrfc_basic.xml");
+        addUacArgs("sf", "./src/main/resources/scenario/" + MRFC_SCENARIO);
         addUacArgs("rl", uacQueue);
         addUacArgs("rt", uasQueue);
         // Uas
-        addUasArgs("sf", "./src/main/resources/scenario/mrfp_basic.xml");
+        addUasArgs("sf", "./src/main/resources/scenario/" + MRFP_SCENARIO);
         addUasArgs("rl", uasQueue);
         addUasArgs("rt", uacQueue);
         // Common
@@ -55,8 +53,17 @@ public class TestScenarioRunner {
         addCommonArgs("rtpw", pass);
         addCommonArgs("rqs", "5");
         addCommonArgs("ts", "5");
-        addCommonArgs( "m", "1");
+        addCommonArgs( "m", CALL_NUM);
+    }
 
+    @Test
+    public void testHelpCommandInfo() {
+        String[] args = {"-h"};
+        new ScenarioRunner().run(args);
+    }
+
+    @Test
+    public void testMRFExternalBasicFlow() throws ExecutionException, InterruptedException {
         // MRFP
         CompletableFuture<String> f = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUasArgs()));
         SleepUtil.trySleep(1000);

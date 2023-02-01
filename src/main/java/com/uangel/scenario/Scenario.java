@@ -8,14 +8,14 @@ import com.uangel.model.SimType;
 import com.uangel.reflection.JarReflection;
 import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.handler.base.KeywordMapper;
+import com.uangel.scenario.phases.LoopPhase;
 import com.uangel.scenario.phases.MsgPhase;
 import com.uangel.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,6 +28,7 @@ public class Scenario extends MsgInfoManager {
 
     private final String name;
     private final List<MsgPhase> phases;
+    private List<LoopPhase> loopPhases;
     private final Map<String, String> fields = new HashMap<>();
     private CommandInfo cmdInfo;
     private SessionManager sessionManager;
@@ -57,6 +58,19 @@ public class Scenario extends MsgInfoManager {
         return phases.size();
     }
 
+    public LoopPhase getLoopPhase(int idx) {
+        if (loopPhases == null) return null;
+        return this.loopPhases.get(idx);
+    }
+
+    public void addFields(Map<String, String> addFields) {
+        fields.putAll(addFields);
+    }
+    public void addField(String fieldName, String value) {
+        fields.put(fieldName, value);
+    }
+    public String getFieldValue(String key) {
+        return fields.get(key);
     }
 
     public boolean isProtoType() {
@@ -84,9 +98,13 @@ public class Scenario extends MsgInfoManager {
 
     @Override
     public String toString() {
+        int phaseSize = (phases != null)? phases.size() : 0;
+        int loopPhaseSize = (loopPhases != null)? loopPhases.size() : 0;
+
         return "Scenario{" +
                 "name='" + name + '\'' +
-                ", phases=" + phases +
+                ", phases(" + phaseSize + ")=" + phases +
+                ", loopPhases(" + loopPhaseSize + ")=" + loopPhases +
                 '}';
     }
 }

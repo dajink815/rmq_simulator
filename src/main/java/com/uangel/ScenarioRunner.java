@@ -7,6 +7,7 @@ import com.uangel.model.SessionManager;
 import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
+import com.uangel.scenario.handler.LoopMsgHandler;
 import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -100,6 +101,11 @@ public class ScenarioRunner {
             }
             scenario.setRmqManager(rmqManager);
 
+            // Loop Message
+            LoopMsgHandler loopMsgHandler = new LoopMsgHandler(scenario);
+            loopMsgHandler.start();
+
+            // todo Loop 메시지 먼저 처리 후 시나리오 시작
             // Scenario Run
             SessionManager sessionManager = new SessionManager(scenario);
             scenario.setSessionManager(sessionManager);

@@ -5,6 +5,7 @@ import com.uangel.model.SessionInfo;
 import com.uangel.reflection.JarReflection;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
+import com.uangel.scenario.phases.LoopPhase;
 import com.uangel.scenario.phases.SendPhase;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -21,7 +22,7 @@ import java.io.IOException;
  */
 public class TestProtoMsgBuilder {
 
-    private final KeywordMapper keywordMapper = new KeywordMapper();
+    private static final String SCENARIO_NAME = "mrfc_basic_hb.xml";
     private Scenario scenario;
     private SessionInfo sessionInfo;
 
@@ -29,7 +30,7 @@ public class TestProtoMsgBuilder {
     public void prepareUserCmd() throws ParseException, IOException, SAXException {
         // CommandInfo
         String localIp = "127.0.0.1";
-        String[] args = {"-sf", "./src/main/resources/scenario/mrfc_basic.xml",
+        String[] args = {"-sf", "./src/main/resources/scenario/" + SCENARIO_NAME,
                 "-t", "proto", "-pf", "./src/main/resources/proto/mrfp-external-msg-1.0.3.jar",
                 "-pkg", "com.uangel.protobuf.mrfp.external",
                 "-rl", "local_queue", "-rh", localIp,
@@ -48,6 +49,7 @@ public class TestProtoMsgBuilder {
         sessionInfo.addField("tId" ,"TEST_TID");
 
         // KeywordMapper
+        KeywordMapper keywordMapper = new KeywordMapper(scenario);
         keywordMapper.addUserCmd("tId", "java.util.UUID.randomUUID().toString()");
         keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
         scenario.setKeywordMapper(keywordMapper);
@@ -60,10 +62,20 @@ public class TestProtoMsgBuilder {
     }
 
     @Test
-    public void protoMsgBuild() {
+    public void testProtoMsgBuilder() {
         SendPhase sendPhase = (SendPhase) scenario.getPhase(0);
         ProtoMsgBuilder msgBuilder = new ProtoMsgBuilder(sessionInfo);
         byte[] msg = msgBuilder.build(sendPhase);
+        System.out.println("Msg : " + msg);
+    }
+
+    @Test
+    public void testLoopProtoMsgBuilder() {
+        LoopPhase loopPhase = scenario.getLoopPhase(0);
+        if (loopPhase == null) return;
+
+        LoopProtoMsgBuilder msgBuilder = new LoopProtoMsgBuilder(scenario);
+        byte[] msg = msgBuilder.build(loopPhase);
         System.out.println("Msg : " + msg);
     }
 }

@@ -24,4 +24,19 @@ public class TestScenarioBuilder {
         System.out.println(scenario);
     }
 
+    @Test
+    public void parseMrfcHbScenario() throws IOException, SAXException {
+        String filePath = "./src/main/resources/scenario/mrfc_basic_hb.xml";
+        Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
+        System.out.println(scenario);
+    }
+
+    @Test
+    public void parseMrfpHbScenario() throws IOException, SAXException {
+        String filePath = "./src/main/resources/scenario/mrfp_basic_hb.xml";
+        Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
+        System.out.println(scenario);
+        System.out.println(scenario.getMsgNameList());
+    }
+
 }
