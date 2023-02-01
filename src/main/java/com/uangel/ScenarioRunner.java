@@ -1,6 +1,7 @@
 package com.uangel;
 
 import com.uangel.command.CommandInfo;
+import com.uangel.command.CommandLineManager;
 import com.uangel.executor.UScheduledExecutorService;
 import com.uangel.model.SessionManager;
 import com.uangel.reflection.JarReflection;
@@ -11,10 +12,6 @@ import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.util.SleepUtil;
 import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.util.List;
@@ -29,7 +26,6 @@ public class ScenarioRunner {
     private String name;
 
     private UScheduledExecutorService scheduledExecutorService;
-
     private RmqManager rmqManager;
 
     //private boolean isShutdown = false;
@@ -41,25 +37,10 @@ public class ScenarioRunner {
 
     public String run(String[] args) {
 
-        // Parse Command Line -> todo 별도 모듈로 분리
-        CommandLineParser parser = new DefaultParser();
-        CommandInfo cmdInfo;
-        try {
-            CommandLine cmd = parser.parse(CommandInfo.createOptions(), args);
-            cmdInfo = new CommandInfo(cmd);
-            if (cmd.hasOption("h") || (cmdInfo.getScenarioFile() == null)) {
-                new HelpFormatter().printHelp("urmqgen.jar [OPTIONS] (see -h options)", CommandInfo.createOptions());
-                return null;
-            }
-            // mode, proto jar file
+        // Parse Command Line
+        CommandInfo cmdInfo = CommandLineManager.parseCommandLine(args);
+        if (cmdInfo == null) {
 
-            // reflection exec 실행 테스트
-
-            // rmq pw
-
-        } catch (Exception e) {
-            log.error("[{}] ScenarioRunner.run.CommandLine.Exception ", this.name, e);
-            new HelpFormatter().printHelp("urmqgen.jar [OPTIONS] (see -h options)", CommandInfo.createOptions());
             return null;
         }
 
