@@ -3,7 +3,6 @@ package com.uangel.scenario.handler.base;
 import com.uangel.model.SessionInfo;
 import com.uangel.reflection.JarReflection;
 import com.uangel.reflection.ReflectionUtil;
-import com.uangel.scenario.Scenario;
 import com.uangel.scenario.model.FieldInfo;
 import com.uangel.scenario.model.HeaderBodyInfo;
 import com.uangel.scenario.phases.SendPhase;
@@ -11,21 +10,20 @@ import com.uangel.scenario.type.FieldType;
 import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author dajin kim
  */
 @Slf4j
-public class ProtoMsgBuilder implements MsgBuilder {
+public class ProtoMsgBuilder extends MsgBuilder {
 
     private final JarReflection jarReflection;
-    private final SessionInfo sessionInfo;
-    private final Scenario scenario;
 
     public ProtoMsgBuilder(SessionInfo sessionInfo) {
-        this.sessionInfo = sessionInfo;
-        this.scenario = sessionInfo.getScenario();
+        super(sessionInfo);
         this.jarReflection = scenario.getJarReflection();
     }
 
@@ -62,11 +60,12 @@ public class ProtoMsgBuilder implements MsgBuilder {
 
         try {
             Object builder = jarReflection.getNewBuilder(pkgBase + msgInfo.getClassName());
-
             List<FieldInfo> fieldInfos = msgInfo.getFieldInfos();
+            Map<String, String> fields = new HashMap<>();
 
             for (FieldInfo fieldInfo : fieldInfos) {
-                String methodName = jarReflection.getMethodName(fieldInfo.getName());
+                String fieldName = fieldInfo.getName();
+                String methodName = jarReflection.getMethodName(fieldName);
                 FieldType type = fieldInfo.getType();
                 String value = fieldInfo.getValue();
 
@@ -83,6 +82,8 @@ public class ProtoMsgBuilder implements MsgBuilder {
                 KeywordMapper keywordMapper = scenario.getKeywordMapper();
                 value = keywordMapper.replaceKeyword(sessionInfo, value);
 
+                if (StringUtil.isNull(value)) continue;
+
                 // Type 별 세팅
                 if (FieldType.STR.equals(type)) {
                     builder = jarReflection.invokeObjMethod(methodName, builder, value);
@@ -94,6 +95,11 @@ public class ProtoMsgBuilder implements MsgBuilder {
                     builder = jarReflection.invokeBoolMethod(methodName, builder, Boolean.parseBoolean(value));
                 }
 
+                fields.put(fieldName, value);
+            }
+
+            if (!fields.isEmpty()) {
+                sessionInfo.addFields(fields);
             }
 
             return jarReflection.build(builder);

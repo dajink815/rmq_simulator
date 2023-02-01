@@ -13,20 +13,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author dajin kim
  */
 @Slf4j
-public class JsonMsgBuilder implements MsgBuilder {
-
-    private final SessionInfo sessionInfo;
-    private final Scenario scenario;
+public class JsonMsgBuilder extends MsgBuilder {
 
     public JsonMsgBuilder(SessionInfo sessionInfo) {
-        this.sessionInfo = sessionInfo;
-        this.scenario = sessionInfo.getScenario();
+        super(sessionInfo);
     }
 
     @Override
@@ -62,8 +60,10 @@ public class JsonMsgBuilder implements MsgBuilder {
 
         try {
             List<FieldInfo> fieldInfos = msgInfo.getFieldInfos();
+            Map<String, String> fields = new HashMap<>();
+
             for (FieldInfo fieldInfo : fieldInfos) {
-                String name = fieldInfo.getName();
+                String fieldName = fieldInfo.getName();
                 FieldType type = fieldInfo.getType();
                 String value = fieldInfo.getValue();
 
@@ -80,17 +80,24 @@ public class JsonMsgBuilder implements MsgBuilder {
                 KeywordMapper keywordMapper = scenario.getKeywordMapper();
                 value = keywordMapper.replaceKeyword(sessionInfo, value);
 
+                if (StringUtil.isNull(value)) continue;
+
                 // Type 별 세팅
                 if (FieldType.STR.equals(type)) {
-                    data.put(name, value);
+                    data.put(fieldName, value);
                 } else if (FieldType.INT.equals(type)) {
-                    data.put(name, Integer.parseInt(value));
+                    data.put(fieldName, Integer.parseInt(value));
                 } else if (FieldType.LONG.equals(type)) {
-                    data.put(name, Long.parseLong(value));
+                    data.put(fieldName, Long.parseLong(value));
                 } else if (FieldType.BOOL.equals(type)) {
-                    data.put(name, Boolean.parseBoolean(value));
+                    data.put(fieldName, Boolean.parseBoolean(value));
                 }
 
+                fields.put(fieldName, value);
+            }
+
+            if (!fields.isEmpty()) {
+                sessionInfo.addFields(fields);
             }
 
         } catch (Exception e) {
