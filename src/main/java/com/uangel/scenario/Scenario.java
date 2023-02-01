@@ -10,6 +10,8 @@ import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.scenario.phases.LoopPhase;
 import com.uangel.scenario.phases.MsgPhase;
+import com.uangel.scenario.phases.RecvPhase;
+import com.uangel.scenario.phases.SendPhase;
 import com.uangel.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,6 +59,27 @@ public class Scenario extends MsgInfoManager {
     public int getScenarioSize() {
         return phases.size();
     }
+
+    public SendPhase getFirstSendPhase() {
+        for (MsgPhase msgPhase : phases) {
+            if (msgPhase instanceof SendPhase s) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public int getFirstRecvPhaseIdx() {
+        int index = 0;
+        for (MsgPhase msgPhase : phases) {
+            if (msgPhase instanceof RecvPhase r && !r.getOptional()) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
 
     public LoopPhase getLoopPhase(int idx) {
         if (loopPhases == null) return null;

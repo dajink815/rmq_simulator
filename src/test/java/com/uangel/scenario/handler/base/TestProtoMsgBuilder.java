@@ -63,7 +63,8 @@ public class TestProtoMsgBuilder {
 
     @Test
     public void testProtoMsgBuilder() {
-        SendPhase sendPhase = (SendPhase) scenario.getPhase(0);
+        SendPhase sendPhase = scenario.getFirstSendPhase();
+        if (sendPhase == null) return;
         ProtoMsgBuilder msgBuilder = new ProtoMsgBuilder(sessionInfo);
         byte[] msg = msgBuilder.build(sendPhase);
         System.out.println("Msg : " + msg);

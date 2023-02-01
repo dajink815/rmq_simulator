@@ -54,7 +54,7 @@ public class ScenarioRunner {
 
             String scenarioName = scenario.getName();
             scenario.setCmdInfo(cmdInfo);
-            log.info("[{}] Scenario Parsing Complete {}", scenarioName, scenario.getMsgNameList());
+            log.info("[{}] Scenario Parsing Completed {}", scenarioName, scenario.getMsgNameList());
 
             // Load ProtoBuf Package File
             if (!scenario.initJarReflection(cmdInfo)) {

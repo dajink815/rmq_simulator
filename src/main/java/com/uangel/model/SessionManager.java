@@ -82,7 +82,7 @@ public class SessionManager {
 
         try {
             SessionInfo sessionInfo = new SessionInfo(getSessionCnt(), scenario);
-            log.debug("Created SessionInfo [{}]", sessionInfo.getSessionId());
+            log.info("Created SessionInfo [{}]", sessionInfo.getSessionId());
             sessionList.add(sessionInfo);
             sessionMap.put(sessionInfo.getSessionId(), sessionInfo);
             sessionInfo.start();
@@ -94,13 +94,13 @@ public class SessionManager {
     }
 
     private void deleteSessionInfo(SessionInfo sessionInfo) {
-        log.debug("Deleted SessionInfo [{}]", sessionInfo.getSessionId());
+        log.info("Deleted SessionInfo [{}]", sessionInfo.getSessionId());
         sessionList.remove(sessionInfo);
     }
 
     public void changeSessionId(String curId, String changeId) {
         if (sessionMap.containsKey(curId) && !curId.equals(changeId)) {
-            log.debug("Session Id Changed {} -> {}", curId, changeId);
+            log.info("Changed Session ID [{} -> {}]", curId, changeId);
             SessionInfo sessionInfo = sessionMap.get(curId);
             sessionMap.remove(curId);
             sessionInfo.setSessionId(changeId);

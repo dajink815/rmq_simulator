@@ -57,7 +57,7 @@ public class TestJsonMsgBuilder {
 
     @Test
     public void jsonMsgBuild() {
-        SendPhase sendPhase = (SendPhase) scenario.getPhase(0);
+        SendPhase sendPhase = scenario.getFirstSendPhase();
         JsonMsgBuilder msgBuilder = new JsonMsgBuilder(sessionInfo);
         byte[] msg = msgBuilder.build(sendPhase);
         String strMsg = new String(msg);

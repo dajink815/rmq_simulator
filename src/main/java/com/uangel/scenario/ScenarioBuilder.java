@@ -84,19 +84,10 @@ public class ScenarioBuilder {
                     break;
                 case "loop" :
                     loopPhases.add(new LoopPhase(m, 0));
-
-                    // xml test (consume loop phase's next phase)
-/*                    m = m.getNextSibling().getNextSibling();
-                    System.out.println("Loop Next Phase : " + m.getNodeName());*/
-
-                    /*LoopPhase loopPhase = new LoopPhase(m, 0);
-                    System.out.println(loopPhase.getMsgName());*/
-/*                    SendPhase sendPhase = new SendPhase(m, 0);
-                    System.out.println(sendPhase.getMsgName());*/
                     break;
-                    // todo label phase
+                case "label" :
+
                 default :
-                    //System.out.println("Default Phase :" + m.getNodeName());
                     break;
             }
         }

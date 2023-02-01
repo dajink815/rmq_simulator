@@ -3,12 +3,15 @@ package com.uangel.scenario.handler.phases;
 import com.uangel.model.SessionInfo;
 import com.uangel.scenario.phases.MsgPhase;
 import com.uangel.scenario.phases.RecvPhase;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author dajin kim
  */
+@Slf4j
 public class ProcRecvPhase extends ProcMsgPhase {
 
     public ProcRecvPhase(SessionInfo sessionInfo) {
@@ -19,7 +22,13 @@ public class ProcRecvPhase extends ProcMsgPhase {
     public void run(MsgPhase msgPhase) {
         RecvPhase recvPhase = (RecvPhase) msgPhase;
 
-        // Optional?
+        // Optional
+        if (Boolean.TRUE.equals(recvPhase.getOptional())) {
+            // Optional Phase 저장해놓고 따로 처리?
+            log.debug("({}) Pass Optional [{}]", sessionInfo.getSessionId(), recvPhase.getMsgName());
+            sessionInfo.execPhase(sessionInfo.increaseCurIdx());
+        }
+
         // timeout
 
         // Recv 단계엔 메시지 수신 했을 때 다음 단계로 진행 가능
@@ -40,7 +49,7 @@ public class ProcRecvPhase extends ProcMsgPhase {
         if (!sessionId.equals(sessionInfo.getSessionId())) {
             // SessionId가 동일하지 않지만 조건 맞는 경우 SessionId 갱신
             // todo 그 외 조건?
-            if (sessionInfo.getCurIdx() == 0) {
+            if (sessionInfo.getCurIdx() == scenario.getFirstRecvPhaseIdx()) {
                 //sessionInfo.setSessionId(sessionId);
                 sessionManager.changeSessionId(sessionInfo.getSessionId(), sessionId);
             } else {

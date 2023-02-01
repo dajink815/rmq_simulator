@@ -25,22 +25,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SessionInfo {
 
     private final UScheduledExecutorService executorService;
-
     private String sessionId;
     private final int sessionNum;
     private final Scenario scenario;
-
-    // todo 무슨 차이?
-    private final AtomicInteger currentIdx = new AtomicInteger();
-    private final AtomicInteger phaseCounter = new AtomicInteger();
-    private long lastExecTime = System.currentTimeMillis();
 
     private final ProcSendPhase procSendPhase;
     private final ProcRecvPhase procRecvPhase;
     private final ProcPausePhase procPausePhase;
 
+    private final AtomicInteger currentIdx = new AtomicInteger();
     private final Map<String, String> fields = new HashMap<>();
-
     private boolean isSessionEnded = false;
 
     public SessionInfo(int sessionNum, Scenario scenario) {
@@ -97,7 +91,6 @@ public class SessionInfo {
         this.executorService.submit(() -> {
             try {
                 if (isSessionEnded) return;
-                phaseCounter.incrementAndGet();
                 MsgPhase phase = scenario.phases().get(step);
                 if (phase instanceof SendPhase) {
                     log.debug("({}) SEND Phase Start [{}]", sessionId, phase.getIdx());
@@ -105,11 +98,10 @@ public class SessionInfo {
                 } else if (phase instanceof RecvPhase) {
                     log.debug("({}) RECV Phase Start [{}]", sessionId, phase.getIdx());
                     procRecvPhase.run(phase);
-                }  else if (phase instanceof PausePhase) {
-                    log.debug("({}) PAUSE Phase Start [{}] [{}]", sessionId, phase.getIdx(), ((PausePhase) phase).getMilliSeconds());
-                    procPausePhase.run(phase);
+                }  else if (phase instanceof PausePhase p) {
+                    log.debug("({}) PAUSE Phase Start [{}] [{}]", sessionId, phase.getIdx(), p.getMilliSeconds());
+                    procPausePhase.run(p);
                 }
-                lastExecTime = System.currentTimeMillis();
             } catch (Exception e) {
                 log.warn("({}) Err Occurs while exec call phase.", sessionId, e);
                 stop("Exception Occurs while execute call phase. " + e);
