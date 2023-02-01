@@ -4,13 +4,11 @@ import com.uangel.command.CommandInfo;
 import com.uangel.command.CommandLineManager;
 import com.uangel.executor.UScheduledExecutorService;
 import com.uangel.model.SessionManager;
-import com.uangel.reflection.JarReflection;
 import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
 import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.util.SleepUtil;
-import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
@@ -23,8 +21,6 @@ import java.util.List;
 public class ScenarioRunner {
 
     private Scenario scenario;
-    private String name;
-
     private UScheduledExecutorService scheduledExecutorService;
     private RmqManager rmqManager;
 
@@ -55,9 +51,9 @@ public class ScenarioRunner {
             // Scenario Validity
 
 
+            String scenarioName = scenario.getName();
             scenario.setCmdInfo(cmdInfo);
-            //log.debug("{}", cmdInfo);
-            log.debug("{}", scenario.getMsgNameList());
+            log.info("[{}] Scenario Parsing Complete {}", scenarioName, scenario.getMsgNameList());
 
             // Load ProtoBuf Package File
             if (!scenario.initJarReflection(cmdInfo)) {
@@ -65,7 +61,8 @@ public class ScenarioRunner {
                 return null;
             }
 
-            KeywordMapper keywordMapper = new KeywordMapper();
+            // Keyword
+            KeywordMapper keywordMapper = new KeywordMapper(scenario);
             scenario.setKeywordMapper(keywordMapper);
 
             // User Defined Command (ReflectionUtil)
@@ -79,8 +76,8 @@ public class ScenarioRunner {
             // Statistics
 
 
-            this.name = scenario.getName() + "@" + hashCode();
-            Thread.currentThread().setName(name);
+            String threadName = scenarioName + "@" + hashCode();
+            Thread.currentThread().setName(threadName);
 
             // Create Thread Pool
             // todo 기본으로 필요한 스레드 최저 개수 체크
@@ -88,10 +85,10 @@ public class ScenarioRunner {
                     Runtime.getRuntime().availableProcessors() : cmdInfo.getThreadSize();
             this.scheduledExecutorService = new UScheduledExecutorService(threadSize,
                     new BasicThreadFactory.Builder()
-                            .namingPattern(this.name + "-%d")
+                            .namingPattern(threadName + "-%d")
                             .priority(Thread.MAX_PRIORITY)
                             .build());
-            log.info("Scenario Runner Start (CorePool:{})", threadSize);
+            log.info("[{}] Scenario Runner Start (CorePool:{})", scenarioName, threadSize);
             scenario.setExecutorService(scheduledExecutorService);
 
             // Load RMQ
@@ -148,7 +145,7 @@ public class ScenarioRunner {
                 log.warn("Main ExecutorService was Terminated, RemainedTask: {}", interruptedTask.size());
         }
 
-        log.debug("Stop Scenario Runner ");
+        log.info("Stop Scenario Runner ");
 
     }
 

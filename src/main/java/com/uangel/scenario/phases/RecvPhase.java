@@ -1,5 +1,6 @@
 package com.uangel.scenario.phases;
 
+import com.uangel.scenario.type.AttrName;
 import com.uangel.util.StringUtil;
 import lombok.Getter;
 import lombok.ToString;
@@ -15,10 +16,14 @@ import org.w3c.dom.NodeList;
 public class RecvPhase extends MsgPhase {
     private String msgName;
     private final String className;
+    private final Boolean optional;
+    private final String next;
 
     public RecvPhase(Node xmlNode, int idx) {
         super(xmlNode, idx);
-        this.className = getClassAttrValue(xmlNode);
+        this.className = getClassAttrValue();
+        this.optional = getBoolAttrWithDefault(AttrName.OPTIONAL.getValue(), false);
+        this.next = getStrAttrValue(AttrName.NEXT.getValue());
 
         Element recvEle = (Element) xmlNode;
         NodeList msgList = recvEle.getChildNodes();

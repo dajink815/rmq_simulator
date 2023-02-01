@@ -9,6 +9,7 @@ import com.uangel.reflection.JarReflection;
 import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.scenario.phases.MsgPhase;
+import com.uangel.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class Scenario extends MsgInfoManager {
 
     private final String name;
     private final List<MsgPhase> phases;
+    private final Map<String, String> fields = new HashMap<>();
     private CommandInfo cmdInfo;
     private SessionManager sessionManager;
     private RmqManager rmqManager;
@@ -42,20 +44,19 @@ public class Scenario extends MsgInfoManager {
     }
 
     public String getName() {
+        return this.name;
+    }
+
     public List<MsgPhase> phases() {
         return Collections.unmodifiableList(this.phases);
     }
-
     public MsgPhase getPhase(int idx) {
         return this.phases.get(idx);
     }
-
     public int getScenarioSize() {
         return phases.size();
     }
 
-    public String getName() {
-        return this.name;
     }
 
     public boolean isProtoType() {

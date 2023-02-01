@@ -2,6 +2,7 @@ package com.uangel.scenario.handler.base;
 
 import com.uangel.model.SessionInfo;
 import com.uangel.reflection.ReflectionUtil;
+import com.uangel.scenario.Scenario;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -14,11 +15,17 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class KeywordMapper {
-    public static final Pattern keyPattern = Pattern.compile("\\[(.*?)\\]");
+    private static final Pattern keyPattern = Pattern.compile("\\[(.*?)\\]");
+    private static final String LAST = "last_";
     private final Map<String, String> execCmdMap = new HashMap<>();
 
+    private Scenario scenario;
+
     public KeywordMapper() {
-        // nothing
+    }
+
+    public KeywordMapper(Scenario scenario) {
+        this.scenario = scenario;
     }
 
     public void addUserCmd(String cmd, String execStr) {
@@ -40,23 +47,18 @@ public class KeywordMapper {
             String result = getValue(sessionInfo, m.group(1));   // 중괄호 제외한 값
             if (result != null) keyword = keyword.replace(m.group(0), result);
         }
-        if (!before.equals(keyword)) log.debug("ReplaceKeyword [{} -> {}]", before, keyword);
+        //if (!before.equals(keyword)) log.debug("ReplaceKeyword ({} -> {})", before, keyword);
         return keyword;
     }
 
     private String getValue(SessionInfo sessionInfo, String keyword) {
 
         try {
+            // todo 예외처리 - exec 예약 명령어 없는 경우 로그, last_ 필드값 없는 경우
+            
             // 저장된 exec 명령어 처리
             String cmd;
             if ((cmd = getExecByCmd(keyword)) != null) {
-
-                // exec 명령어로 Reflection 실행
-/*                    ReflectionUtil.TypeValuePair typeValuePair = ReflectionUtil.exec(cmd);
-                    if (typeValuePair != null) {
-                        keyword = typeValuePair.value.toString();
-                    }*/
-
                 return ReflectionUtil.getExecResult(cmd);
             }
 
@@ -66,15 +68,16 @@ public class KeywordMapper {
                 case "call_number" :
                     return Integer.toString(sessionInfo.getSessionNum());
                 case "rmq_local" :
-                    return sessionInfo.getScenario().getCmdInfo().getRmqLocal();
+                    return scenario.getCmdInfo().getRmqLocal();
                 case "rmq_target" :
-                    return sessionInfo.getScenario().getCmdInfo().getRmqTarget();
+                    return scenario.getCmdInfo().getRmqTarget();
                 default:
                     break;
             }
 
-            if (keyword.startsWith("last_")) {
-                return getLastKeyword(sessionInfo, keyword);
+            if (keyword.startsWith(LAST)) {
+                String fieldName = keyword.substring(LAST.length());
+                return sessionInfo.getFieldValue(fieldName);
             }
 
         } catch (Exception e) {
@@ -83,13 +86,45 @@ public class KeywordMapper {
         return null;
     }
 
-    public String getLastKeyword(SessionInfo sessionInfo, String keyword) {
-        Map<String, String> fields = sessionInfo.getFields();
-        String fieldName = keyword.substring("last_".length());
+    public String replaceKeyword(String keyword) {
+        String before = keyword;
+        Matcher m = keyPattern.matcher(keyword);
 
-        if (fields != null && fields.containsKey(fieldName)) {
-            return fields.get(fieldName); // trim?
+        // [] 포함돼 있는 모든 단어 처리
+        while (m.find()) {
+            String result = getValue(m.group(1));   // 중괄호 제외한 값
+            if (result != null) keyword = keyword.replace(m.group(0), result);
+        }
+        //if (!before.equals(keyword)) log.debug("ReplaceLastField ({} -> {})", before, keyword);
+        return keyword;
+    }
+
+    public String getValue(String keyword) {
+
+        try {
+            // 저장된 exec 명령어 처리
+            String cmd;
+            if ((cmd = getExecByCmd(keyword)) != null) {
+                return ReflectionUtil.getExecResult(cmd);
+            }
+
+            switch (keyword) {
+                case "rmq_local" :
+                    return scenario.getCmdInfo().getRmqLocal();
+                case "rmq_target" :
+                    return scenario.getCmdInfo().getRmqTarget();
+                default:
+                    break;
+            }
+
+            if (keyword.startsWith(LAST)) {
+                String fieldName = keyword.substring(LAST.length());
+                return scenario.getFieldValue(fieldName);
+            }
+        } catch (Exception e) {
+            log.error("KeywordMapper.getValue.Exception ", e);
         }
         return null;
+
     }
 }

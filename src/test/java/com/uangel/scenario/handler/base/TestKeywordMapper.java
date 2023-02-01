@@ -16,19 +16,23 @@ import java.io.IOException;
 @Slf4j
 public class TestKeywordMapper {
 
-    private final KeywordMapper keywordMapper = new KeywordMapper();
+    private KeywordMapper keywordMapper;
     private SessionInfo sessionInfo;
 
     @Before
     public void prepareUserCmd() throws IOException, SAXException {
+
+        String filePath = "./src/main/resources/scenario/mrfc_basic.xml";
+        Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
+
+        keywordMapper = new KeywordMapper(scenario);
         keywordMapper.addUserCmd("tId", "java.util.UUID.randomUUID().toString()");
         keywordMapper.addUserCmd("timestamp", "java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss.SSS\"))");
         //keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
 
-        String filePath = "./src/main/resources/scenario/mrfc_basic.xml";
-        Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
         sessionInfo = new SessionInfo(0, scenario);
         sessionInfo.addField("tId" ,"TEST_TID");
+        scenario.addField("tId", "SCENARIO_TID");
     }
 
     @Test
@@ -39,13 +43,6 @@ public class TestKeywordMapper {
 
         keyword = "[timestamp]";
         result = keywordMapper.replaceKeyword(sessionInfo, keyword);
-        log.debug("{} => {}", keyword, result);
-    }
-
-    @Test
-    public void testLastKeyword() {
-        String keyword = "last_tId";
-        String result = keywordMapper.getLastKeyword(sessionInfo, keyword);
         log.debug("{} => {}", keyword, result);
     }
 
@@ -65,4 +62,17 @@ public class TestKeywordMapper {
         result = keywordMapper.replaceKeyword(sessionInfo, keyword);
         log.debug("3. {} => \r\n{}", keyword, result);
     }
+
+    @Test
+    public void testReplaceLastField() {
+        String keyword = "[last_tId]";
+        String result = keywordMapper.replaceKeyword(keyword);
+        log.debug("1. {} => {}", keyword, result);
+
+        // 저장 되지 않은 last field 호출 -> 문자열 그대로 리턴
+        keyword = "[last_dialog]//[timestamp]";
+        result = keywordMapper.replaceKeyword(keyword);
+        log.debug("2. {} => {}", keyword, result);
+    }
+
 }

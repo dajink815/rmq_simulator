@@ -6,7 +6,8 @@ package com.uangel.scenario.type;
 public enum AttrName {
     NAME("name"), CLASS("class"),
     TYPE("type"), VALUE("value"), EXEC("exec"),
-    MILLIS("milliseconds");
+    MILLIS("milliseconds"), RETRANS("retrans"),
+    OPTIONAL("optional"), NEXT("next");
 
     private final String value;
 
