@@ -38,41 +38,46 @@ public class TestKeywordMapper {
     @Test
     public void testExecCmd() {
         String keyword = "[tId]_[timestamp]";
-        String result = keywordMapper.replaceKeyword(sessionInfo, keyword);
+        String result = keywordMapper.replaceKeyword(keyword, sessionInfo);
         log.debug("{} => {}", keyword, result);
 
         keyword = "[timestamp]";
-        result = keywordMapper.replaceKeyword(sessionInfo, keyword);
+        result = keywordMapper.replaceKeyword(keyword, sessionInfo);
         log.debug("{} => {}", keyword, result);
     }
 
     @Test
     public void testReplaceKeyword() {
         String keyword = "[call_id]~~[last_tId],CallNum=[call_number]";
-        String result = keywordMapper.replaceKeyword(sessionInfo, keyword);
+        String result = keywordMapper.replaceKeyword(keyword, sessionInfo);
         log.debug("1. {} => \r\n{}", keyword, result);
 
         // 저장 되지 않는 exec, keyword 호출 -> 문자열 그대로 리턴
         keyword = "[dialog],CallNum=[call_number]";
-        result = keywordMapper.replaceKeyword(sessionInfo, keyword);
+        result = keywordMapper.replaceKeyword(keyword, sessionInfo);
         log.debug("2. {} => \r\n{}", keyword, result);
 
         // 저장 되지 않은 last field 호출 -> 문자열 그대로 리턴
         keyword = "[last_dialog]//[timestamp]";
-        result = keywordMapper.replaceKeyword(sessionInfo, keyword);
+        result = keywordMapper.replaceKeyword(keyword, sessionInfo);
         log.debug("3. {} => \r\n{}", keyword, result);
     }
 
     @Test
     public void testReplaceLastField() {
         String keyword = "[last_tId]";
-        String result = keywordMapper.replaceKeyword(keyword);
+        String result = keywordMapper.replaceKeyword(keyword, null);
         log.debug("1. {} => {}", keyword, result);
 
         // 저장 되지 않은 last field 호출 -> 문자열 그대로 리턴
         keyword = "[last_dialog]//[timestamp]";
-        result = keywordMapper.replaceKeyword(keyword);
+        result = keywordMapper.replaceKeyword(keyword, null);
         log.debug("2. {} => {}", keyword, result);
+
+        // 저장 되지 않은 keyword 호출 -> 문자열 그대로 리턴
+        keyword = "[call_id], CallNum=[call_number]";
+        result = keywordMapper.replaceKeyword(keyword, null);
+        log.debug("3. {} => {}", keyword, result);
     }
 
 }

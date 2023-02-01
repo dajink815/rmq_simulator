@@ -47,6 +47,7 @@ public class LoopProtoMsgBuilder extends LoopMsgBuilder {
             // Build Message
             Object msgResult = jarReflection.build(msgBuilder);
             log.debug("Build LoopMsg [{}]", loopPhase.getMsgName());
+            //System.out.println(msgResult);
 
             return jarReflection.toByteArray(msgResult);
         } catch (Exception e)  {
@@ -81,7 +82,7 @@ public class LoopProtoMsgBuilder extends LoopMsgBuilder {
 
                 // Keyword
                 KeywordMapper keywordMapper = scenario.getKeywordMapper();
-                value = keywordMapper.replaceKeyword(value);
+                value = keywordMapper.replaceKeyword(value, null);
 
                 if (StringUtil.isNull(value)) continue;
 

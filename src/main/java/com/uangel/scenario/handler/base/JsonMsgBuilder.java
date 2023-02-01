@@ -78,7 +78,7 @@ public class JsonMsgBuilder extends MsgBuilder {
 
                 // Keyword
                 KeywordMapper keywordMapper = scenario.getKeywordMapper();
-                value = keywordMapper.replaceKeyword(sessionInfo, value);
+                value = keywordMapper.replaceKeyword(value, sessionInfo);
 
                 if (StringUtil.isNull(value)) continue;
 
