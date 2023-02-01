@@ -41,6 +41,7 @@ public class Scenario extends MsgInfoManager {
         super.initList(phases);
     }
 
+    public String getName() {
     public List<MsgPhase> phases() {
         return Collections.unmodifiableList(this.phases);
     }
@@ -65,6 +66,19 @@ public class Scenario extends MsgInfoManager {
 
     public void schedule(Runnable command, long delay) {
         this.executorService.schedule(command, delay, TimeUnit.MILLISECONDS);
+    }
+
+    public boolean initJarReflection(CommandInfo cmdInfo) {
+        if (isProtoType()) {
+            JarReflection jarRef = new JarReflection(cmdInfo.getProtoFile());
+            // Load Proto jar file & Check Proto base package name
+            if (!jarRef.loadJarFile() || StringUtil.isNull(cmdInfo.getProtoPkg())) {
+                log.error("Check Proto jar file, base package path ({}, {})", cmdInfo.getProtoFile(), cmdInfo.getProtoPkg());
+                return false;
+            }
+            setJarReflection(jarRef);
+        }
+        return true;
     }
 
     @Override

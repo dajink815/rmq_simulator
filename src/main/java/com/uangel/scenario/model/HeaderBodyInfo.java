@@ -1,7 +1,6 @@
 package com.uangel.scenario.model;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
@@ -12,10 +11,13 @@ import java.util.List;
  * @author dajin kim
  */
 @Getter
-@Setter
 @ToString
 public class HeaderBodyInfo {
-    private String className;
-    private List<FieldInfo> fieldInfos;
+    private final String className;
+    private final List<FieldInfo> fieldInfos;
 
+    public HeaderBodyInfo(String className, List<FieldInfo> fieldInfos) {
+        this.className = className;
+        this.fieldInfos = fieldInfos;
+    }
 }

@@ -4,10 +4,13 @@ HOME=/home/urmqgen
 PATH_TO_JAR=$HOME/urmqgen/lib/urmqgen-jar-with-dependencies.jar
 JAVA_OPT="-Dlogback.configurationFile=$HOME/urmqgen/config/logback.xml"
 
+# Scenario
 SCENARIO_PATH=$HOME/urmqgen/scenario
 SCENARIO_FILE=$SCENARIO_PATH/mrfc_basic.xml
 
+# Keyword Field
 KEYWORD=dialogId
+# Simulator Mode
 TYPE=proto
 
 # protoBuf Configuration
@@ -27,11 +30,11 @@ TARGET_PORT=5672
 TARGET_USER=mrfp
 TARGET_PW=mBDdk2WFOtCNY9gRTAIOUSMRuhIHO/Cq
 
-RMQ_THREAD_SIZE=5
+# Performance
 RMQ_QUEUE_SIZE=10
 
 THREAD_SIZE=5
 MAX_SESSION=1
 
 
-/usr/bin/java $JAVA_OPT $DEBUG -classpath $PATH_TO_JAR com.uangel.URmqGenMain -sf $SCENARIO_FILE -k $KEYWORD -t $TYPE-pf $PROTO_FILE -pkg $PKG_BASE -rl $LOCAL_Q -rh $HOST -ru $USER -rp $PORT -rpw $PW-rt $TARGET_Q -rth $TARGET_HOST -rtu $TARGET_USER -rtp $TARGET_PORT -rtpw $TARGET_PW-rts $RMQ_THREAD_SIZE -rqs $RMQ_QUEUE_SIZE -ts $THREAD_SIZE -m $MAX_SESSION 2>> stdout
+java $JAVA_OPT $DEBUG -classpath $PATH_TO_JAR com.uangel.URmqGenMain -sf $SCENARIO_FILE -k $KEYWORD -t $TYPE-pf $PROTO_FILE -pkg $PKG_BASE -rl $LOCAL_Q -rh $HOST -ru $USER -rp $PORT -rpw $PW-rt $TARGET_Q -rth $TARGET_HOST -rtu $TARGET_USER -rtp $TARGET_PORT -rtpw $TARGET_PW-rts -rqs $RMQ_QUEUE_SIZE -ts $THREAD_SIZE -m $MAX_SESSION 2>> stdout

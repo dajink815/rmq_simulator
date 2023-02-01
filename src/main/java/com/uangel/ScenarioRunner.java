@@ -45,35 +45,34 @@ public class ScenarioRunner {
         }
 
         try {
-            // Scenario Setting
+            // Build Scenario
             scenario = ScenarioBuilder.fromXMLFileName(cmdInfo.getScenarioFile());
             if (scenario == null) {
                 log.error("ScenarioRunner Scenario Build Fail");
                 return null;
             }
+
+            // Scenario Validity
+
+
             scenario.setCmdInfo(cmdInfo);
             //log.debug("{}", cmdInfo);
             log.debug("{}", scenario.getMsgNameList());
 
-            if (scenario.isProtoType()) {
-                JarReflection jarReflection = new JarReflection(cmdInfo.getProtoFile());
-                // Load Proto jar file & Check Proto base package name
-                if (!jarReflection.loadJarFile() || StringUtil.isNull(cmdInfo.getProtoPkg())) {
-                    log.error("Check Proto jar file, base package path ({}, {})", cmdInfo.getProtoFile(), cmdInfo.getProtoPkg());
-                    return null;
-                }
-                scenario.setJarReflection(jarReflection);
+            // Load ProtoBuf Package File
+            if (!scenario.initJarReflection(cmdInfo)) {
+
+                return null;
             }
 
-            // User Defined Command (Reflection)
             KeywordMapper keywordMapper = new KeywordMapper();
             scenario.setKeywordMapper(keywordMapper);
 
-            // addUserCmd
+            // User Defined Command (ReflectionUtil)
+            // todo parse & add UserCmd
             keywordMapper.addUserCmd("tId", "java.util.UUID.randomUUID().toString()");
             keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
 
-            // Scenario Validity
 
 
 
@@ -84,6 +83,7 @@ public class ScenarioRunner {
             Thread.currentThread().setName(name);
 
             // Create Thread Pool
+            // todo 기본으로 필요한 스레드 최저 개수 체크
             int threadSize = cmdInfo.getThreadSize() <= 0 ?
                     Runtime.getRuntime().availableProcessors() : cmdInfo.getThreadSize();
             this.scheduledExecutorService = new UScheduledExecutorService(threadSize,
@@ -98,7 +98,7 @@ public class ScenarioRunner {
             rmqManager = new RmqManager(scenario);
             boolean rmqResult = rmqManager.start();
             if (!rmqResult) {
-                log.error("ScenarioRunner Stop. Fail to RmqManager.start()");
+                log.error("ScenarioRunner Stop. Fail to RmqManager.start");
                 return null;
             }
             scenario.setRmqManager(rmqManager);
