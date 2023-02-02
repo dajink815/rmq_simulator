@@ -1,7 +1,7 @@
 package com.uangel.scenario.handler.base;
 
 import com.uangel.scenario.Scenario;
-import com.uangel.scenario.phases.LoopPhase;
+import com.uangel.scenario.phases.OutgoingPhase;
 
 /**
  * @author dajin kim
@@ -14,6 +14,6 @@ public abstract class LoopMsgBuilder {
         this.scenario = scenario;
     }
 
-    public abstract byte[] build(LoopPhase loopPhase);
+    public abstract byte[] build(OutgoingPhase loopPhase);
 
 }

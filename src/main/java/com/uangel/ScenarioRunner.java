@@ -101,14 +101,16 @@ public class ScenarioRunner {
             }
             scenario.setRmqManager(rmqManager);
 
+            // SessionManager
+            SessionManager sessionManager = new SessionManager(scenario);
+            scenario.setSessionManager(sessionManager);
+
             // Loop Message
             LoopMsgHandler loopMsgHandler = new LoopMsgHandler(scenario);
             loopMsgHandler.start();
 
-            // todo Loop 메시지 먼저 처리 후 시나리오 시작
             // Scenario Run
-            SessionManager sessionManager = new SessionManager(scenario);
-            scenario.setSessionManager(sessionManager);
+            // Loop 메시지 먼저 처리 후 시나리오 시작
             sessionManager.createSessionByRate();
 
             // Remove Ended Session

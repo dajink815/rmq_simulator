@@ -35,17 +35,28 @@ public class RmqProtoConsumer {
         try {
             // Byte Array -> Object
             String className = config.getProtoPkg() + scenario.getMsgClassName();
-            //log.debug("RmqProtoConsumer ClassName [{}]", className);
             Object msgObj = jarReflection.parseFrom(className, msg);
-            log.debug("RmqProtoConsumer RecvMsg [{}]", msgObj);
 
             // Object -> Pretty Json
             String json = ProtoUtil.buildProto(msgObj);
-            //log.debug("RmqProtoConsumer PrettyJson [{}]", json);
 
-            // Parse KeyWord
+            // Parse Keyword Field
             Map<String, String> fields = jarReflection.getAllFieldsMap(msgObj);
             String sessionId = fields.get(config.getFieldKeyword());
+/*            if (sessionId == null) {
+                // LogIn HB 같은 메시지는 keyword field 없음
+                log.debug("Doesnt have sessionId [{}]", fields.get("type"));
+                //return;
+            } else {
+                log.debug("RmqProtoConsumer RecvMsg [{}]", msgObj);
+            }*/
+
+            log.debug("RmqProtoConsumer RecvMsg [{}]", msgObj);
+
+            if (sessionManager == null) {
+                log.warn("RmqProtoConsumer Fail - SessionManager is Null");
+                return;
+            }
 
             // sessionId로 SessionManager 에 등록된 SessionInfo 조회
             SessionInfo sessionInfo = sessionManager.getSessionInfo(sessionId);

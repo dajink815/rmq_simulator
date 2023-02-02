@@ -38,7 +38,7 @@
         <header class="Header">
             <field name="type" type="str" value="DIALOG_START_REQ"/>
             <field name="tId" type="str" value="[tId]"/>
-            <field name="msgFrom" type="str" value="MRFC"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
             <field name="timestamp" type="long" value="[timestamp]"/>
             <field name="dialogId" type="str" value="[call_id]"/>
         </header>
@@ -59,9 +59,9 @@
         <header class="Header">
             <field name="type" type="str" value="DIALOG_SETUP_REQ"/>
             <field name="tId" type="str" value="[tId]"/>
-            <field name="msgFrom" type="str" value="MRFC"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
             <field name="timestamp" type="long" value="[timestamp]"/>
-            <field name="dialogId" type="str" value="[last_dialogId]"/>
+            <field name="dialogId" type="str" value="[call_id]"/>
         </header>
         <body class="DialogSetupReq">
             <field name="sdp" type="str" value="[last_sdp]"/>
@@ -78,9 +78,9 @@
         <header class="Header">
             <field name="type" type="str" value="DIALOG_STOP_REQ"/>
             <field name="tId" type="str" value="[tId]"/>
-            <field name="msgFrom" type="str" value="MRFC"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
             <field name="timestamp" type="long" value="[timestamp]"/>
-            <field name="dialogId" type="str" value="[last_dialogId]"/>
+            <field name="dialogId" type="str" value="[call_id]"/>
         </header>
         <body class="DialogStopReq">
             <field name="record" type="int" value="1"/>

@@ -17,7 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -70,29 +72,28 @@ public class ScenarioBuilder {
         }
         List<MsgPhase> msgPhases = new ArrayList<>();
         List<LoopPhase> loopPhases = new ArrayList<>();
+        Map<String, LabelPhase> labelPhases = new HashMap<>();
         int idx = 0;
         for (Node m = scenarioEle.getFirstChild(); m != null; m = m.getNextSibling()) {
             switch (m.getNodeName()) {
-                case "recv" :
-                    msgPhases.add(new RecvPhase(m, idx++));
-                    break;
-                case "send" :
-                    msgPhases.add(new SendPhase(m, idx++));
-                    break;
-                case "pause" :
-                    msgPhases.add(new PausePhase(m, idx++));
-                    break;
-                case "loop" :
-                    loopPhases.add(new LoopPhase(m, 0));
-                    break;
-                case "label" :
-
-                default :
-                    break;
+                case "recv" -> msgPhases.add(new RecvPhase(m, idx++));
+                case "send" -> msgPhases.add(new SendPhase(m, idx++));
+                case "pause" -> msgPhases.add(new PausePhase(m, idx++));
+                // todo index?
+                case "loop" -> loopPhases.add(new LoopPhase(m, 0));
+                case "label" -> {
+                    LabelPhase labelPhase = new LabelPhase(m, 0);
+                    String id = labelPhase.getId();
+                    labelPhases.put(id, labelPhase);
+                }
+                default -> {
+                    // nothing
+                }
             }
         }
         Scenario scenario = new Scenario(name, msgPhases);
         scenario.setLoopPhases(loopPhases);
+        scenario.setLabelPhaseMap(labelPhases);
         return scenario;
     }
 

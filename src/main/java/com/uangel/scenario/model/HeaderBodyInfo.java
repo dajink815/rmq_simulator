@@ -1,7 +1,6 @@
 package com.uangel.scenario.model;
 
 import lombok.Getter;
-import lombok.ToString;
 
 import java.util.List;
 
@@ -11,7 +10,6 @@ import java.util.List;
  * @author dajin kim
  */
 @Getter
-@ToString
 public class HeaderBodyInfo {
     private final String className;
     private final List<FieldInfo> fieldInfos;
@@ -19,5 +17,12 @@ public class HeaderBodyInfo {
     public HeaderBodyInfo(String className, List<FieldInfo> fieldInfos) {
         this.className = className;
         this.fieldInfos = fieldInfos;
+    }
+
+    @Override
+    public String toString() {
+        return "{" + className +
+                ", fields=" + fieldInfos +
+                '}';
     }
 }

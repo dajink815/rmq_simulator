@@ -5,6 +5,7 @@ import com.uangel.reflection.JarReflection;
 import com.uangel.reflection.ReflectionUtil;
 import com.uangel.scenario.model.FieldInfo;
 import com.uangel.scenario.model.HeaderBodyInfo;
+import com.uangel.scenario.phases.OutgoingPhase;
 import com.uangel.scenario.phases.SendPhase;
 import com.uangel.scenario.type.FieldType;
 import com.uangel.util.StringUtil;
@@ -28,16 +29,19 @@ public class ProtoMsgBuilder extends MsgBuilder {
     }
 
     @Override
-    public byte[] build(SendPhase sendPhase) {
+    public byte[] build(OutgoingPhase outgoingPhase) {
+        // Send 만 처리
+        if (!(outgoingPhase instanceof SendPhase)) return new byte[0];
+
         try {
             String pkgBase = scenario.getCmdInfo().getProtoPkg();
 
             // get Builder
-            String msgClassName = pkgBase + sendPhase.getClassName();
+            String msgClassName = pkgBase + outgoingPhase.getClassName();
             Object msgBuilder = jarReflection.getNewBuilder(msgClassName);
 
             // set subMessages
-            for (HeaderBodyInfo msgInfo : sendPhase.getHeaderBodyInfos()) {
+            for (HeaderBodyInfo msgInfo : outgoingPhase.getHeaderBodyInfos()) {
                 Object subMsgObj = getSubMessage(msgInfo, pkgBase);
                 if (subMsgObj == null) continue;
                 msgBuilder = jarReflection.invokeObjMethod(jarReflection.getMethodName(msgInfo.getClassName()), msgBuilder, subMsgObj);

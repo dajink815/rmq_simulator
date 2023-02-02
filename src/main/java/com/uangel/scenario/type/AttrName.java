@@ -7,7 +7,8 @@ public enum AttrName {
     NAME("name"), CLASS("class"),
     TYPE("type"), VALUE("value"), EXEC("exec"),
     MILLIS("milliseconds"), RETRANS("retrans"),
-    OPTIONAL("optional"), NEXT("next");
+    OPTIONAL("optional"), NEXT("next"),
+    ID("id");
 
     private final String value;
 

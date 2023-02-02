@@ -2,9 +2,9 @@ package com.uangel.scenario.handler.base;
 
 import com.uangel.model.SessionInfo;
 import com.uangel.reflection.ReflectionUtil;
-import com.uangel.scenario.Scenario;
 import com.uangel.scenario.model.FieldInfo;
 import com.uangel.scenario.model.HeaderBodyInfo;
+import com.uangel.scenario.phases.OutgoingPhase;
 import com.uangel.scenario.phases.SendPhase;
 import com.uangel.scenario.type.FieldType;
 import com.uangel.util.JsonUtil;
@@ -28,10 +28,13 @@ public class JsonMsgBuilder extends MsgBuilder {
     }
 
     @Override
-    public byte[] build(SendPhase sendPhase) {
+    public byte[] build(OutgoingPhase outgoingPhase) {
+        // Send 만 처리
+        if (!(outgoingPhase instanceof SendPhase)) return new byte[0];
+
         try {
             JSONObject jsonObject = new JSONObject();
-            for (HeaderBodyInfo msgInfo : sendPhase.getHeaderBodyInfos()) {
+            for (HeaderBodyInfo msgInfo : outgoingPhase.getHeaderBodyInfos()) {
                 JSONObject data = getSubMessage(msgInfo);
                 if (data == null) continue;
                 jsonObject.put(msgInfo.getClassName(), data);

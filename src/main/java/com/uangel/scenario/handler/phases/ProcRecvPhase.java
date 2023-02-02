@@ -3,16 +3,22 @@ package com.uangel.scenario.handler.phases;
 import com.uangel.model.SessionInfo;
 import com.uangel.scenario.phases.MsgPhase;
 import com.uangel.scenario.phases.RecvPhase;
+import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author dajin kim
  */
 @Slf4j
 public class ProcRecvPhase extends ProcMsgPhase {
+
+    // 프로세스 다 같이 공유? static
+    // 시나리오 파싱 후 바로 세팅?
+    private final Set<RecvPhase> optionalPhases = ConcurrentHashMap.newKeySet();
 
     public ProcRecvPhase(SessionInfo sessionInfo) {
         super(sessionInfo);
@@ -24,7 +30,8 @@ public class ProcRecvPhase extends ProcMsgPhase {
 
         // Optional
         if (Boolean.TRUE.equals(recvPhase.getOptional())) {
-            // Optional Phase 저장해놓고 따로 처리?
+            // Optional Phase 저장 후 따로 처리
+            optionalPhases.add(recvPhase);
             log.debug("({}) Pass Optional [{}]", sessionInfo.getSessionId(), recvPhase.getMsgName());
             sessionInfo.execPhase(sessionInfo.increaseCurIdx());
         }
@@ -40,20 +47,36 @@ public class ProcRecvPhase extends ProcMsgPhase {
         if (this.sessionInfo.isSessionEnded() || !sessionManager.checkIndex(sessionInfo)) return false;
 
         MsgPhase curPhase = scenario.getPhase(sessionInfo.getCurIdx());
-        // Optional 처리?
+        log.debug("({}) HandleMessage CurIndex ({})", sessionId, sessionInfo.getCurIdx());
+
+        // Optional 처리 - Optional 메시지는 CurrentPhase 타입과 무관하게 처리 가능해야함
+        RecvPhase optionalRecv = checkOptionalPhases(json);
+        if (optionalRecv != null) {
+            log.debug("CheckOptionalPhases True : {}", optionalRecv.getMsgName());
+            ProcLabelPhase procLabelPhase = new ProcLabelPhase(scenario);
+            scenario.addFields(fields);
+            procLabelPhase.run(optionalRecv.getNext(), fields);
+            return true;
+        }
+
+        // Optional 처리 후 RecvPhase 타입 체크
         // 현재 단계가 Recv 아니라면 skip
-        if (!(curPhase instanceof RecvPhase)) return false;
-        RecvPhase curRecvPhase = (RecvPhase) curPhase;
+        if (!(curPhase instanceof RecvPhase curRecvPhase)) return false;
+
+        if (StringUtil.isNull(sessionId)) {
+            // sessionId Null
+            return true;
+        }
 
         // check SessionId
         if (!sessionId.equals(sessionInfo.getSessionId())) {
             // SessionId가 동일하지 않지만 조건 맞는 경우 SessionId 갱신
             // todo 그 외 조건?
             if (sessionInfo.getCurIdx() == scenario.getFirstRecvPhaseIdx()) {
-                //sessionInfo.setSessionId(sessionId);
                 sessionManager.changeSessionId(sessionInfo.getSessionId(), sessionId);
             } else {
                 // UnExpected
+                log.warn("({}) ProcRecvPhase MisMatch SessionInfo [{}]", sessionId, sessionInfo.getSessionId());
                 return false;
             }
         }
@@ -62,5 +85,26 @@ public class ProcRecvPhase extends ProcMsgPhase {
         sessionInfo.execPhase(sessionInfo.increaseCurIdx());
 
         return true;
+    }
+
+    private RecvPhase checkOptionalPhases(String json) {
+
+        // todo filtering 방법 수정 - JSON 에는 쓸 수 없는 방법
+        RecvPhase recvPhase = optionalPhases.stream()
+                .filter(r -> checkMsgName(r, json))
+                .findFirst().orElse(null);
+
+        if (recvPhase == null) {
+            //log.debug("checkOptionalPhases Result Null \r\n[{}]", json);
+        } else {
+            //log.debug("checkOptionalPhases Result : {}", recvPhase.getMsgName());
+        }
+
+        return recvPhase;
+    }
+
+    private boolean checkMsgName(RecvPhase recvPhase, String json) {
+        String msgName = recvPhase.getMsgName().toLowerCase();
+        return json.toLowerCase().contains(msgName);
     }
 }

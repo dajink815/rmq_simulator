@@ -2,7 +2,7 @@ package com.uangel.scenario.handler.base;
 
 import com.uangel.model.SessionInfo;
 import com.uangel.scenario.Scenario;
-import com.uangel.scenario.phases.SendPhase;
+import com.uangel.scenario.phases.OutgoingPhase;
 
 /**
  * @author dajin kim
@@ -17,5 +17,5 @@ public abstract class MsgBuilder {
         this.scenario = sessionInfo.getScenario();
     }
 
-    public abstract byte[] build(SendPhase sendPhase);
+    public abstract byte[] build(OutgoingPhase outgoingPhase);
 }

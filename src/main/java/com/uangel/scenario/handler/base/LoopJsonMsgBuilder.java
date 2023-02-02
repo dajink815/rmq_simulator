@@ -1,7 +1,7 @@
 package com.uangel.scenario.handler.base;
 
 import com.uangel.scenario.Scenario;
-import com.uangel.scenario.phases.LoopPhase;
+import com.uangel.scenario.phases.OutgoingPhase;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,7 +15,7 @@ public class LoopJsonMsgBuilder extends LoopMsgBuilder {
     }
 
     @Override
-    public byte[] build(LoopPhase loopPhase) {
+    public byte[] build(OutgoingPhase outgoingPhase) {
         return new byte[0];
     }
 }

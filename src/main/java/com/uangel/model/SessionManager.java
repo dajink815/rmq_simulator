@@ -5,6 +5,7 @@ import com.uangel.executor.UScheduledExecutorService;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.handler.phases.ProcRecvPhase;
 import com.uangel.util.SleepUtil;
+import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class SessionManager {
     private final Scenario scenario;
 
     public SessionManager(Scenario scenario) {
-        // nothing
+        log.info("[{}] SessionManager Started", scenario.getName());
         this.scenario = scenario;
     }
 
@@ -64,6 +65,7 @@ public class SessionManager {
     }
 
     public SessionInfo getSessionInfo(String sessionId) {
+        if (StringUtil.isNull(sessionId)) return null;
         SessionInfo sessionInfo = sessionMap.get(sessionId);
         if (sessionInfo == null) {
             log.warn("sessionInfo [{}] is null", sessionId);

@@ -8,10 +8,7 @@ import com.uangel.model.SimType;
 import com.uangel.reflection.JarReflection;
 import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.handler.base.KeywordMapper;
-import com.uangel.scenario.phases.LoopPhase;
-import com.uangel.scenario.phases.MsgPhase;
-import com.uangel.scenario.phases.RecvPhase;
-import com.uangel.scenario.phases.SendPhase;
+import com.uangel.scenario.phases.*;
 import com.uangel.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +28,7 @@ public class Scenario extends MsgInfoManager {
     private final String name;
     private final List<MsgPhase> phases;
     private List<LoopPhase> loopPhases;
+    private Map<String, LabelPhase> labelPhaseMap;
     private final Map<String, String> fields = new HashMap<>();
     private CommandInfo cmdInfo;
     private SessionManager sessionManager;
@@ -75,6 +73,9 @@ public class Scenario extends MsgInfoManager {
             if (msgPhase instanceof RecvPhase r && !r.getOptional()) {
                 return index;
             }
+            if (msgPhase instanceof SendPhase) {
+                return -1;
+            }
             index++;
         }
         return -1;
@@ -84,6 +85,10 @@ public class Scenario extends MsgInfoManager {
     public LoopPhase getLoopPhase(int idx) {
         if (loopPhases == null) return null;
         return this.loopPhases.get(idx);
+    }
+
+    public LabelPhase getLabelPhase(String id) {
+        return labelPhaseMap.get(id);
     }
 
     public void addFields(Map<String, String> addFields) {
@@ -122,12 +127,14 @@ public class Scenario extends MsgInfoManager {
     @Override
     public String toString() {
         int phaseSize = (phases != null)? phases.size() : 0;
-        int loopPhaseSize = (loopPhases != null)? loopPhases.size() : 0;
+        int loopPhaseSize = loopPhases.size();
+        int labelPhaseSize = labelPhaseMap.size();
 
         return "Scenario{" +
-                "name='" + name + '\'' +
-                ", phases(" + phaseSize + ")=" + phases +
-                ", loopPhases(" + loopPhaseSize + ")=" + loopPhases +
+                "NAME='" + name + '\'' +
+                ", PHASES(" + phaseSize + ")=" + phases +
+                ", LOOP(" + loopPhaseSize + ")=" + loopPhases +
+                ", LABEL(" + labelPhaseSize + ")=" + labelPhaseMap +
                 '}';
     }
 }

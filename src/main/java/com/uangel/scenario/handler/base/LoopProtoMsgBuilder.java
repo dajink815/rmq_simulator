@@ -5,7 +5,8 @@ import com.uangel.reflection.ReflectionUtil;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.model.FieldInfo;
 import com.uangel.scenario.model.HeaderBodyInfo;
-import com.uangel.scenario.phases.LoopPhase;
+import com.uangel.scenario.phases.OutgoingPhase;
+import com.uangel.scenario.phases.SendPhase;
 import com.uangel.scenario.type.FieldType;
 import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -28,17 +29,20 @@ public class LoopProtoMsgBuilder extends LoopMsgBuilder {
     }
 
     @Override
-    public byte[] build(LoopPhase loopPhase) {
+    public byte[] build(OutgoingPhase outgoingPhase) {
+        // Loop, Label 만 처리
+        if (outgoingPhase instanceof SendPhase) return new byte[0];
+
         try {
             String pkgBase = scenario.getCmdInfo().getProtoPkg();
 
             // get Builder
-            String msgClassName = pkgBase + loopPhase.getClassName();
+            String msgClassName = pkgBase + outgoingPhase.getClassName();
             Object msgBuilder = jarReflection.getNewBuilder(msgClassName);
 
 
             // set subMessages
-            for (HeaderBodyInfo msgInfo : loopPhase.getHeaderBodyInfos()) {
+            for (HeaderBodyInfo msgInfo : outgoingPhase.getHeaderBodyInfos()) {
                 Object subMsgObj = getSubMessage(msgInfo, pkgBase);
                 if (subMsgObj == null) continue;
                 msgBuilder = jarReflection.invokeObjMethod(jarReflection.getMethodName(msgInfo.getClassName()), msgBuilder, subMsgObj);
@@ -46,7 +50,9 @@ public class LoopProtoMsgBuilder extends LoopMsgBuilder {
 
             // Build Message
             Object msgResult = jarReflection.build(msgBuilder);
-            log.debug("Build LoopMsg [{}]", loopPhase.getMsgName());
+            log.debug("Build LoopMsg [{}]", outgoingPhase.getMsgName());
+            //log.debug("Build LoopMsg \r\n[{}]", msgResult);
+
             //System.out.println(msgResult);
 
             return jarReflection.toByteArray(msgResult);

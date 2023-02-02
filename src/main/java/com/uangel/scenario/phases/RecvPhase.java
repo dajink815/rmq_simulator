@@ -3,7 +3,6 @@ package com.uangel.scenario.phases;
 import com.uangel.scenario.type.AttrName;
 import com.uangel.util.StringUtil;
 import lombok.Getter;
-import lombok.ToString;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -12,7 +11,6 @@ import org.w3c.dom.NodeList;
  * @author dajin kim
  */
 @Getter
-@ToString
 public class RecvPhase extends MsgPhase {
     private String msgName;
     private final String className;
@@ -35,6 +33,21 @@ public class RecvPhase extends MsgPhase {
                 break;
             }
 
+        }
+
+    }
+
+    @Override
+    public String toString() {
+        if (StringUtil.isNull(next)) {
+            return "Recv{" + msgName +
+                    "(" + optional +
+                    ")}";
+        } else {
+            return "Recv{" + msgName +
+                    "(" + optional +
+                    "/next=" + next +
+                    ")}";
         }
 
     }

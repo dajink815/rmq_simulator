@@ -9,6 +9,7 @@
         <body class="HbReq"/>
     </recv>
 
+    <!-- send 전 recv 있으면 optional 없는 recv 필요?-->
     <recv class="Message">
         <body class="DialogStartReq"/>
     </recv>
@@ -17,7 +18,7 @@
         <header class="Header">
             <field name="type" type="str" value="DIALOG_START_RES"/>
             <field name="tId" type="str" value="[last_tId]"/>
-            <field name="msgFrom" type="str" value="MRFP"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
             <field name="timestamp" type="long" value="[timestamp]"/>
             <field name="dialogId" type="str" value="[last_dialogId]"/>
         </header>
@@ -36,7 +37,7 @@
         <header class="Header">
             <field name="type" type="str" value="DIALOG_SETUP_RES"/>
             <field name="tId" type="str" value="[last_tId]"/>
-            <field name="msgFrom" type="str" value="MRFP"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
             <field name="timestamp" type="long" value="[timestamp]"/>
             <field name="dialogId" type="str" value="[call_id]"/>
         </header>
@@ -54,7 +55,7 @@
         <header class="Header">
             <field name="type" type="str" value="DIALOG_STOP_RES"/>
             <field name="tId" type="str" value="[last_tId]"/>
-            <field name="msgFrom" type="str" value="MRFP"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
             <field name="timestamp" type="long" value="[timestamp]"/>
             <field name="dialogId" type="str" value="[call_id]"/>
         </header>
@@ -70,7 +71,7 @@
         <header class="Header">
             <field name="type" type="str" value="LOGIN_RES"/>
             <field name="tId" type="str" value="[last_tId]"/>
-            <field name="msgFrom" type="str" value="MRFP"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
             <field name="timestamp" type="long" value="[timestamp]"/>
         </header>
         <body class="LoginRes">
@@ -81,7 +82,7 @@
         <header class="Header">
             <field name="type" type="str" value="HB_RES"/>
             <field name="tId" type="str" value="[last_tId]"/>
-            <field name="msgFrom" type="str" value="MRFP"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
             <field name="timestamp" type="long" value="[timestamp]"/>
         </header>
         <body class="HbRes">
