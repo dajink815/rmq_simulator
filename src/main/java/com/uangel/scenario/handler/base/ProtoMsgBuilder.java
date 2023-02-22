@@ -1,5 +1,9 @@
 package com.uangel.scenario.handler.base;
 
+import com.github.javaparser.utils.StringEscapeUtils;
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.GeneratedMessageV3;
+import com.google.protobuf.Message;
 import com.uangel.model.SessionInfo;
 import com.uangel.reflection.JarReflection;
 import com.uangel.reflection.ReflectionUtil;
@@ -49,6 +53,7 @@ public class ProtoMsgBuilder extends MsgBuilder {
 
             // Build Message
             Object msgResult = jarReflection.build(msgBuilder);
+            msgResult = unescapeBodyFields((GeneratedMessageV3) msgResult);
             log.debug("Build SendMsg \r\n[{}]", msgResult);
 
             return jarReflection.toByteArray(msgResult);
@@ -113,5 +118,29 @@ public class ProtoMsgBuilder extends MsgBuilder {
         }
 
         return null;
+    }
+
+    private Object unescapeBodyFields(GeneratedMessageV3 message) {
+        try {
+            Message.Builder bodyBuilder = message.getAllFields().entrySet().stream()
+                    .filter(entry -> !entry.getKey().getName().equals("header"))
+                    .map(Map.Entry::getValue)
+                    .findAny()
+                    .map(o -> ((GeneratedMessageV3) o).toBuilder())
+                    .orElseThrow();
+
+            bodyBuilder.getAllFields().keySet().stream()
+                    .filter(o -> o.getType() == Descriptors.FieldDescriptor.Type.STRING)
+                    .filter(o -> bodyBuilder.getField(o) instanceof String)
+                    .forEach(key -> {
+                        String value = (String) bodyBuilder.getField(key);
+                        String converted = StringEscapeUtils.unescapeJava(value);
+                        bodyBuilder.setField(key, converted);
+                    });
+            return bodyBuilder.build();
+        } catch (Exception e) {
+            log.warn("Err Occurs", e);
+            return message;
+        }
     }
 }
