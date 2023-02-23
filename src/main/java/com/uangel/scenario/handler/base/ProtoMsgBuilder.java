@@ -122,6 +122,7 @@ public class ProtoMsgBuilder extends MsgBuilder {
 
     private Object unescapeBodyFields(GeneratedMessageV3 message) {
         try {
+            Message.Builder msgBuilder = message.toBuilder();
             Message.Builder bodyBuilder = message.getAllFields().entrySet().stream()
                     .filter(entry -> !entry.getKey().getName().equals("header"))
                     .map(Map.Entry::getValue)
@@ -137,7 +138,9 @@ public class ProtoMsgBuilder extends MsgBuilder {
                         String converted = StringEscapeUtils.unescapeJava(value);
                         bodyBuilder.setField(key, converted);
                     });
-            return bodyBuilder.build();
+            msgBuilder.getAllFields().keySet().stream().filter(o -> !o.getName().equals("header"))
+                    .forEach(o -> msgBuilder.setField(o, bodyBuilder.build()));
+            return msgBuilder.build();
         } catch (Exception e) {
             log.warn("Err Occurs", e);
             return message;
