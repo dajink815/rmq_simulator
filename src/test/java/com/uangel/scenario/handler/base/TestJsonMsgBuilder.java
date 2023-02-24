@@ -67,6 +67,7 @@ public class TestJsonMsgBuilder {
 
     private void parseJsonStr(String json) {
 
+        // Json 포맷 맞는지 먼저 체크
         Pattern keyPattern = Pattern.compile("\\{(.*?)\\}");
         Matcher m = keyPattern.matcher(json);
 
@@ -103,5 +104,24 @@ public class TestJsonMsgBuilder {
 
         System.out.println(json);
         parseJsonStr(json);
+
+        json = "{\n" +
+                "  \"header\": {\n" +
+                "    \"type\": \"heartbeat_req\",\n" +
+                "    \"msgFrom\": \"C_AMF_0\",\n" +
+                "    \"transactionId\": \"c39d7b86-c609-4b70-ad9e-b67b33a261ba\",\n" +
+                "    \"reasonCode\": 0\n" +
+                "  },\n" +
+                "  \"body\": {\n" +
+                "    \"amfId\": 0,\n" +
+                "    \"cpuUsage\": 3,\n" +
+                "    \"memoryUsage\": 82,\n" +
+                "    \"sessionCount\": 0\n" +
+                "  }\n" +
+                "}";
+
+        System.out.println(json);
+        parseJsonStr(json);
+
     }
 }

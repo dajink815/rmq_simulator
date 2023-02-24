@@ -27,7 +27,7 @@ public class SessionManager {
     private final Set<SessionInfo> sessionList = ConcurrentHashMap.newKeySet();
     private final Map<String, SessionInfo> sessionMap = new ConcurrentHashMap<>();
     // 처리한 총 세션 개수
-    private final AtomicInteger sessionCnt = new AtomicInteger();
+    private final AtomicInteger totalSessionCnt = new AtomicInteger();
 
     private final Scenario scenario;
 
@@ -77,18 +77,18 @@ public class SessionManager {
         // shutdown 체크?
         CommandInfo cmdInfo = scenario.getCmdInfo();
         if (sessionList.size() >= cmdInfo.getLimit() || (cmdInfo.getMaxCall() > 0
-                && getSessionCnt() >= cmdInfo.getMaxCall())) {
+                && getTotalSessionCnt() >= cmdInfo.getMaxCall())) {
             // log
             return;
         }
 
         try {
-            SessionInfo sessionInfo = new SessionInfo(getSessionCnt(), scenario);
+            SessionInfo sessionInfo = new SessionInfo(getTotalSessionCnt(), scenario);
             log.info("Created SessionInfo [{}]", sessionInfo.getSessionId());
             sessionList.add(sessionInfo);
             sessionMap.put(sessionInfo.getSessionId(), sessionInfo);
             sessionInfo.start();
-            increaseSessionCnt();  // SessionList Size 로 대체?
+            increaseTotalSessionCnt();
         } catch (Exception e) {
             log.warn("SessionManager.createSessionInfo.Exception ", e);
         }
@@ -124,12 +124,12 @@ public class SessionManager {
         return sessionList.isEmpty();
     }
 
-    public int getSessionCnt() {
-        return sessionCnt.get();
+    public int getTotalSessionCnt() {
+        return totalSessionCnt.get();
     }
 
-    public void increaseSessionCnt() {
-        sessionCnt.getAndIncrement();
+    public void increaseTotalSessionCnt() {
+        totalSessionCnt.getAndIncrement();
     }
 
     public boolean checkIndex(SessionInfo sessionInfo) {

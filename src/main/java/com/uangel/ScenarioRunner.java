@@ -123,9 +123,9 @@ public class ScenarioRunner {
             // when the scenario is over
             while (!scenario.isTestEnded()) {
                 if (cmdInfo.getMaxCall() > 0
-                        && sessionManager.getSessionCnt() >= cmdInfo.getMaxCall()
+                        && sessionManager.getTotalSessionCnt() >= cmdInfo.getMaxCall()
                         && sessionManager.isSessionEmpty()) {
-                    stop(); // "Scenario Ended"
+                    stop("Scenario Ended"); //
                 }/* else if (isShutdown && sipCallList.isEmpty()) {
                     stop(); // "Shut down gracefully"
                 }*/ else {
@@ -141,7 +141,7 @@ public class ScenarioRunner {
     }
 
     // todo 테스트 종료 조건 추가
-    public synchronized void stop() {
+    public synchronized void stop(String reason) {
         if (scenario == null || scenario.isTestEnded()) return;
         scenario.setTestEnded(true);
 
@@ -153,7 +153,7 @@ public class ScenarioRunner {
                 log.warn("Main ExecutorService was Terminated, RemainedTask: {}", interruptedTask.size());
         }
 
-        log.info("Stop Scenario Runner ");
+        log.info("Stop Scenario Runner ({})", reason);
 
     }
 

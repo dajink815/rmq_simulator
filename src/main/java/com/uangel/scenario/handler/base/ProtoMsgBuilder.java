@@ -142,7 +142,7 @@ public class ProtoMsgBuilder extends MsgBuilder {
                     .forEach(o -> msgBuilder.setField(o, bodyBuilder.build()));
             return msgBuilder.build();
         } catch (Exception e) {
-            log.warn("Err Occurs", e);
+            log.error("ProtoMsgBuilder.unescapeBodyFields.Exception ", e);
             return message;
         }
     }

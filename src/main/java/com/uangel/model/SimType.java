@@ -20,9 +20,9 @@ public enum SimType {
 
     public static SimType getTypeEnum(String type) {
         switch (StringUtil.blankIfNull(type).toLowerCase()) {
-            case "proto": case "p" :
+            case "proto", "p" :
                 return PROTO;
-            case "json": case "j" :
+            case "json", "j" :
             default:
                 return JSON;
         }

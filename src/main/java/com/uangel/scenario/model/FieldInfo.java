@@ -19,16 +19,10 @@ public class FieldInfo {
 
     @Override
     public String toString() {
-/*        if (exec == null)
+        if (exec == null)
             return name + "(" + type + "):" + value;
 
         return name + "(" + type + "):" + value +
-                ", exec=" + exec;*/
-
-        if (exec == null)
-            return name + ":" + value;
-
-        return name + ":" + value +
                 ", exec=" + exec;
     }
 }

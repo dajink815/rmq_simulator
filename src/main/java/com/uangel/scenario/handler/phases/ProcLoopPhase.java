@@ -28,6 +28,9 @@ public class ProcLoopPhase {
             }
             byte[] msg = builder.build(loopPhase);
 
+            log.debug("Session Count : [{}]", scenario.getSessionManager().getTotalSessionCnt());
+            System.out.println("Session Count : " + scenario.getSessionManager().getTotalSessionCnt());
+
             // send
             RmqClient rmqClient = scenario.getRmqManager().getDefaultClient();
             rmqClient.send(msg);

@@ -37,14 +37,6 @@ public class TestScenarioBuilder {
         Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
         System.out.println(scenario);
         System.out.println(scenario.getMsgNameList());
-    }
-
-    @Test
-    public void testFirstRecvPhaseIdx() throws IOException, SAXException {
-        String filePath = "./src/main/resources/scenario/mrfp_basic_hb.xml";
-        Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
-        System.out.println(scenario);
-        System.out.println(scenario.getMsgNameList());
         System.out.println("First Not Optional Recv Phase Index : " + scenario.getFirstRecvPhaseIdx());
     }
 

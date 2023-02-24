@@ -55,6 +55,7 @@ public class KeywordMapper {
             // 저장된 exec 명령어 처리
             String cmd;
             if ((cmd = getExecByCmd(keyword)) != null) {
+                // todo 예외처리 테스트
                 return ReflectionUtil.getExecResult(cmd);
             }
 
