@@ -53,8 +53,8 @@ public class ProtoMsgBuilder extends MsgBuilder {
 
             // Build Message
             Object msgResult = jarReflection.build(msgBuilder);
-            msgResult = unescapeBodyFields((GeneratedMessageV3) msgResult);
             log.debug("Build SendMsg \r\n[{}]", msgResult);
+            msgResult = unescapeBodyFields((GeneratedMessageV3) msgResult);
 
             return jarReflection.toByteArray(msgResult);
         } catch (Exception e) {
@@ -81,7 +81,7 @@ public class ProtoMsgBuilder extends MsgBuilder {
                 // 값 체크
 
                 // Exec
-                if (StringUtil.isNull(value)) {
+                if (StringUtil.notNull(fieldInfo.getExec())) {
                     String exec = fieldInfo.getExec();
                     value = ReflectionUtil.getExecResult(exec);
                     if (value == null) continue;
@@ -122,6 +122,10 @@ public class ProtoMsgBuilder extends MsgBuilder {
 
     private Object unescapeBodyFields(GeneratedMessageV3 message) {
         try {
+            if (message == null) {
+                log.warn("ProtoMsgBuilder.unescapeBodyFields Message Null");
+                return message;
+            }
             Message.Builder msgBuilder = message.toBuilder();
             Message.Builder bodyBuilder = message.getAllFields().entrySet().stream()
                     .filter(entry -> !entry.getKey().getName().equals("header"))

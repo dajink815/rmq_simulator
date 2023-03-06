@@ -37,6 +37,10 @@ public class RmqProtoConsumer {
             String className = config.getProtoPkg() + scenario.getMsgClassName();
             Object msgObj = jarReflection.parseFrom(className, msg);
 
+            if (msgObj == null) {
+                log.warn("RmqProtoConsumer.protoMsgProcessing Fail - MSgObj is Null [Class:{}]", className);
+                return;
+            }
             // Object -> Pretty Json
             String json = ProtoUtil.buildProto(msgObj);
 

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -34,7 +35,7 @@ public class JarReflection {
             result = true;
             log.info("Jar File Loading Completed [{}]", jarPath);
         } catch (Exception e) {
-            log.error("JarReflection.Exception ", e);
+            log.error("JarReflection.loadJarFile.Exception ", e);
         }
         return  result;
     }
@@ -48,7 +49,7 @@ public class JarReflection {
         try {
             return classLoader.loadClass(name);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("JarReflection.getClass.Exception ", e);
         }
         return null;
     }
@@ -65,7 +66,7 @@ public class JarReflection {
             constructor.setAccessible(true);
             return constructor.newInstance();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("JarReflection.getClassObject.Exception ", e);
         }
         return null;
     }
@@ -83,7 +84,7 @@ public class JarReflection {
             Method method = obj.getClass().getMethod(methodName);
             return method.invoke(obj);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("JarReflection.invokeMethod.Exception ", e);
         }
         return null;
     }
@@ -106,8 +107,12 @@ public class JarReflection {
             Method method = obj.getClass().getMethod(methodName, paramType);
             // 호출한 메소드 실행 with parameter
             return method.invoke(obj, parameter);
+        } catch (InvocationTargetException e) {
+            log.error("JarReflection.invokeMethodWparam.InvocationTargetException [Method:{}, ParamType:{}, Obj:{}]",
+                    methodName, paramType.getSimpleName(), obj, e.getCause());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("JarReflection.invokeMethodWparam.Exception [Method:{}, ParamType:{}, Obj:{}]",
+                    methodName, paramType.getSimpleName(),obj, e);
         }
         return null;
     }
