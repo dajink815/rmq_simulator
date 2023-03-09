@@ -7,6 +7,7 @@ import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
 import com.uangel.scenario.phases.LoopPhase;
 import com.uangel.scenario.phases.SendPhase;
+import com.uangel.scenario.type.OutMsgType;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -65,7 +66,7 @@ public class TestProtoMsgBuilder {
     public void testProtoMsgBuilder() {
         SendPhase sendPhase = scenario.getFirstSendPhase();
         if (sendPhase == null) return;
-        ProtoMsgBuilder msgBuilder = new ProtoMsgBuilder(sessionInfo);
+        ProtoMsgBuilder msgBuilder = new ProtoMsgBuilder(sessionInfo, OutMsgType.SEND);
         byte[] msg = msgBuilder.build(sendPhase);
         System.out.println("Msg : " + msg);
     }
@@ -75,7 +76,7 @@ public class TestProtoMsgBuilder {
         LoopPhase loopPhase = scenario.getLoopPhase(0);
         if (loopPhase == null) return;
 
-        LoopProtoMsgBuilder msgBuilder = new LoopProtoMsgBuilder(scenario);
+        ProtoMsgBuilder msgBuilder = new ProtoMsgBuilder(scenario, OutMsgType.LOOP);
         byte[] msg = msgBuilder.build(loopPhase);
         System.out.println("Msg : " + msg);
     }

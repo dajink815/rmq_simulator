@@ -53,6 +53,8 @@ public class ProcRecvPhase extends ProcMsgPhase {
         RecvPhase optionalRecv = checkOptionalPhases(json);
         if (optionalRecv != null) {
             log.debug("CheckOptionalPhases True : {}", optionalRecv.getMsgName());
+
+            // recv 태그의 next 속성 값 있을 경우 next label 처리
             ProcLabelPhase procLabelPhase = new ProcLabelPhase(scenario);
             scenario.addFields(fields);
             procLabelPhase.run(optionalRecv.getNext(), fields);
@@ -61,7 +63,7 @@ public class ProcRecvPhase extends ProcMsgPhase {
 
         // Optional 처리 후 RecvPhase 타입 체크
         // 현재 단계가 Recv 아니라면 skip
-        if (!(curPhase instanceof RecvPhase curRecvPhase)) return false;
+        if (!(curPhase instanceof RecvPhase)) return false;
 
         if (StringUtil.isNull(sessionId)) {
             // sessionId Null
@@ -70,8 +72,9 @@ public class ProcRecvPhase extends ProcMsgPhase {
 
         // check SessionId
         if (!sessionId.equals(sessionInfo.getSessionId())) {
-            // SessionId가 동일하지 않지만 조건 맞는 경우 SessionId 갱신
-            // todo 그 외 조건?
+            // SessionId가 동일하지 않지만 조건 맞는 경우 SessionId 갱신        // todo 그 외 조건?
+            // 조건 1. RmqGen Receiver, RecvPhase 로 시작
+            //       (처리 중인 Index == optional 아닌 첫번째 RecvPhase Index)
             if (sessionInfo.getCurIdx() == scenario.getFirstRecvPhaseIdx()) {
                 sessionManager.changeSessionId(sessionInfo.getSessionId(), sessionId);
             } else {
@@ -95,9 +98,9 @@ public class ProcRecvPhase extends ProcMsgPhase {
                 .findFirst().orElse(null);
 
         if (recvPhase == null) {
-            //log.debug("checkOptionalPhases Result Null \r\n[{}]", json);
+            log.debug("checkOptionalPhases Result Null \r\n[{}]", json);
         } else {
-            //log.debug("checkOptionalPhases Result : {}", recvPhase.getMsgName());
+            log.debug("checkOptionalPhases Result : {}", recvPhase.getMsgName());
         }
 
         return recvPhase;

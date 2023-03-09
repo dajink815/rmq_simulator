@@ -4,6 +4,7 @@ import com.uangel.rmq.module.RmqClient;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.handler.base.*;
 import com.uangel.scenario.phases.LoopPhase;
+import com.uangel.scenario.type.OutMsgType;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -20,11 +21,11 @@ public class ProcLoopPhase {
     public void run(LoopPhase loopPhase) {
         try {
             // create
-            LoopMsgBuilder builder;
+            MsgBuilder builder;
             if (scenario.isProtoType()) {
-                builder = new LoopProtoMsgBuilder(scenario);
+                builder = new ProtoMsgBuilder(scenario, OutMsgType.LOOP);
             } else {
-                builder = new LoopJsonMsgBuilder(scenario);
+                builder = new JsonMsgBuilder(scenario, OutMsgType.LOOP);
             }
             byte[] msg = builder.build(loopPhase);
 

@@ -70,8 +70,8 @@ public class SessionInfo {
     public void stop(String reason) {
         this.isSessionEnded = true;
 
-        // stat
-        //log.debug("({}) Call Ended [{}] [{}]", callInfo.getCallId(), reason, this.scenarioStat);
+        // todo stat
+        log.debug("({}) Session Ended [{}]", sessionId, reason);
     }
 
     public int getCurIdx() {

@@ -2,10 +2,11 @@ package com.uangel.scenario.handler.phases;
 
 import com.uangel.rmq.module.RmqClient;
 import com.uangel.scenario.Scenario;
-import com.uangel.scenario.handler.base.LoopJsonMsgBuilder;
-import com.uangel.scenario.handler.base.LoopMsgBuilder;
-import com.uangel.scenario.handler.base.LoopProtoMsgBuilder;
+import com.uangel.scenario.handler.base.JsonMsgBuilder;
+import com.uangel.scenario.handler.base.MsgBuilder;
+import com.uangel.scenario.handler.base.ProtoMsgBuilder;
 import com.uangel.scenario.phases.LabelPhase;
+import com.uangel.scenario.type.OutMsgType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -33,11 +34,11 @@ public class ProcLabelPhase {
 
         try {
             // create
-            LoopMsgBuilder builder;
+            MsgBuilder builder;
             if (scenario.isProtoType()) {
-                builder = new LoopProtoMsgBuilder(scenario);
+                builder = new ProtoMsgBuilder(scenario, OutMsgType.LOOP);
             } else {
-                builder = new LoopJsonMsgBuilder(scenario);
+                builder = new JsonMsgBuilder(scenario, OutMsgType.LOOP);
             }
             byte[] msg = builder.build(labelPhase);
 

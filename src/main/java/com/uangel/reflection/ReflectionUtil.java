@@ -3,6 +3,7 @@ package com.uangel.reflection;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.expr.*;
 import com.uangel.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -13,6 +14,7 @@ import java.util.stream.IntStream;
  *
  * @author kangmoo Heo
  */
+@Slf4j
 public class ReflectionUtil {
 
     public static void main(String[] args) throws Exception {
@@ -23,15 +25,20 @@ public class ReflectionUtil {
         System.out.println(exec("java.util.UUID.randomUUID().toString()"));
     }
 
-    public static String getExecResult(String execCmd) throws Exception {
-        if (StringUtil.isNull(execCmd))
-            return null;
+    public static String getExecResult(String execCmd) {
+        try {
+            if (StringUtil.isNull(execCmd))
+                return null;
 
-        TypeValuePair typeValuePair = exec(execCmd);
-        if (typeValuePair == null || typeValuePair.value == null)
-            return null;
+            TypeValuePair typeValuePair = exec(execCmd);
+            if (typeValuePair == null || typeValuePair.value == null)
+                return null;
 
-        return typeValuePair.value.toString();
+            return typeValuePair.value.toString();
+        } catch (Exception e) {
+            log.error("ReflectionUtil.getExecResult.Exception [{}]", execCmd, e);
+            return null;
+        }
     }
 
     public static TypeValuePair exec(String expression) throws Exception {

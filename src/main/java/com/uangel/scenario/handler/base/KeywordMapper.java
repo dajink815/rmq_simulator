@@ -34,6 +34,9 @@ public class KeywordMapper {
     public Map<String, String> getExecCmdMap() {
         return execCmdMap;
     }
+    public int getExecCmdMapSize() {
+        return execCmdMap.size();
+    }
 
     public String replaceKeyword(String keyword, SessionInfo sessionInfo) {
         String before = keyword;
@@ -50,12 +53,9 @@ public class KeywordMapper {
 
     private String getValue(String keyword, SessionInfo sessionInfo) {
         try {
-            // todo 예외처리 - exec 예약 명령어 없는 경우 로그, last_ 필드값 없는 경우
-            
             // 저장된 exec 명령어 처리
             String cmd;
             if ((cmd = getExecByCmd(keyword)) != null) {
-                // todo 예외처리 테스트
                 return ReflectionUtil.getExecResult(cmd);
             }
 

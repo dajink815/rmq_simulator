@@ -23,8 +23,6 @@ public class CommandInfo {
     private  String protoFile;
     private  String protoPkg;
 
-    // todo User Command Exec
-
     // RMQ
     private  String rmqLocal;
     private  String rmqHost;
@@ -50,6 +48,8 @@ public class CommandInfo {
 
     // Command Line UDP Port
 
+    // User Command File Path
+    private String userCmdFilePath;
 
     public CommandInfo(CommandLine cmd) {
         loadServiceConfig(cmd);
@@ -63,6 +63,8 @@ public class CommandInfo {
         this.fieldKeyword = cmd.getOptionValue("k", "callId");
         String mode = cmd.getOptionValue("t", "proto");
         this.type = SimType.getTypeEnum(mode);
+
+        this.userCmdFilePath = cmd.getOptionValue("user_cmd");
     }
 
     public void loadProtoConfig(CommandLine cmd) {
@@ -110,6 +112,7 @@ public class CommandInfo {
         opts.addOption(new Option("h", "display help text"));
         opts.addOption(Option.builder("sf").argName("file").hasArg().desc("The XML scenario file").build());
         opts.addOption(Option.builder("k").argName("field_keyword").hasArg().desc("Field keyword").build());
+        opts.addOption(Option.builder("user_cmd").argName("user_cmd_file").hasArg().desc("user exec command file path").build());
 
         // Simulator Type
         opts.addOption(Option.builder("t").argName("simulator_type").hasArg().desc("Simulator Mode [json/proto]").build());

@@ -9,11 +9,14 @@ import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
 import com.uangel.scenario.handler.LoopMsgHandler;
 import com.uangel.scenario.handler.base.KeywordMapper;
+import com.uangel.util.JsonUtil;
 import com.uangel.util.SleepUtil;
+import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author dajin kim
@@ -67,12 +70,14 @@ public class ScenarioRunner {
             scenario.setKeywordMapper(keywordMapper);
 
             // User Defined Command (ReflectionUtil)
-            // todo parse & add UserCmd
             keywordMapper.addUserCmd("tId", "java.util.UUID.randomUUID().toString()");
             keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
-
-
-
+            if (StringUtil.notNull(cmdInfo.getUserCmdFilePath())) {
+                // parse & add UserCmd
+                Map<String, String> userCmdFields = JsonUtil.getAllFileFields(cmdInfo.getUserCmdFilePath());
+                userCmdFields.forEach(keywordMapper::addUserCmd);
+            }
+            log.debug("[{}] User Defined Command (Size:{})\r\n{}", scenarioName, keywordMapper.getExecCmdMapSize(), keywordMapper.getExecCmdMap());
 
             // Statistics
 

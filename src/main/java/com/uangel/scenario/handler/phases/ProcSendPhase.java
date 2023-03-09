@@ -7,6 +7,7 @@ import com.uangel.scenario.handler.base.MsgBuilder;
 import com.uangel.scenario.handler.base.ProtoMsgBuilder;
 import com.uangel.scenario.phases.MsgPhase;
 import com.uangel.scenario.phases.SendPhase;
+import com.uangel.scenario.type.OutMsgType;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -27,15 +28,19 @@ public class ProcSendPhase extends ProcMsgPhase {
             // create
             MsgBuilder builder;
             if (scenario.isProtoType()) {
-                builder = new ProtoMsgBuilder(sessionInfo);
+                builder = new ProtoMsgBuilder(sessionInfo, OutMsgType.SEND);
             } else {
-                builder = new JsonMsgBuilder(sessionInfo);
+                builder = new JsonMsgBuilder(sessionInfo, OutMsgType.SEND);
             }
             byte[] msg = builder.build(sendPhase);
 
             // send
-            RmqClient rmqClient = scenario.getRmqManager().getDefaultClient();
-            rmqClient.send(msg);
+            if (msg.length > 0) {
+                RmqClient rmqClient = scenario.getRmqManager().getDefaultClient();
+                rmqClient.send(msg);
+            } else {
+                log.warn("ProcSendPhase Fail - {} Idx Msg Build Fail (ProtoMode:{})", sessionInfo.getCurIdx(), scenario.isProtoType());
+            }
 
             sessionInfo.execPhase(sessionInfo.increaseCurIdx());
         } catch (Exception e) {

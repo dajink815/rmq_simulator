@@ -62,6 +62,11 @@ public class RmqProtoConsumer {
                 return;
             }
 
+            if (fields.isEmpty()) {
+                log.warn("RmqProtoConsumer Fail - Msg Fields Map is Empty");
+                return;
+            }
+
             // sessionId로 SessionManager 에 등록된 SessionInfo 조회
             SessionInfo sessionInfo = sessionManager.getSessionInfo(sessionId);
             if (sessionInfo != null) {

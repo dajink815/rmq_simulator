@@ -83,7 +83,7 @@ public class Scenario extends MsgInfoManager {
 
 
     public LoopPhase getLoopPhase(int idx) {
-        if (loopPhases == null) return null;
+        if (loopPhases == null || loopPhases.isEmpty()) return null;
         return this.loopPhases.get(idx);
     }
 

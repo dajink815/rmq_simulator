@@ -3,16 +3,15 @@ package com.uangel.reflection;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.Message;
-import com.google.protobuf.MessageOrBuilder;
-import com.google.protobuf.Struct;
+import com.google.protobuf.*;
 import com.google.protobuf.util.JsonFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dajin kim
@@ -24,21 +23,10 @@ public class ProtoUtil {
         // nothing
     }
 
+    // JSON -> ClassType Object
     public static <T> T parse(String json, Type classType) {
         Gson gson = new Gson();
         return gson.fromJson(json, classType);
-    }
-
-    // Object -> Pretty JSON
-    public static String buildPretty(Object obj) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(obj);
-    }
-
-    // JSON -> Pretty JSON
-    public static String buildPretty(String json) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(JsonParser.parseString(json));
     }
 
     public static String protoToJson(MessageOrBuilder message) {

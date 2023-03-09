@@ -7,13 +7,15 @@ import com.google.protobuf.Message;
 import com.uangel.model.SessionInfo;
 import com.uangel.reflection.JarReflection;
 import com.uangel.reflection.ReflectionUtil;
+import com.uangel.scenario.Scenario;
 import com.uangel.scenario.model.FieldInfo;
 import com.uangel.scenario.model.HeaderBodyInfo;
 import com.uangel.scenario.phases.OutgoingPhase;
-import com.uangel.scenario.phases.SendPhase;
 import com.uangel.scenario.type.FieldType;
+import com.uangel.scenario.type.OutMsgType;
 import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,15 +29,21 @@ public class ProtoMsgBuilder extends MsgBuilder {
 
     private final JarReflection jarReflection;
 
-    public ProtoMsgBuilder(SessionInfo sessionInfo) {
-        super(sessionInfo);
+    public ProtoMsgBuilder(SessionInfo sessionInfo, OutMsgType type) {
+        super(sessionInfo, type);
+        this.jarReflection = scenario.getJarReflection();
+    }
+
+    // SessionInfo Null
+    public ProtoMsgBuilder(Scenario scenario, OutMsgType type) {
+        super(scenario, type);
         this.jarReflection = scenario.getJarReflection();
     }
 
     @Override
     public byte[] build(OutgoingPhase outgoingPhase) {
-        // Send 만 처리
-        if (!(outgoingPhase instanceof SendPhase)) return new byte[0];
+        // Check Instance Type
+        if (!checkType(outgoingPhase)) return new byte[0];
 
         try {
             String pkgBase = scenario.getCmdInfo().getProtoPkg();
@@ -53,14 +61,20 @@ public class ProtoMsgBuilder extends MsgBuilder {
 
             // Build Message
             Object msgResult = jarReflection.build(msgBuilder);
-            log.debug("Build SendMsg \r\n[{}]", msgResult);
+            // Type 별 로그
+            if (isSendType()) {
+                log.debug("Build SendMsg \r\n[{}]", msgResult);
+            } else {
+                log.debug("Build LoopMsg [{}]", outgoingPhase.getMsgName());
+                //System.out.println(msgResult);
+            }
             msgResult = unescapeBodyFields((GeneratedMessageV3) msgResult);
 
             return jarReflection.toByteArray(msgResult);
         } catch (Exception e) {
             log.error("ProtoMsgBuilder.build.Exception ", e);
         }
-        //return null;
+
         return new byte[0];
     }
 
@@ -84,7 +98,10 @@ public class ProtoMsgBuilder extends MsgBuilder {
                 if (StringUtil.notNull(fieldInfo.getExec())) {
                     String exec = fieldInfo.getExec();
                     value = ReflectionUtil.getExecResult(exec);
-                    if (value == null) continue;
+                    if (value == null) {
+                        log.warn("ProtoMsgBuilder - Exec field processing failed (fieldName:{}, exec:{})", fieldName, exec);
+                        continue;
+                    }
                 }
 
                 // Keyword
@@ -108,7 +125,8 @@ public class ProtoMsgBuilder extends MsgBuilder {
             }
 
             if (!fields.isEmpty()) {
-                sessionInfo.addFields(fields);
+                if (ObjectUtils.isNotEmpty(sessionInfo)) sessionInfo.addFields(fields);
+                else scenario.addFields(fields);
             }
 
             return jarReflection.build(builder);
