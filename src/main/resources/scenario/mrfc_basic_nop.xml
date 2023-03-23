@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenario name="mrfc_basic_flow">
+
+    <nop>
+        <action>
+            <exec rtp_stream="/Users/kimdajin/Simulator/urmqgen/src/test/resources/audio/sample.wav"/>
+            <exec play_pcap_audio="PCAP1" rtp_stream="Test"/>
+        </action>
+        <action>
+            <exec play_pcap_audio="PCAP2"/>
+        </action>
+    </nop>
+
+    <send class="Message">
+        <header class="request">
+            <field name="type" type="str" value="sys"/>
+            <field name="transactionId" type="str" value="[tId]"/>
+            <field name="cmd" type="str" value="connect"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+        </header>
+        <body class="DialogStartReq">
+            <field name="fromNo" type="str" value="010-1111-2222"/>
+            <field name="toNo" type="str" value="010-3333-4444"/>
+        </body>
+        <body class="data">
+            <field name="ip" type="str" value="127.0.0.1"/>
+            <field name="port" type="int" value="5060"/>
+            <!-- 내부에 resource 구조체 -->
+            <body class="resource">
+                <field name="amrCount" type="int" value="100"/>
+                <field name="evsCount" type="int" value="200"/>
+            </body>
+        </body>
+    </send>
+
+    <recv class="Message">
+        <body class="DialogStartRes"/>
+    </recv>
+
+    <pause milliseconds="4000"/>
+
+    <send class="Message">
+        <header class="Header">
+            <field name="type" type="str" value="DIALOG_SETUP_REQ"/>
+            <field name="tId" type="str" value="[tId]"/>
+            <field name="msgFrom" type="str" value="MRFC"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+            <field name="dialogId" type="str" value="[last_dialogId]"/>
+        </header>
+        <body class="DialogSetupReq">
+            <field name="sdp" type="str" value="[last_sdp]"/>
+        </body>
+    </send>
+
+    <recv class="Message">
+        <body class="DialogSetupRes"/>
+    </recv>
+
+    <pause milliseconds="4000"/>
+
+    <send class="Message">
+        <header class="Header">
+            <field name="type" type="str" value="DIALOG_STOP_REQ"/>
+            <field name="tId" type="str" value="[tId]"/>
+            <field name="msgFrom" type="str" value="MRFC"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+            <field name="dialogId" type="str" value="[last_dialogId]"/>
+        </header>
+        <body class="DialogStopReq">
+            <field name="record" type="int" value="1"/>
+        </body>
+    </send>
+
+    <recv class="Message">
+        <body class="DialogStopRes"/>
+    </recv>
+</scenario>

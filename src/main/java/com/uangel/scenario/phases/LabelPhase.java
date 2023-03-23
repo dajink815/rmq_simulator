@@ -11,14 +11,14 @@ import org.w3c.dom.Node;
 public class LabelPhase extends OutgoingPhase {
     private final String id;
 
-    public LabelPhase(Node xmlNode, int idx) {
-        super(xmlNode, idx);
+    public LabelPhase(Node xmlNode, int idx, boolean isProtoMode) {
+        super(xmlNode, idx, isProtoMode);
         this.id = getStrAttrValue(AttrName.ID.getValue());
     }
 
     @Override
     public String toString() {
-        return "Label{" + msgName +
+        return "Label{msgName:" + msgName +
                 ", headerBody=" + headerBodyInfos +
                 '}';
     }

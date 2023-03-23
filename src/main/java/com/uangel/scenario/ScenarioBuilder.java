@@ -50,7 +50,10 @@ public class ScenarioBuilder {
     }
 
     // 파일 이름
-    public static Scenario fromXMLFileName(String filename) throws SAXException, IOException {
+    public static Scenario fromXMLFileName(String filename) throws IOException, SAXException {
+        return fromXMLFileName(filename, true);
+    }
+    public static Scenario fromXMLFileName(String filename, boolean isProtoMode) throws SAXException, IOException {
         if (DOCUMENT_BUILDER == null) return null;
 
         File fXmlFile = new File(filename);
@@ -58,10 +61,13 @@ public class ScenarioBuilder {
         synchronized (DOCUMENT_BUILDER) {
             doc = DOCUMENT_BUILDER.parse(fXmlFile);
         }
-        return fromXMLDocument(doc);
+        return fromXMLDocument(doc, isProtoMode);
     }
 
     public static Scenario fromXMLDocument(Document doc) {
+        return fromXMLDocument(doc, true);
+    }
+    public static Scenario fromXMLDocument(Document doc, boolean isProtoMode) {
         Element scenarioEle = doc.getDocumentElement();
         NamedNodeMap attr = scenarioEle.getAttributes();
         Node nameAttr = attr.getNamedItem(AttrName.NAME.getValue());
@@ -77,12 +83,13 @@ public class ScenarioBuilder {
         for (Node m = scenarioEle.getFirstChild(); m != null; m = m.getNextSibling()) {
             switch (m.getNodeName()) {
                 case "recv" -> msgPhases.add(new RecvPhase(m, idx++));
-                case "send" -> msgPhases.add(new SendPhase(m, idx++));
+                case "send" -> msgPhases.add(new SendPhase(m, idx++, isProtoMode));
                 case "pause" -> msgPhases.add(new PausePhase(m, idx++));
+                case "nop" -> msgPhases.add(new NopPhase(m, idx++));
                 // todo index?
-                case "loop" -> loopPhases.add(new LoopPhase(m, 0));
+                case "loop" -> loopPhases.add(new LoopPhase(m, 0, isProtoMode));
                 case "label" -> {
-                    LabelPhase labelPhase = new LabelPhase(m, 0);
+                    LabelPhase labelPhase = new LabelPhase(m, 0, isProtoMode);
                     String id = labelPhase.getId();
                     labelPhases.put(id, labelPhase);
                 }

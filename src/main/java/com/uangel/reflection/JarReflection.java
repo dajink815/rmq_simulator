@@ -212,7 +212,7 @@ public class JarReflection {
         return invokeByteMethod(className, "parseFrom", bytes);
     }
 
-    public String getMethodName(String fieldName) {
+    public String getSetterMethodName(String fieldName) {
         return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 

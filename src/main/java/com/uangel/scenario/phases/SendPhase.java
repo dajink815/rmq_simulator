@@ -9,14 +9,22 @@ import org.w3c.dom.Node;
 @Getter
 public class SendPhase extends OutgoingPhase {
 
-    public SendPhase(Node xmlNode, int idx) {
-        super(xmlNode, idx);
+    public SendPhase(Node xmlNode, int idx, boolean isProtoMode) {
+        super(xmlNode, idx, isProtoMode);
     }
 
     @Override
     public String toString() {
-        return "Send{" + msgName +
-                ", headerBody=" + headerBodyInfos +
-                '}';
+        StringBuilder sb = new StringBuilder("Send{msgName:").append(msgName).append(", ");
+        for (int i = 0; i < headerBodyInfos.size(); i++) {
+            sb.append("Node").append(i+1).append(headerBodyInfos.get(i));
+            if (i != (headerBodyInfos.size() - 1))
+                sb.append(", ");
+        }
+/*        for (HeaderBodyInfo headerBody : headerBodyInfos) {
+            sb.append(headerBody).append(", ");
+        }*/
+        sb.append("}");
+        return sb.toString();
     }
 }

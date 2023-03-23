@@ -52,7 +52,8 @@ public class ScenarioRunner {
 
         try {
             // Build Scenario
-            scenario = ScenarioBuilder.fromXMLFileName(cmdInfo.getScenarioFile());
+            boolean isProtoMode = SimType.PROTO.equals(cmdInfo.getType());
+            scenario = ScenarioBuilder.fromXMLFileName(cmdInfo.getScenarioFile(), isProtoMode);
             if (scenario == null) {
                 log.error("ScenarioRunner Scenario Build Fail");
                 return null;

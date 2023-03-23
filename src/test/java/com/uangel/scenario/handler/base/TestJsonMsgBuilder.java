@@ -28,8 +28,13 @@ public class TestJsonMsgBuilder {
     @Before
     public void prepareUserCmd() throws ParseException, IOException, SAXException {
         // CommandInfo
+        String scenarioPath = "./src/main/resources/scenario/";
+        String scenarioName = "mrfc_basic_json_hb.xml";
+        scenarioName = "mrfc_basic_nop.xml";
+        scenarioName = "amf_testvcif_basic.xml";
+
         String localIp = "127.0.0.1";
-        String[] args = {"-sf", "./src/main/resources/scenario/mrfc_basic_json_hb.xml",
+        String[] args = {"-sf", scenarioPath + scenarioName,
                 "-t", "json",
                 "-rl", "local_queue", "-rh", localIp,
                 "-rp", "5672", "-m", "1"};
@@ -39,7 +44,7 @@ public class TestJsonMsgBuilder {
         CommandInfo cmdInfo = new CommandInfo(cmd);
 
         String filePath = cmdInfo.getScenarioFile();
-        scenario = ScenarioBuilder.fromXMLFileName(filePath);
+        scenario = ScenarioBuilder.fromXMLFileName(filePath, false);
 
         scenario.setCmdInfo(cmdInfo);
 
@@ -49,7 +54,6 @@ public class TestJsonMsgBuilder {
         // KeywordMapper
         KeywordMapper keywordMapper = new KeywordMapper(scenario);
         keywordMapper.addUserCmd("tId", "java.util.UUID.randomUUID().toString()");
-        //keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
         keywordMapper.addUserCmd("timestamp", "java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm:ss.SSS\"))");
 
         scenario.setKeywordMapper(keywordMapper);

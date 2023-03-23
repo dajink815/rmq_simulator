@@ -4,7 +4,6 @@ import com.uangel.scenario.model.FieldInfo;
 import com.uangel.scenario.model.HeaderBodyInfo;
 import com.uangel.util.StringUtil;
 import lombok.Getter;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -20,12 +19,11 @@ public class OutgoingPhase extends MsgPhase {
     protected final String className;
     protected final List<HeaderBodyInfo> headerBodyInfos = new ArrayList<>();
 
-    protected OutgoingPhase(Node xmlNode, int idx) {
-        super(xmlNode, idx);
+    protected OutgoingPhase(Node xmlNode, int idx, boolean isProtoMode) {
+        super(xmlNode, idx, isProtoMode);
         this.className = getClassAttrValue();
 
-        Element sendEle = (Element) xmlNode;
-        NodeList headerBodyList = sendEle.getChildNodes();
+        NodeList headerBodyList = xmlNode.getChildNodes();
 
         for (int i = 0; i < headerBodyList.getLength(); i++) {
             Node headerBodyNode = headerBodyList.item(i);
@@ -39,11 +37,9 @@ public class OutgoingPhase extends MsgPhase {
                 }
 
                 // Field List
-                Element headerBodyEle = (Element) headerBodyNode;
-                List<FieldInfo> fieldInfos = createFieldInfos(headerBodyEle.getChildNodes());
-
+                List<FieldInfo> fieldInfos = createFieldInfos(headerBodyNode.getChildNodes());
                 // Create & Add HeaderBodyInfo
-                HeaderBodyInfo headerBodyInfo = new HeaderBodyInfo(msgClass, fieldInfos);
+                HeaderBodyInfo headerBodyInfo = new HeaderBodyInfo(headerBodyNode, msgClass, fieldInfos, isProtoMode);
                 headerBodyInfos.add(headerBodyInfo);
             }
         }

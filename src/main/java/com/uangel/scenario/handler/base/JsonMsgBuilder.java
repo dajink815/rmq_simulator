@@ -5,6 +5,7 @@ import com.uangel.reflection.ReflectionUtil;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.model.FieldInfo;
 import com.uangel.scenario.model.HeaderBodyInfo;
+import com.uangel.scenario.model.StructInfo;
 import com.uangel.scenario.phases.OutgoingPhase;
 import com.uangel.scenario.type.FieldType;
 import com.uangel.scenario.type.OutMsgType;
@@ -41,13 +42,7 @@ public class JsonMsgBuilder extends MsgBuilder {
 
         try {
             JSONObject jsonObject = new JSONObject();
-
-            // set subMessages
-            for (HeaderBodyInfo msgInfo : outgoingPhase.getHeaderBodyInfos()) {
-                JSONObject data = getSubMessage(msgInfo);
-                if (data == null || data.isEmpty()) continue;
-                jsonObject.put(msgInfo.getClassName(), data);
-            }
+            buildJsonMsg(jsonObject, outgoingPhase.getHeaderBodyInfos());
 
             //log.debug("Pretty Json \r\n[{}]", JsonUtil.buildPretty(jsonObject));
 
@@ -60,7 +55,7 @@ public class JsonMsgBuilder extends MsgBuilder {
                 log.debug("Build SendMsg \r\n[{}]", JsonUtil.buildPretty(new String(bytes)));
             } else {
                 log.debug("Build LoopMsg [{}]", outgoingPhase.getMsgName());
-                System.out.println(JsonUtil.buildPretty(new String(bytes)));
+                //System.out.println(JsonUtil.buildPretty(new String(bytes)));
             }
 
             return bytes;
@@ -71,13 +66,30 @@ public class JsonMsgBuilder extends MsgBuilder {
         return new byte[0];
     }
 
+    private void buildJsonMsg(JSONObject jsonObject, List<HeaderBodyInfo> childrenInfo) {
+        for (HeaderBodyInfo childInfo : childrenInfo) {
+            JSONObject data = buildSubMsg(childInfo.getFieldInfos(), childInfo.getStructList());
+            if (data.isEmpty()) continue;
+            jsonObject.put(childInfo.getClassName(), data);
+        }
+    }
 
-    public JSONObject getSubMessage(HeaderBodyInfo msgInfo) {
+    private void setStructMsg(JSONObject parentObj, List<StructInfo> structInfos) {
+        for (StructInfo structInfo : structInfos) {
+            JSONObject structObj = buildSubMsg(structInfo.getFieldInfos(), structInfo.getStructList());
+            if (structObj.isEmpty()) continue;
+            parentObj.put(structInfo.getName(), structObj);
+        }
+    }
+
+    private JSONObject buildSubMsg(List<FieldInfo> fieldInfos, List<StructInfo> structInfos) {
 
         try {
             JSONObject data = new JSONObject();
-            List<FieldInfo> fieldInfos = msgInfo.getFieldInfos();
             Map<String, String> fields = new HashMap<>();
+
+            // Struct Node Message build
+            setStructMsg(data, structInfos);
 
             for (FieldInfo fieldInfo : fieldInfos) {
                 String fieldName = fieldInfo.getName();

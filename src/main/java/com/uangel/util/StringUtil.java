@@ -58,4 +58,34 @@ public class StringUtil {
         return new ArrayList<>(Arrays.asList(arr));
     }
 
+    public static String camelToSnake(String str) {
+        StringBuilder result = new StringBuilder();
+        char c = str.charAt(0);
+        result.append(Character.toLowerCase(c));
+        for (int i = 1; i < str.length(); i++) {
+
+            char ch = str.charAt(i);
+            if (Character.isUpperCase(ch)) {
+                result.append('_');
+                result.append(Character.toLowerCase(ch));
+            } else {
+                result.append(ch);
+            }
+        }
+        return result.toString();
+    }
+
+    public static String snakeToCamel(String str) {
+        str = str.substring(0, 1).toUpperCase() + str.substring(1);
+        StringBuilder builder = new StringBuilder(str);
+
+        for (int i = 0; i < builder.length(); i++) {
+            if (builder.charAt(i) == '_') {
+                builder.deleteCharAt(i);
+                builder.replace(i, i + 1, String.valueOf(Character.toUpperCase(builder.charAt(i))));
+            }
+        }
+
+        return builder.toString();
+    }
 }

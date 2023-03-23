@@ -8,7 +8,8 @@ import com.uangel.util.StringUtil;
 public enum NodeName {
     SCENARIO("scenario"),
     SEND("send"), RECV("recv"), PAUSE("pause"),
-    HEADER("header"), BODY("body"), FIELD("field");
+    HEADER("header"), BODY("body"), FIELD("field"),
+    STRUCT("struct");
 
     private final String value;
 

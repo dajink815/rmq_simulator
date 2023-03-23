@@ -3,6 +3,7 @@ package com.uangel.scenario.handler.base;
 import com.uangel.model.SessionInfo;
 import com.uangel.reflection.ReflectionUtil;
 import com.uangel.scenario.Scenario;
+import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -76,6 +77,10 @@ public class KeywordMapper {
 
             if (keyword.startsWith(LAST)) {
                 String fieldName = keyword.substring(LAST.length());
+                if (scenario.isProtoType() && fieldName.contains("_")) {
+                    //log.debug("Last Keyword Changed {} -> {}", fieldName, StringUtil.snakeToCamel(fieldName.toLowerCase()));
+                    fieldName = StringUtil.snakeToCamel(fieldName.toLowerCase());
+                }
                 if (sessionInfo != null) return sessionInfo.getFieldValue(fieldName);
                 else return scenario.getFieldValue(fieldName);
             }

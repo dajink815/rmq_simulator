@@ -11,14 +11,14 @@ import org.w3c.dom.Node;
 public class LoopPhase extends OutgoingPhase {
     private final int reTrans;
 
-    public LoopPhase(Node xmlNode, int idx) {
-        super(xmlNode, idx);
+    public LoopPhase(Node xmlNode, int idx, boolean isProtoMode) {
+        super(xmlNode, idx, isProtoMode);
         this.reTrans = getIntAttrWithDefault(AttrName.RETRANS.getValue(), 0);
     }
 
     @Override
     public String toString() {
-        return "Loop{" + msgName +
+        return "Loop{msgName:" + msgName +
                 ", headerBody=" + headerBodyInfos +
                 '}';
     }}
