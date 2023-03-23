@@ -25,6 +25,7 @@
 
         <maven.test.skip>true</maven.test.skip>
 
+        <protobuf.version>1.0.2</protobuf.version>
     </properties>
 
     <dependencies>
@@ -142,6 +143,25 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.11.0.rc1</version>
+        </dependency>
+
+        <!-- For RTP -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.65.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>io.kaitai</groupId>
+            <artifactId>kaitai-struct-runtime</artifactId>
+            <version>0.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.uangel.vcs</groupId>
+            <artifactId>vcs-proto-msg</artifactId>
+            <version>${protobuf.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

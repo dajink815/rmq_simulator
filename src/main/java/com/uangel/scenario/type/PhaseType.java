@@ -5,7 +5,7 @@ package com.uangel.scenario.type;
  */
 public enum PhaseType {
 
-    SEND("Send"), RECV("Recv"),  PAUSE("Pause");
+    SEND("Send"), RECV("Recv"),  PAUSE("Pause"), NOP("Nop");
 
     private final String value;
 

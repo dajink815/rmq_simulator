@@ -1,6 +1,7 @@
 package com.uangel.model;
 
 import com.uangel.scenario.phases.MsgPhase;
+import com.uangel.scenario.phases.NopPhase;
 import com.uangel.scenario.phases.RecvPhase;
 import com.uangel.scenario.phases.SendPhase;
 import com.uangel.scenario.type.PhaseType;
@@ -36,14 +37,14 @@ public class MsgInfoManager {
         }
 
         for (MsgPhase msgPhase : phases) {
-            if (msgPhase instanceof SendPhase) {
-                SendPhase sendPhase = (SendPhase) msgPhase;
+            if (msgPhase instanceof SendPhase sendPhase) {
                 createMsgInfo(sendPhase.getMsgName(), PhaseType.SEND);
                 setMsgClassName(sendPhase.getClassName());
-            } else if (msgPhase instanceof RecvPhase) {
-                RecvPhase recvPhase = (RecvPhase) msgPhase;
+            } else if (msgPhase instanceof RecvPhase recvPhase) {
                 createMsgInfo(recvPhase.getMsgName(), PhaseType.RECV);
                 setMsgClassName(recvPhase.getClassName());
+            } else if (msgPhase instanceof NopPhase) {
+                createMsgInfo(PhaseType.NOP.getValue(), PhaseType.NOP);
             } else {
                 createMsgInfo(PhaseType.PAUSE.getValue(), PhaseType.PAUSE);
             }

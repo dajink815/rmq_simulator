@@ -1,15 +1,16 @@
 package com.uangel.model;
 
 import com.uangel.executor.UScheduledExecutorService;
+import com.uangel.media.info.MediaInfo;
+import com.uangel.media.netty.NettyChannelManager;
+import com.uangel.media.rtp.MediaPlayer;
 import com.uangel.scenario.Scenario;
+import com.uangel.scenario.handler.phases.ProcNopPhase;
 import com.uangel.scenario.handler.phases.ProcPausePhase;
 import com.uangel.scenario.handler.phases.ProcRecvPhase;
 import com.uangel.scenario.handler.phases.ProcSendPhase;
-import com.uangel.scenario.phases.MsgPhase;
-import com.uangel.scenario.phases.PausePhase;
-import com.uangel.scenario.phases.RecvPhase;
-import com.uangel.scenario.phases.SendPhase;
-import lombok.Getter;
+import com.uangel.scenario.phases.*;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -21,8 +22,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author dajin kim
  */
 @Slf4j
-@Getter
+@Data
 public class SessionInfo {
+    private static final NettyChannelManager nettyChannelManager = NettyChannelManager.getInstance();
 
     private final UScheduledExecutorService executorService;
     private String sessionId;
@@ -32,10 +34,13 @@ public class SessionInfo {
     private final ProcSendPhase procSendPhase;
     private final ProcRecvPhase procRecvPhase;
     private final ProcPausePhase procPausePhase;
+    private final ProcNopPhase procNopPhase;
 
     private final AtomicInteger currentIdx = new AtomicInteger();
     private final Map<String, String> fields = new HashMap<>();
     private boolean isSessionEnded = false;
+    private MediaPlayer mediaPlayer;
+    private final MediaInfo mediaInfo;
 
     public SessionInfo(int sessionNum, Scenario scenario) {
         this.sessionNum = sessionNum + 1;
@@ -46,6 +51,8 @@ public class SessionInfo {
         this.procSendPhase = new ProcSendPhase(this);
         this.procRecvPhase = new ProcRecvPhase(this);
         this.procPausePhase = new ProcPausePhase(this);
+        this.procNopPhase = new ProcNopPhase(this);
+        this.mediaInfo = new MediaInfo(sessionId, sessionNum);
     }
 
     public void setSessionId(String sessionId) {
@@ -69,7 +76,7 @@ public class SessionInfo {
 
     public void stop(String reason) {
         this.isSessionEnded = true;
-
+        mediaInfo.closeRtpChannel();
         // todo stat
         log.debug("({}) Session Ended [{}]", sessionId, reason);
     }
@@ -98,9 +105,12 @@ public class SessionInfo {
                 } else if (phase instanceof RecvPhase) {
                     log.debug("({}) RECV Phase Start [{}]", sessionId, phase.getIdx());
                     procRecvPhase.run(phase);
-                }  else if (phase instanceof PausePhase p) {
+                } else if (phase instanceof PausePhase p) {
                     log.debug("({}) PAUSE Phase Start [{}] [{}]", sessionId, phase.getIdx(), p.getMilliSeconds());
                     procPausePhase.run(p);
+                } else if (phase instanceof NopPhase) {
+                    log.debug("({}) NOP Phase Start [{}]", sessionId, phase.getIdx());
+                    procNopPhase.run(phase);
                 }
             } catch (Exception e) {
                 log.warn("({}) Err Occurs while exec call phase.", sessionId, e);

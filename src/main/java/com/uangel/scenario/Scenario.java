@@ -1,5 +1,6 @@
 package com.uangel.scenario;
 
+import com.uangel.ScenarioRunner;
 import com.uangel.command.CommandInfo;
 import com.uangel.executor.UScheduledExecutorService;
 import com.uangel.model.MsgInfoManager;
@@ -37,6 +38,7 @@ public class Scenario extends MsgInfoManager {
     private JarReflection jarReflection;
     private KeywordMapper keywordMapper;
     private boolean isTestEnded;
+    private ScenarioRunner scenarioRunner;
 
     public Scenario(String name, List<MsgPhase> phases) {
         this.name = name;

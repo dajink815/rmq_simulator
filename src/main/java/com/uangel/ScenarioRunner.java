@@ -3,7 +3,9 @@ package com.uangel;
 import com.uangel.command.CommandInfo;
 import com.uangel.command.CommandLineManager;
 import com.uangel.executor.UScheduledExecutorService;
+import com.uangel.media.netty.NettyChannelManager;
 import com.uangel.model.SessionManager;
+import com.uangel.model.SimType;
 import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
@@ -12,6 +14,7 @@ import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.util.JsonUtil;
 import com.uangel.util.SleepUtil;
 import com.uangel.util.StringUtil;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
@@ -22,11 +25,14 @@ import java.util.Map;
  * @author dajin kim
  */
 @Slf4j
+@Getter
 public class ScenarioRunner {
 
     private Scenario scenario;
     private UScheduledExecutorService scheduledExecutorService;
     private RmqManager rmqManager;
+    private CommandInfo cmdInfo;
+    private final NettyChannelManager nettyChannelManager = NettyChannelManager.getInstance();
 
     //private boolean isShutdown = false;
 
@@ -38,7 +44,7 @@ public class ScenarioRunner {
     public String run(String[] args) {
 
         // Parse Command Line
-        CommandInfo cmdInfo = CommandLineManager.parseCommandLine(args);
+        cmdInfo = CommandLineManager.parseCommandLine(args);
         if (cmdInfo == null) {
 
             return null;
@@ -64,6 +70,14 @@ public class ScenarioRunner {
 
                 return null;
             }
+
+            // RTP Port
+            if (cmdInfo.getMinRtpPort() > 0 && cmdInfo.getMaxRtpPort() > 0) {
+                nettyChannelManager.setRtpPortRange(cmdInfo.getMinRtpPort(), cmdInfo.getMaxRtpPort());
+            }
+
+            // set ScenarioRunner
+            scenario.setScenarioRunner(this);
 
             // Keyword
             KeywordMapper keywordMapper = new KeywordMapper(scenario);
@@ -96,6 +110,9 @@ public class ScenarioRunner {
                             .build());
             log.info("[{}] Scenario Runner Start (CorePool:{})", scenarioName, threadSize);
             scenario.setExecutorService(scheduledExecutorService);
+
+            // todo RTP Consumer count
+            nettyChannelManager.openRtpServer((cmdInfo.getLimit() / 5) + 10);
 
             // Load RMQ
             rmqManager = new RmqManager(scenario);
@@ -157,6 +174,8 @@ public class ScenarioRunner {
             if (!interruptedTask.isEmpty())
                 log.warn("Main ExecutorService was Terminated, RemainedTask: {}", interruptedTask.size());
         }
+
+        if (this.nettyChannelManager != null) this.nettyChannelManager.close();
 
         log.info("Stop Scenario Runner ({})", reason);
 

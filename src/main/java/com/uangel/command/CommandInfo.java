@@ -51,11 +51,27 @@ public class CommandInfo {
     // User Command File Path
     private String userCmdFilePath;
 
+    // RTP
+    private int minRtpPort;
+    private int maxRtpPort;
+    private int mediaTimestampGap;
+    private int mediaSendGap;
+    private int rtpBundle;
+
     public CommandInfo(CommandLine cmd) {
         loadServiceConfig(cmd);
         loadProtoConfig(cmd);
         loadRmqConfig(cmd);
         loadPerfConfig(cmd);
+        ladaRtpConfig(cmd);
+    }
+
+    private void ladaRtpConfig(CommandLine cmd) {
+        this.minRtpPort = Integer.parseInt(cmd.getOptionValue("min_rtp_port", "0"));
+        this.maxRtpPort = Integer.parseInt(cmd.getOptionValue("max_rtp_port", "0"));
+        this.mediaTimestampGap = Integer.parseInt(cmd.getOptionValue("media_timestamp_gap", "160"));
+        this.mediaSendGap = Integer.parseInt(cmd.getOptionValue("media_send_gap", "20"));
+        this.rtpBundle = Integer.parseInt(cmd.getOptionValue("rtp_bundle", "1"));
     }
 
     public void loadServiceConfig(CommandLine cmd) {
@@ -68,8 +84,8 @@ public class CommandInfo {
     }
 
     public void loadProtoConfig(CommandLine cmd) {
-        this.protoFile = cmd.getOptionValue("pf");
-        this.protoPkg = cmd.getOptionValue("pkg");
+        this.protoFile = cmd.getOptionValue("pf", "");
+        this.protoPkg = cmd.getOptionValue("pkg", "");
         if (protoPkg != null && !protoPkg.endsWith(".")) {
             protoPkg += ".";
         }
@@ -143,6 +159,13 @@ public class CommandInfo {
         opts.addOption(Option.builder("rpd").argName("rate_period").hasArg().desc("Specify the rate period for the call rate. unit is milliseconds (default 10)").build());
         opts.addOption(Option.builder("l").argName("limit").hasArg().desc("et the maximum number of simultaneous calls").build());
         opts.addOption(Option.builder("m").argName("max").hasArg().desc("Stop the test and exit when 'calls' calls are processed").build());
+
+        // RTP behaviour options
+        opts.addOption(Option.builder("min_rtp_port").argName("min_media_port").hasArg().desc("Minimum port number for RTP socket range").build());
+        opts.addOption(Option.builder("max_rtp_port").argName("max_media_port").hasArg().desc("Maximum port number for RTP socket range").build());
+        opts.addOption(Option.builder("media_timestamp_gap").argName("media_timestamp_gap").hasArg().desc("RTP Timestamp will increase by [media_timestamp_gap]. default : 160").build());
+        opts.addOption(Option.builder("media_send_gap").argName("media_send_gap").hasArg().desc("RTP send every [media_send_gap]ms. default : 20").build());
+        opts.addOption(Option.builder("rtp_bundle").argName("rtp_bundle").hasArg().desc("If rtp_bundle 1, send 1 rtp by [media_send_gap]ms. If rtp_bundle 50, send 50 rtp by 50 * [media_send_gap] ms").build());
 
         return opts;
     }
