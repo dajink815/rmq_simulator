@@ -3,7 +3,6 @@ package com.uangel.scenario.phases;
 import com.uangel.scenario.type.AttrName;
 import com.uangel.util.StringUtil;
 import lombok.Getter;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -23,8 +22,7 @@ public class RecvPhase extends MsgPhase {
         this.optional = getBoolAttrWithDefault(AttrName.OPTIONAL.getValue(), false);
         this.next = getStrAttrValue(AttrName.NEXT.getValue());
 
-        Element recvEle = (Element) xmlNode;
-        NodeList msgList = recvEle.getChildNodes();
+        NodeList msgList = xmlNode.getChildNodes();
 
         for (int i = 0; i < msgList.getLength(); i++) {
             Node msgNode = msgList.item(i);
@@ -32,7 +30,6 @@ public class RecvPhase extends MsgPhase {
                 msgName = getClassAttrValue(msgNode);
                 break;
             }
-
         }
 
     }
@@ -40,11 +37,11 @@ public class RecvPhase extends MsgPhase {
     @Override
     public String toString() {
         if (StringUtil.isNull(next)) {
-            return "Recv{" + msgName +
+            return "Recv{msgName:" + msgName +
                     "(" + optional +
                     ")}";
         } else {
-            return "Recv{" + msgName +
+            return "Recv{msgName:" + msgName +
                     "(" + optional +
                     "/next=" + next +
                     ")}";

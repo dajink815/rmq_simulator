@@ -252,4 +252,11 @@ public class TestJsonUtil {
             map.put(currentPath, valueNode.asText());
         }
     }
+
+    @Test
+    public void testGetAllFileFields() {
+        String filePath = "src/main/resources/json/user_cmd.json";
+        Map<String, String> userCmdFields = JsonUtil.getAllFileFields(filePath);
+        System.out.println(userCmdFields);
+    }
 }

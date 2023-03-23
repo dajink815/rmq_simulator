@@ -47,7 +47,8 @@ public class ProcRecvPhase extends ProcMsgPhase {
         if (this.sessionInfo.isSessionEnded() || !sessionManager.checkIndex(sessionInfo)) return false;
 
         MsgPhase curPhase = scenario.getPhase(sessionInfo.getCurIdx());
-        log.debug("({}) HandleMessage CurIndex ({})", sessionId, sessionInfo.getCurIdx());
+        if (StringUtil.notNull(sessionId))
+            log.debug("({}) HandleMessage CurIndex ({})", sessionId, sessionInfo.getCurIdx());
 
         // Optional 처리 - Optional 메시지는 CurrentPhase 타입과 무관하게 처리 가능해야함
         RecvPhase optionalRecv = checkOptionalPhases(json);
@@ -92,16 +93,15 @@ public class ProcRecvPhase extends ProcMsgPhase {
 
     private RecvPhase checkOptionalPhases(String json) {
 
-        // todo filtering 방법 수정 - JSON 에는 쓸 수 없는 방법
         RecvPhase recvPhase = optionalPhases.stream()
                 .filter(r -> checkMsgName(r, json))
                 .findFirst().orElse(null);
 
-        if (recvPhase == null) {
-            log.debug("checkOptionalPhases Result Null \r\n[{}]", json);
+/*        if (recvPhase == null) {
+            log.debug("checkOptionalPhases Result Null [\r\n{}]", json);
         } else {
             log.debug("checkOptionalPhases Result : {}", recvPhase.getMsgName());
-        }
+        }*/
 
         return recvPhase;
     }

@@ -30,7 +30,7 @@ public class JsonUtil {
         // nothing
     }
 
-    // JSON -> ClassType Object
+    // Json Str -> ClassType Object
     public static <T> T parse(String json, Type classType) {
         Gson gson = new Gson();
         return gson.fromJson(json, classType);
@@ -42,25 +42,25 @@ public class JsonUtil {
         return gson.fromJson(json, classType);
     }
 
-    // Object -> JSON
+    // Object -> Json Str
     public static String build(Object obj) {
         Gson gson = new Gson();
         return gson.toJson(obj);
     }
 
-    // Object -> Pretty JSON
+    // Object -> Pretty Json Str
     public static String buildPretty(Object obj) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(obj);
     }
 
-    // JSON -> Pretty JSON
+    // Json Str -> Pretty Json Str
     public static String buildPretty(String json) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(JsonParser.parseString(json));
     }
 
-    // String -> JsonElement
+    // Json Str -> JsonElement
     public static JsonElement build(String json) {
         Gson gson = new Gson();
         return gson.toJsonTree(json);
@@ -72,6 +72,7 @@ public class JsonUtil {
         return gson.toJsonTree(obj, objType);
     }
 
+    // Json File -> Key, Value Map
     public static Map<String, String> getAllFileFields(String filePath) {
         Map<String, String> map = new HashMap<>();
 
@@ -91,6 +92,7 @@ public class JsonUtil {
         return map;
     }
 
+    // Json Str -> Key, Value Map
     public static Map<String, String> getAllJsonFields(String json) {
         Map<String, String> map = new HashMap<>();
 
@@ -98,8 +100,8 @@ public class JsonUtil {
             // jackson objectMapper 객체 생성
             ObjectMapper mapper = new ObjectMapper();
 
-            MyDto readValue = mapper.readValue(json, MyDto.class);
-            log.debug("MyDto : [{}]", readValue);
+ /*           MyDto readValue = mapper.readValue(json, MyDto.class);
+            log.debug("MyDto : [{}]", readValue);*/
 
             // JsonNode 생성 (readTree, readValue)
             JsonNode jsonNode = mapper.readTree(json);
@@ -110,7 +112,7 @@ public class JsonUtil {
         return map;
     }
 
-    public static void getAllFieldsMap(String currentPath, JsonNode jsonNode, Map<String, String> map) {
+    private static void getAllFieldsMap(String currentPath, JsonNode jsonNode, Map<String, String> map) {
         if (jsonNode.isObject()) {
             ObjectNode objectNode = (ObjectNode) jsonNode;
             Iterator<Map.Entry<String, JsonNode>> iter = objectNode.fields();

@@ -108,11 +108,11 @@ public class JarReflection {
             // 호출한 메소드 실행 with parameter
             return method.invoke(obj, parameter);
         } catch (InvocationTargetException e) {
-            log.error("JarReflection.invokeMethodWparam.InvocationTargetException [Method:{}, ParamType:{}, Obj:{}]",
-                    methodName, paramType.getSimpleName(), obj, e.getCause());
+            log.error("JarReflection.invokeMethodWparam.InvocationTargetException [Method:{}, ParamType:{}, Obj:\r\n{}]",
+                    methodName, paramType.getName(), obj, e.getCause());
         } catch (Exception e) {
-            log.error("JarReflection.invokeMethodWparam.Exception [Method:{}, ParamType:{}, Obj:{}]",
-                    methodName, paramType.getSimpleName(),obj, e);
+            log.error("JarReflection.invokeMethodWparam.Exception [Method:{}.{}, ParamType:{}, Obj:\r\n{}]",
+                    obj.getClass().getName(), methodName, paramType.getName(), obj, e);
         }
         return null;
     }
@@ -182,7 +182,7 @@ public class JarReflection {
      * @brief invoke method with Object Parameter
      * @param methodName 실행할 메서드 이름
      * @param obj 메서드가 있는 클래스의 객체
-     * @param parameter 메서드 실행에 필요한 Object 타입 매개 변수
+     * @param parameter 메서드 매개 변수
      * */
     public Object invokeObjMethod(String methodName, Object obj, Object parameter) {
         // parameter.class 타입의 매개 변수 있는 methodName 이름의 메소드 호출
