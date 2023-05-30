@@ -100,16 +100,16 @@ public class SessionInfo {
                 if (isSessionEnded) return;
                 MsgPhase phase = scenario.phases().get(step);
                 if (phase instanceof SendPhase) {
-                    log.debug("({}) SEND Phase Start [{}]", sessionId, phase.getIdx());
+                    log.info("({}) SEND Phase Start [{}]", sessionId, phase.getIdx());
                     procSendPhase.run(phase);
                 } else if (phase instanceof RecvPhase) {
-                    log.debug("({}) RECV Phase Start [{}]", sessionId, phase.getIdx());
+                    log.info("({}) RECV Phase Start [{}]", sessionId, phase.getIdx());
                     procRecvPhase.run(phase);
                 } else if (phase instanceof PausePhase p) {
-                    log.debug("({}) PAUSE Phase Start [{}] [{}]", sessionId, phase.getIdx(), p.getMilliSeconds());
+                    log.info("({}) PAUSE Phase Start [{}] [{}]", sessionId, phase.getIdx(), p.getMilliSeconds());
                     procPausePhase.run(p);
                 } else if (phase instanceof NopPhase) {
-                    log.debug("({}) NOP Phase Start [{}]", sessionId, phase.getIdx());
+                    log.info("({}) NOP Phase Start [{}]", sessionId, phase.getIdx());
                     procNopPhase.run(phase);
                 }
             } catch (Exception e) {

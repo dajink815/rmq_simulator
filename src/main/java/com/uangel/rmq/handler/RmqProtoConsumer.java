@@ -55,7 +55,11 @@ public class RmqProtoConsumer {
                 log.debug("RmqProtoConsumer RecvMsg [{}]", msgObj);
             }*/
 
-            log.debug("RmqProtoConsumer RecvMsg [{}]", msgObj);
+            {
+                String jsonUpper = json.toUpperCase();
+                if (!jsonUpper.contains("HB") && !jsonUpper.contains("HEARTBEAT"))
+                    log.debug("RmqProtoConsumer RecvMsg [{}]", msgObj);
+            }
 
             if (sessionManager == null) {
                 log.warn("RmqProtoConsumer Fail - SessionManager is Null");

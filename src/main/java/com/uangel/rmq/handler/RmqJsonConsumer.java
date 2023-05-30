@@ -40,7 +40,11 @@ public class RmqJsonConsumer {
             String sessionId = fields.get(config.getFieldKeyword());
 
             // log
-            log.debug("RmqJsonConsumer RecvMsg [{}]", JsonUtil.buildPretty(json));
+            {
+                String jsonUpper = json.toUpperCase();
+                if (!jsonUpper.contains("HB") && !jsonUpper.contains("HEARTBEAT"))
+                    log.debug("RmqJsonConsumer RecvMsg [{}]", JsonUtil.buildPretty(json));
+            }
 
             if (sessionManager == null) {
                 log.warn("RmqJsonConsumer Fail - SessionManager is Null");

@@ -33,7 +33,7 @@ public class ProcNopPhase extends ProcMsgPhase {
         for (ExecNode exec : action.execs) {
             if (exec.rtpStream != null){
                 execRtpStream(exec);
-            } else if(exec.playPcapAudio != null){
+            } else if (exec.playPcapAudio != null){
                 execPlayPcap(exec);
             }
         }

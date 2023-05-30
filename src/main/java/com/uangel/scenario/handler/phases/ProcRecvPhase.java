@@ -32,7 +32,7 @@ public class ProcRecvPhase extends ProcMsgPhase {
         if (Boolean.TRUE.equals(recvPhase.getOptional())) {
             // Optional Phase 저장 후 따로 처리
             optionalPhases.add(recvPhase);
-            log.debug("({}) Pass Optional [{}]", sessionInfo.getSessionId(), recvPhase.getMsgName());
+            log.info("({}) Pass Optional [{}]", sessionInfo.getSessionId(), recvPhase.getMsgName());
             sessionInfo.execPhase(sessionInfo.increaseCurIdx());
         }
 
@@ -48,7 +48,7 @@ public class ProcRecvPhase extends ProcMsgPhase {
 
         MsgPhase curPhase = scenario.getPhase(sessionInfo.getCurIdx());
         if (StringUtil.notNull(sessionId))
-            log.debug("({}) HandleMessage CurIndex ({})", sessionId, sessionInfo.getCurIdx());
+            log.info("({}) HandleMessage CurIndex ({})", sessionId, sessionInfo.getCurIdx());
 
         // Optional 처리 - Optional 메시지는 CurrentPhase 타입과 무관하게 처리 가능해야함
         RecvPhase optionalRecv = checkOptionalPhases(json);
