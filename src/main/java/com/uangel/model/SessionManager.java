@@ -11,11 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * @author dajin kim
@@ -24,7 +22,6 @@ import java.util.stream.Collectors;
 public class SessionManager {
 
     // 처리 중인 세션 관리
-    private final Set<SessionInfo> sessionList = ConcurrentHashMap.newKeySet();
     private final Map<String, SessionInfo> sessionMap = new ConcurrentHashMap<>();
     // 처리한 총 세션 개수
     private final AtomicInteger totalSessionCnt = new AtomicInteger();
@@ -76,19 +73,21 @@ public class SessionManager {
     private void createSessionInfo() {
         // shutdown 체크?
         CommandInfo cmdInfo = scenario.getCmdInfo();
-        if (sessionList.size() >= cmdInfo.getLimit() || (cmdInfo.getMaxCall() > 0
-                && getTotalSessionCnt() >= cmdInfo.getMaxCall())) {
+        if (sessionMap.size() >= cmdInfo.getLimit() ||
+                (cmdInfo.getMaxCall() > 0 && getTotalSessionCnt() >= cmdInfo.getMaxCall())) {
             // log
             return;
         }
 
         try {
             SessionInfo sessionInfo = new SessionInfo(getTotalSessionCnt(), scenario);
-            log.info("Created SessionInfo [{}]", sessionInfo.getSessionId());
-            sessionList.add(sessionInfo);
-            sessionMap.put(sessionInfo.getSessionId(), sessionInfo);
-            sessionInfo.start();
-            increaseTotalSessionCnt();
+            if (sessionMap.putIfAbsent(sessionInfo.getSessionId(), sessionInfo) == null) {
+                log.info("Created SessionInfo [{}]", sessionInfo.getSessionId());
+                sessionInfo.start();
+                totalSessionCnt.getAndIncrement();
+            } else {
+                log.warn("Created SessionInfo Fail - Duplicated SessionID [{}]", sessionInfo.getSessionId());
+            }
         } catch (Exception e) {
             log.warn("SessionManager.createSessionInfo.Exception ", e);
         }
@@ -96,8 +95,10 @@ public class SessionManager {
     }
 
     private void deleteSessionInfo(SessionInfo sessionInfo) {
-        log.info("Deleted SessionInfo [{}]", sessionInfo.getSessionId());
-        sessionList.remove(sessionInfo);
+        SessionInfo removeInfo = sessionMap.remove(sessionInfo.getSessionId());
+        if (removeInfo != null) {
+            log.info("Deleted SessionInfo [{}]", sessionInfo.getSessionId());
+        }
     }
 
     public void changeSessionId(String curId, String changeId) {
@@ -111,29 +112,28 @@ public class SessionManager {
     }
 
     public List<SessionInfo> getSessionList() {
-        synchronized (sessionList) {
-            return new ArrayList<>(sessionList);
+        synchronized (sessionMap) {
+            return new ArrayList<>(sessionMap.values());
         }
     }
 
     public List<ProcRecvPhase> getRecvPhaseList() {
-        return getSessionList().stream().map(SessionInfo::getProcRecvPhase).collect(Collectors.toList());
+        return getSessionList().stream().map(SessionInfo::getProcRecvPhase).toList();
+    }
+
+    public int getCurrentSessionCnt() {
+        return sessionMap.size();
     }
 
     public boolean isSessionEmpty() {
-        return sessionList.isEmpty();
+        return sessionMap.isEmpty();
     }
 
     public int getTotalSessionCnt() {
         return totalSessionCnt.get();
     }
 
-    public void increaseTotalSessionCnt() {
-        totalSessionCnt.getAndIncrement();
-    }
-
     public boolean checkIndex(SessionInfo sessionInfo) {
         return sessionInfo.getCurIdx() < scenario.getScenarioSize();
-
     }
 }
