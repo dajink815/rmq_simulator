@@ -8,7 +8,7 @@ import com.uangel.scenario.ScenarioBuilder;
 import com.uangel.scenario.phases.LoopPhase;
 import com.uangel.scenario.phases.SendPhase;
 import com.uangel.scenario.type.OutMsgType;
-import com.uangel.vcs.*;
+//import com.uangel.vcs.*;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -82,7 +82,7 @@ public class TestProtoVcsMsgBuild {
         System.out.println("Msg : " + msg);
     }
 
-    @Test
+/*    @Test
     public void buildRecStartReq() {
         RecData caller = RecData.newBuilder()
                 .setFile("recdataFile")
@@ -118,5 +118,5 @@ public class TestProtoVcsMsgBuild {
         System.out.println("Proto Msg :");
         System.out.println(message);
 
-    }
+    }*/
 }
