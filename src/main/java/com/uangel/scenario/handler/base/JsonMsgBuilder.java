@@ -54,7 +54,7 @@ public class JsonMsgBuilder extends MsgBuilder {
             if (isSendType()) {
                 log.debug("Build SendMsg \r\n[{}]", JsonUtil.buildPretty(new String(bytes)));
             } else {
-                log.debug("Build LoopMsg [{}]", outgoingPhase.getMsgName());
+                log.trace("Build LoopMsg [{}]", outgoingPhase.getMsgName());
                 //System.out.println(JsonUtil.buildPretty(new String(bytes)));
             }
 

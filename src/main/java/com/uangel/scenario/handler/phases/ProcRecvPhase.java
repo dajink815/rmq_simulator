@@ -53,7 +53,7 @@ public class ProcRecvPhase extends ProcMsgPhase {
         // Optional 처리 - Optional 메시지는 CurrentPhase 타입과 무관하게 처리 가능해야함
         RecvPhase optionalRecv = checkOptionalPhases(json);
         if (optionalRecv != null) {
-            log.debug("CheckOptionalPhases True : {}", optionalRecv.getMsgName());
+            log.trace("CheckOptionalPhases True : {}", optionalRecv.getMsgName());
 
             // recv 태그의 next 속성 값 있을 경우 next label 처리
             ProcLabelPhase procLabelPhase = new ProcLabelPhase(scenario);

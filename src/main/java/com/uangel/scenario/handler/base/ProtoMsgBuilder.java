@@ -65,7 +65,7 @@ public class ProtoMsgBuilder extends MsgBuilder {
             if (isSendType()) {
                 log.debug("Build SendMsg \r\n[{}]", msgResult);
             } else {
-                log.debug("Build LoopMsg [{}]", outgoingPhase.getMsgName());
+                log.trace("Build LoopMsg [{}]", outgoingPhase.getMsgName());
                 //System.out.println(msgResult);
             }
 

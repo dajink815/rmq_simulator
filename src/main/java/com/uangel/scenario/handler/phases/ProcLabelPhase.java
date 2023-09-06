@@ -30,7 +30,7 @@ public class ProcLabelPhase {
     // 프로세스 전체 메시지 아니고 세션 별 label 메시지 처리시에는...? Session field 도 전달?
     public void run(LabelPhase labelPhase, Map<String, String> fields) {
 
-        log.debug("ProcLabelPhase id [{}]", labelPhase.getId());
+        log.trace("ProcLabelPhase id [{}]", labelPhase.getId());
 
         try {
             // create
