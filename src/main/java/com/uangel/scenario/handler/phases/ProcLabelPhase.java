@@ -43,7 +43,7 @@ public class ProcLabelPhase {
             byte[] msg = builder.build(labelPhase);
 
             // send
-            RmqClient rmqClient = scenario.getRmqManager().getDefaultClient();
+            RmqClient rmqClient = scenario.getRmqManager().getRmqClient();
             rmqClient.send(msg);
 
         } catch (Exception e) {

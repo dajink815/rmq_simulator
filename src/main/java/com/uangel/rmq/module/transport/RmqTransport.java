@@ -6,6 +6,7 @@ import com.uangel.rmq.module.RmqRecoveryListener;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public class RmqTransport {
@@ -18,6 +19,8 @@ public class RmqTransport {
 
     private Connection connection;
     private Channel channel;
+
+    private AtomicBoolean blockFlag = new AtomicBoolean(false);
 
 
     /**
@@ -41,6 +44,14 @@ public class RmqTransport {
 
     protected String getQueueName() {
         return this.queueName;
+    }
+
+    public boolean isConnected() {
+        return channel != null && channel.isOpen();
+    }
+
+    public boolean isBlocked() {
+        return blockFlag.get();
     }
 
     /**
@@ -114,10 +125,12 @@ public class RmqTransport {
             this.connection.addBlockedListener(new BlockedListener() {
                 @Override
                 public void handleBlocked(String reason) {
+                    blockFlag.set(true);
                     log.error("handleBlocked [{}] Queue", queueName);
                 }
                 @Override
                 public void handleUnblocked() {
+                    blockFlag.set(false);
                     log.error("handleUnblocked [{}] Queue", queueName);
                 }
             });

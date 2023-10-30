@@ -35,7 +35,7 @@ public class ProcLoopPhase {
             System.out.println("Session Count : " + sessionManager.getCurrentSessionCnt() + " (Total:" + sessionManager.getTotalSessionCnt() + ")");
 
             // send
-            RmqClient rmqClient = scenario.getRmqManager().getDefaultClient();
+            RmqClient rmqClient = scenario.getRmqManager().getRmqClient();
             rmqClient.send(msg);
 
         } catch (Exception e) {

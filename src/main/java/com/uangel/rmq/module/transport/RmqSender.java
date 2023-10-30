@@ -1,21 +1,16 @@
 package com.uangel.rmq.module.transport;
 
+import com.rabbitmq.client.AMQP;
+import com.uangel.rmq.module.RmqInfo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RmqSender extends RmqTransport {
-    /**
-     * RabbitMQ Message Sender
-     *
-     * @param host      RabbitMQ host
-     * @param userName  RabbitMQ user
-     * @param password  RabbitMQ password(암호화)
-     * @param port      RabbitMQ post
-     * @param queueName RabbitMQ a2s queueName
-     * @see RmqTransport
-     */
-    public RmqSender(String host, String userName, String password, int port, String queueName) {
-        super(host, userName, password, port, queueName);
+    private final AMQP.BasicProperties properties;
+
+    public RmqSender(RmqInfo rmqInfo, int expiration) {
+        super(rmqInfo.getHost(), rmqInfo.getUser(), rmqInfo.getPass(), rmqInfo.getPort(), rmqInfo.getRmqName());
+        properties = new AMQP.BasicProperties.Builder().expiration(Integer.toString(expiration)).build();
     }
 
     /**
@@ -25,25 +20,18 @@ public class RmqSender extends RmqTransport {
      * @return
      */
     public boolean send(byte[] msg) {
-        if (!isOpened()) {
-            log.error("RMQ channel is NOT opened");
+        if (!isConnected() || isBlocked()) {
+            log.error("channel is not opened or not available. [RMQ name: {}]", getQueueName());
             return false;
         }
 
-        boolean result = false;
-
         try {
-            getChannel().basicPublish("", getQueueName(), null, msg);
-            result = true;
+            getChannel().basicPublish("", getQueueName(), properties, msg);
+            return true;
         } catch (Exception e) {
-            log.error("RmqSender.send", e);
+            log.error("RmqSender.send.basicPublish exception", e);
         }
-
-        return result;
-    }
-
-    public boolean isOpened() {
-        return getChannel().isOpen();
+        return false;
     }
 }
 

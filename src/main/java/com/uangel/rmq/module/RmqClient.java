@@ -3,7 +3,12 @@ package com.uangel.rmq.module;
 import com.uangel.rmq.module.transport.RmqSender;
 import com.uangel.rmq.util.PasswdDecryptor;
 import com.uangel.service.ServiceDefine;
+import com.uangel.util.SleepUtil;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -11,50 +16,49 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 public class RmqClient {
     private boolean isConnected;
-    private RmqSender rmqSender = null;
+    private boolean isQuit = false;
 
-    private final String host;
-    private final String user;
-    private final String pass;
-    private final String queueName;
-    private final int port;
+    private RmqSender sender = null;
 
-    public RmqClient(String host, String user, String pass, String queueName, int port) {
-        this.host = host;
-        this.user = user;
-        this.pass = pass;
-        this.queueName = queueName;
-        this.port = port;
+    private final RmqInfo rmqInfo;
+    private final BlockingQueue<byte[]> queue;
+
+    public RmqClient(RmqInfo rmqInfo, int sendQueueSize) {
+        this.rmqInfo = rmqInfo;
+        this.queue = new ArrayBlockingQueue<>(sendQueueSize);
     }
 
     public boolean start() {
-        RmqSender sender = createSender();
-        if (sender != null) {
-            setRmqSender(sender);
-            setConnected(true);
+        try {
+            PasswdDecryptor decryptor = new PasswdDecryptor(ServiceDefine.U_RMQ.getStr(), ServiceDefine.PW_ALG.getStr());
+            String decPass = decryptor.decrypt0(rmqInfo.getPass());
+            rmqInfo.setPass(decPass);
+        } catch (Exception e) {
+            log.error("RMQ Password is not available ", e);
+        }
+
+        if (sender == null) {
+            sender = new RmqSender(rmqInfo, 5000);
+        }
+
+        isConnected = sender.connect();
+
+        if (isConnected) {
+            log.info("RMQ({}) is connected", rmqInfo.getRmqName());
+            new Thread(new RmqSenderProc()).start();
+        } else {
+            log.info("RMQ({}) is disconnected", rmqInfo.getRmqName());
+            new Thread(new RmqConnectThread()).start();
         }
 
         return isConnected;
     }
 
-    private RmqSender createSender() {
-        PasswdDecryptor decryptor = new PasswdDecryptor(ServiceDefine.U_RMQ.getStr(), ServiceDefine.PW_ALG.getStr());
-        String decPass = "";
-        try {
-            decPass = decryptor.decrypt0(this.pass);
-        } catch (Exception e) {
-            log.error("RMQ Password is not available ", e);
-        }
-        RmqSender sender = new RmqSender(host, user, decPass, port, queueName);
-
-        log.debug("RmqSender [{}] -> [{}:{}]", queueName, host, user);
-        if (!sender.connect()) sender = null;
-        return sender;
-    }
-
     public void closeSender() {
-        if (rmqSender != null) {
-            rmqSender.close();
+        isQuit = true;
+        if (sender != null) {
+            sender.close();
+            sender = null;
         }
     }
 
@@ -63,36 +67,69 @@ public class RmqClient {
     }
 
     public boolean send(byte[] msg) {
-        RmqSender sender = getRmqSender();
         if (sender == null) {
-            sender = createSender();
-            if (sender == null) {
-                return false;
-            }
-
-            setRmqSender(sender);
-            setConnected(true);
+            log.warn("RMQ({}) sender is null. message is ignored.", rmqInfo.getRmqName());
+            return false;
         }
 
-        if (!sender.isOpened() && !sender.connect())
-            return false;
+        boolean result = false;
+        try {
+            if (!queue.offer(msg)){
+                log.warn("RmqClient({}) send Fail - msg was dropped\r\n{}", rmqInfo.getRmqName(), msg);
+            } else {
+                result = true;
+            }
+        } catch (Exception e) {
+            log.warn("RMQ({}) RmqClient.send.exception.", rmqInfo.getRmqName(), e);
+        }
 
-        return sender.send(msg);
+        return result;
     }
 
-    public String getQueueName() {
-        return this.queueName;
+    /**
+     * RMQ connect 재시도
+     * @author kangmooHeo
+     */
+    private class RmqConnectThread implements Runnable {
+        @Override
+        public void run() {
+            while (!isQuit) {
+                SleepUtil.trySleep(1000);
+                if (sender != null && !sender.isConnected()) {
+                    isConnected = sender.connect();
+                    if (isConnected) {
+                        log.info("RMQ({}) is connect.", rmqInfo.getRmqName());
+                        new Thread(new RmqSenderProc()).start();
+                        return;
+                    } else {
+                        log.error("RMQ({}) is disconnect.", rmqInfo.getRmqName());
+                    }
+                }
+            }
+        }
     }
 
-    public void setConnected(boolean conn) {
-        this.isConnected = conn;
+    /**
+     * Send RMQ MSG
+     * @author kangmooHeo
+     */
+    private class RmqSenderProc implements Runnable {
+        @Override
+        public void run() {
+            while (!isQuit) {
+                try {
+                    byte[] msg = queue.poll(20, TimeUnit.MILLISECONDS);
+                    if (msg == null) {
+                        SleepUtil.trySleep(20);
+                    } else {
+                        sender.send(msg);
+                    }
+                } catch (InterruptedException e) {
+                    log.warn("RMQ({}) client thread InterruptedException.", rmqInfo.getRmqName(), e);
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
     }
 
-    public RmqSender getRmqSender() {
-        return rmqSender;
-    }
-
-    public void setRmqSender(RmqSender rmqSender) {
-        this.rmqSender = rmqSender;
-    }
 }
