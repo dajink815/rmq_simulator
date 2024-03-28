@@ -40,6 +40,11 @@ public class XmlParser {
         return XmlUtil.getStrParam(nodeAttr.getNamedItem(AttrName.CLASS.getValue()));
     }
 
+    protected String getNameAttrValue(Node node) {
+        NamedNodeMap nodeAttr = node.getAttributes();
+        return XmlUtil.getStrParam(nodeAttr.getNamedItem(AttrName.NAME.getValue()));
+    }
+
     protected String getStrAttrValue(String name) {
         return XmlUtil.getStrParam(attr.getNamedItem(name));
     }

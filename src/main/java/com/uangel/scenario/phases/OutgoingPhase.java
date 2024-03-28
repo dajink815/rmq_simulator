@@ -29,17 +29,21 @@ public class OutgoingPhase extends MsgPhase {
             Node headerBodyNode = headerBodyList.item(i);
             if (isElementNode(headerBodyNode)) {
                 // get Class Attribute
-                String msgClass = getClassAttrValue(headerBodyNode);
+                String classAttr = getClassAttrValue(headerBodyNode);
+                String nameAttr = getNameAttrValue(headerBodyNode);
+                if(nameAttr == null) {
+                    nameAttr = (isProtoMode && classAttr.contains("_")) ? StringUtil.snakeToCamel(classAttr.toLowerCase()) : classAttr;
+                }
 
                 // Set Phase's Message Name
                 if (StringUtil.isNull(msgName) && isBodyNode(headerBodyNode)) {
-                    msgName = msgClass;
+                    msgName = classAttr;
                 }
 
                 // Field List
                 List<FieldInfo> fieldInfos = createFieldInfos(headerBodyNode.getChildNodes());
                 // Create & Add HeaderBodyInfo
-                HeaderBodyInfo headerBodyInfo = new HeaderBodyInfo(headerBodyNode, msgClass, fieldInfos, isProtoMode);
+                HeaderBodyInfo headerBodyInfo = new HeaderBodyInfo(headerBodyNode, classAttr, nameAttr, fieldInfos, isProtoMode);
                 headerBodyInfos.add(headerBodyInfo);
             }
         }

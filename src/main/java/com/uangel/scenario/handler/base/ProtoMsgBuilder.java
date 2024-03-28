@@ -99,7 +99,7 @@ public class ProtoMsgBuilder extends MsgBuilder {
 
     private void buildProtoMsg(Object msgBuilder, List<HeaderBodyInfo> childrenInfo) {
         for (HeaderBodyInfo childInfo : childrenInfo) {
-            Object childObj = buildSubMsg(childInfo.getClassName(), childInfo.getFieldInfos(), childInfo.getStructList());
+            Object childObj = buildSubMsg(childInfo.getClassType(), childInfo.getClassName(), childInfo.getFieldInfos(), childInfo.getStructList());
             if (childObj == null) continue;
             String methodName = jarReflection.getSetterMethodName(childInfo.getClassName());
             msgBuilder = jarReflection.invokeObjMethod(methodName, msgBuilder, childObj);
@@ -109,7 +109,7 @@ public class ProtoMsgBuilder extends MsgBuilder {
     // parent Object 는 builder 가 와야 함
     private void setStructMsg(Object parentBuilder, List<StructInfo> structInfos) {
         for (StructInfo structInfo : structInfos) {
-            Object structObj = buildSubMsg(structInfo.getClassName(), structInfo.getFieldInfos(), structInfo.getStructList());
+            Object structObj = buildSubMsg(structInfo.getClassName(), structInfo.getClassName(), structInfo.getFieldInfos(), structInfo.getStructList());
             if (structObj == null) continue;
             String setterMethod = jarReflection.getSetterMethodName(structInfo.getName());
             parentBuilder = jarReflection.invokeObjMethod(setterMethod, parentBuilder, structObj);
@@ -118,10 +118,10 @@ public class ProtoMsgBuilder extends MsgBuilder {
         }
     }
 
-    private Object buildSubMsg(String className, List<FieldInfo> fieldInfos, List<StructInfo> structInfos) {
+    private Object buildSubMsg(String classType, String className, List<FieldInfo> fieldInfos, List<StructInfo> structInfos) {
         try {
             // SubMessage builder
-            Object builder = jarReflection.getNewBuilder(pkgBase + className);
+            Object builder = jarReflection.getNewBuilder(pkgBase + classType);
             Map<String, String> fields = new HashMap<>();
 
             // Struct Node Message build

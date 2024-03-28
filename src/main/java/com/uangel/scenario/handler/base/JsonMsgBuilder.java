@@ -90,7 +90,7 @@ public class JsonMsgBuilder extends MsgBuilder {
         for (HeaderBodyInfo childInfo : childrenInfo) {
             JSONObject data = buildSubMsg(childInfo.getFieldInfos(), childInfo.getStructList());
             if (data.isEmpty()) continue;
-            jsonObject.put(childInfo.getClassName(), data);
+            jsonObject.put(childInfo.getClassType(), data);
         }
     }
 

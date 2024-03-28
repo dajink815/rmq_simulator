@@ -18,21 +18,23 @@ import java.util.List;
 @Slf4j
 public class HeaderBodyInfo extends XmlParser {
 
+    private final String classType;
     private final String className;
     private final List<FieldInfo> fieldInfos;
     private final List<HeaderBodyInfo> bodyList = new ArrayList<>();
     private final List<StructInfo> structList;
 
-    public HeaderBodyInfo(Node xmlNode, String className, List<FieldInfo> fieldInfos, boolean isProtoMode) {
+    public HeaderBodyInfo(Node xmlNode, String classType, String className, List<FieldInfo> fieldInfos, boolean isProtoMode) {
         super(xmlNode, isProtoMode);
-        this.className = (isProtoMode && className.contains("_")) ? StringUtil.snakeToCamel(className.toLowerCase()) : className;
+        this.classType = classType;
+        this.className = className;
         this.fieldInfos = fieldInfos;
         this.structList = createStructList(xmlNode.getChildNodes());
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("(").append(className).append("Class fields=").append(fieldInfos);
+        StringBuilder sb = new StringBuilder("(").append(classType).append("Class fields=").append(fieldInfos);
         if (!structList.isEmpty()) {
             sb.append(", childStruct").append(structList);
         }
