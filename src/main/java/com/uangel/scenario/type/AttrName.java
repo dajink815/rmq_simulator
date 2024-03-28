@@ -8,7 +8,7 @@ public enum AttrName {
     TYPE("type"), VALUE("value"), EXEC("exec"),
     MILLIS("milliseconds"), RETRANS("retrans"),
     OPTIONAL("optional"), NEXT("next"),
-    ID("id");
+    ID("id"), REPEATED("repeated");
 
     private final String value;
 

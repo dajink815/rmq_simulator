@@ -111,8 +111,12 @@ public class ProtoMsgBuilder extends MsgBuilder {
         for (StructInfo structInfo : structInfos) {
             Object structObj = buildSubMsg(structInfo.getClassName(), structInfo.getClassName(), structInfo.getFieldInfos(), structInfo.getStructList());
             if (structObj == null) continue;
-            String setterMethod = jarReflection.getSetterMethodName(structInfo.getName());
-            parentBuilder = jarReflection.invokeObjMethod(setterMethod, parentBuilder, structObj);
+            String methodName;
+            if (structInfo.isRepeated())
+                methodName = jarReflection.getAddMethodName(structInfo.getName());
+            else
+                methodName = jarReflection.getSetterMethodName(structInfo.getName());
+            parentBuilder = jarReflection.invokeObjMethod(methodName, parentBuilder, structObj);
 /*            System.out.println("Struct Class : " + obj.getClass().getName() + ", setMethod : " + parentBuilder.getClass().getName() + "." + setterMethod);
             System.out.println("SubMessage Builder : " + parentBuilder);*/
         }

@@ -18,6 +18,7 @@ public class StructInfo extends XmlParser {
     private final String name;
     private final String className;
     private final List<StructInfo> structList;
+    private boolean isRepeated = false;
 
     public StructInfo(Node structNode, boolean isProtoMode) {
         super(structNode, isProtoMode);
@@ -27,6 +28,10 @@ public class StructInfo extends XmlParser {
         this.fieldInfos = createFieldInfos(structNode.getChildNodes());
         // 혹시 하위 struct node 있으면 또 파싱
         this.structList = createStructList(structNode.getChildNodes());
+        String repeated = getStrAttrValue(AttrName.REPEATED.getValue());
+        if (repeated != null && !repeated.isEmpty()) {
+            this.isRepeated = repeated.equalsIgnoreCase("true");
+        }
     }
 
     @Override

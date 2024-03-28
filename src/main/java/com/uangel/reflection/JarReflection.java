@@ -216,6 +216,10 @@ public class JarReflection {
         return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 
+    public String getAddMethodName(String fieldName) {
+        return "add" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    }
+
     public Map<String, String> getAllFieldsMap(Object msgObj) throws InvalidProtocolBufferException {
         Map<Descriptors.FieldDescriptor, Object> fields = (Map<Descriptors.FieldDescriptor, Object>) getAllFields(msgObj);
 
