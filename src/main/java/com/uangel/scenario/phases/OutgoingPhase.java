@@ -17,11 +17,13 @@ import java.util.List;
 public class OutgoingPhase extends MsgPhase {
     protected String msgName;
     protected final String className;
+    private final String targetQueue;
     protected final List<HeaderBodyInfo> headerBodyInfos = new ArrayList<>();
 
     protected OutgoingPhase(Node xmlNode, int idx, boolean isProtoMode) {
         super(xmlNode, idx, isProtoMode);
         this.className = getClassAttrValue();
+        this.targetQueue = getTargetAttrValue();
 
         NodeList headerBodyList = xmlNode.getChildNodes();
 

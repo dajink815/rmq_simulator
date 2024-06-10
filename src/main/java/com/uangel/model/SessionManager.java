@@ -71,11 +71,7 @@ public class SessionManager {
 
     public SessionInfo getSessionInfo(String sessionId) {
         if (StringUtil.isNull(sessionId)) return null;
-        SessionInfo sessionInfo = sessionMap.get(sessionId);
-        if (sessionInfo == null) {
-            log.warn("sessionInfo [{}] is null", sessionId);
-        }
-        return sessionInfo;
+        return sessionMap.get(sessionId);
     }
 
     // todo Session 생성하는 스레드 풀과 실행하는 스레드 풀 분리

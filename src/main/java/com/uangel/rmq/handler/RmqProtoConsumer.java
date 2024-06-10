@@ -1,15 +1,11 @@
 package com.uangel.rmq.handler;
 
 import com.uangel.command.CommandInfo;
-import com.uangel.model.SessionInfo;
-import com.uangel.model.SessionManager;
 import com.uangel.reflection.JarReflection;
 import com.uangel.reflection.ProtoUtil;
 import com.uangel.scenario.Scenario;
-import com.uangel.scenario.handler.phases.ProcRecvPhase;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,13 +16,14 @@ public class RmqProtoConsumer {
     private final Scenario scenario;
     private final CommandInfo config;
     private final JarReflection jarReflection;
-    private final SessionManager sessionManager;
+    private final IncomingHandler handler;
+
 
     public RmqProtoConsumer(Scenario scenario) {
         this.scenario = scenario;
         this.config = scenario.getCmdInfo();
         this.jarReflection = scenario.getJarReflection();
-        this.sessionManager = scenario.getSessionManager();
+        this.handler = new IncomingHandler(scenario);
     }
 
     public void protoMsgProcessing(byte[] msg) {
@@ -61,7 +58,9 @@ public class RmqProtoConsumer {
                     log.debug("RmqProtoConsumer RecvMsg [{}]", msgObj);
             }
 
-            if (sessionManager == null) {
+            handler.handle(sessionId, json, fields);
+
+/*            if (sessionManager == null) {
                 log.warn("RmqProtoConsumer Fail - SessionManager is Null");
                 return;
             }
@@ -82,6 +81,7 @@ public class RmqProtoConsumer {
                 // SessionInfo 없는 경우 세션 생성 후 시나리오 첫번째 부터 시작
                 // SessionManager createSessionInfo 호출 -> sessionId 인자값 전달
                 SessionInfo newSessionInfo = sessionManager.createSessionInfo(sessionId);
+                newSessionInfo.getCurrentIdx().set(scenario.getFirstRecvPhaseIdx());
 
                 if (newSessionInfo != null) {
                     if (!newSessionInfo.getProcRecvPhase().handleMessage(json, sessionId, fields))
@@ -89,7 +89,7 @@ public class RmqProtoConsumer {
                 } else {
                     log.warn("[{}] [{}] ProtoConsumer Fail - new session created fail [MSG:{}]", scenario.getName(), sessionId, json);
                 }
-            }
+            }*/
 
         } catch (Exception e) {
             log.error("RmqProtoConsumer.protoMsgProcessing.Exception ", e);

@@ -1,5 +1,6 @@
 package com.uangel.scenario;
 
+import com.uangel.scenario.phases.RecvPhase;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -17,6 +18,12 @@ public class TestScenarioBuilder {
         filePath = fileDir + "awf_inonly.xml";
         Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
         System.out.println(scenario);
+
+        System.out.println(scenario.getFirstRecvPhaseIdx());
+        RecvPhase firstRcv = (RecvPhase) scenario.getPhase(scenario.getFirstRecvPhaseIdx());
+        System.out.println(firstRcv);
+
+        System.out.println(firstRcv.getMsgName());
     }
 
     @Test

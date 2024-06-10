@@ -102,10 +102,11 @@ public class GenRmqManager {
 
     public boolean send(String target, byte[] msg) {
         if (serverModule == null) {
-            log.warn("RMQ Client is null. message was ignored. (target:{})", target);
+            log.warn("RMQ Module is null. Fail to send message. (target:{})", target);
             return false;
         }
 
+        // default target queue name
         if (target == null || target.isEmpty())
             target = config.getRmqTarget();
         Objects.requireNonNullElseGet(clientModule, () -> serverModule).sendMessage(target, msg);
