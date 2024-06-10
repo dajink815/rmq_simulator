@@ -42,10 +42,15 @@ public class SessionInfo {
     private MediaPlayer mediaPlayer;
     private final MediaInfo mediaInfo;
 
+    // sessionId 중복 체크?
     public SessionInfo(int sessionNum, Scenario scenario) {
-        this.sessionNum = sessionNum + 1;
-        // 중복 체크?
-        this.sessionId = UUID.randomUUID() + "_" + this.sessionNum;
+        this((UUID.randomUUID() + "_" + sessionNum), sessionNum, scenario);
+    }
+
+    // SessionInfo CallId 파라미터 추가
+    public SessionInfo(String sessionId, int sessionNum, Scenario scenario) {
+        this.sessionNum = sessionNum;
+        this.sessionId = sessionId;
         this.scenario = scenario;
         this.executorService = scenario.getExecutorService();
         this.procSendPhase = new ProcSendPhase(this);

@@ -11,8 +11,7 @@ import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.scenario.phases.*;
 import com.uangel.util.StringUtil;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
@@ -22,8 +21,7 @@ import java.util.concurrent.TimeUnit;
  * @author dajin kim
  */
 @Slf4j
-@Getter
-@Setter
+@Data
 public class Scenario extends MsgInfoManager {
 
     private final String name;
@@ -39,15 +37,24 @@ public class Scenario extends MsgInfoManager {
     private KeywordMapper keywordMapper;
     private boolean isTestEnded;
     private ScenarioRunner scenarioRunner;
+    // 시나리오 Outbound 타입 여부
+    private boolean outScenario;
 
     public Scenario(String name, List<MsgPhase> phases) {
         this.name = name;
         this.phases = phases;
         super.initList(phases);
-    }
 
-    public String getName() {
-        return this.name;
+        for (MsgPhase msgPhase : phases) {
+            if (msgPhase instanceof SendPhase) {
+                this.outScenario = true;
+                break;
+            } else if (msgPhase instanceof RecvPhase phase) {
+                if (phase.getOptional()) continue;
+                this.outScenario = false;
+                break;
+            }
+        }
     }
 
     public List<MsgPhase> phases() {

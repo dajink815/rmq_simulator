@@ -76,19 +76,17 @@ public class RmqProtoConsumer {
             if (sessionInfo != null) {
                 ProcRecvPhase recvPhase = sessionInfo.getProcRecvPhase();
                 recvPhase.handleMessage(json, sessionId, fields);
-            }
-            // SessionInfo 조회 실패시 ProcRecvPhase 조회
-            else {
-                List<ProcRecvPhase> procRecvPhaseList = sessionManager.getRecvPhaseList();
-                if (procRecvPhaseList.isEmpty()) return;
+            } else if (!scenario.isOutScenario()) {
+                // SessionInfo 없는 경우 세션 생성 후 시나리오 첫번째 부터 시작
+                // SessionManager createSessionInfo 호출 -> sessionId 인자값 전달
+                SessionInfo newSessionInfo = sessionManager.createSessionInfo(sessionId);
 
-                scenario.getExecutorService().submit(() -> {
-                    for (ProcRecvPhase procRecvPhase : procRecvPhaseList) {
-                        if(procRecvPhase.handleMessage(json, sessionId, fields)){
-                            break;
-                        }
-                    }
-                });
+                if (newSessionInfo != null) {
+                    if (!newSessionInfo.getProcRecvPhase().handleMessage(json, sessionId, fields))
+                        log.warn("[{}] [{}] ProtoConsumer Fail - new session recvPhase.handleMessage fail [MSG:{}]", scenario.getName(), sessionId, json);
+                } else {
+                    log.warn("[{}] [{}] ProtoConsumer Fail - new session created fail [MSG:{}]", scenario.getName(), sessionId, json);
+                }
             }
 
         } catch (Exception e) {
