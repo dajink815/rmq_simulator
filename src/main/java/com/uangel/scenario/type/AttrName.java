@@ -4,7 +4,7 @@ package com.uangel.scenario.type;
  * @author dajin kim
  */
 public enum AttrName {
-    NAME("name"), CLASS("class"),
+    NAME("name"), CLASS("class"), TARGET("target"),
     TYPE("type"), VALUE("value"), EXEC("exec"),
     MILLIS("milliseconds"), RETRANS("retrans"),
     OPTIONAL("optional"), NEXT("next"),

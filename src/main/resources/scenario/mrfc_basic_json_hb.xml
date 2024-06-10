@@ -2,7 +2,7 @@
 <scenario name="mrfc_basic_flow">
 
     <!-- Loop Message -->
-    <loop class="Message">
+    <loop class="Message" target="Q_MRFP">
         <header class="Header">
             <field name="type" type="str" value="LOGIN_REQ"/>
             <field name="tId" type="str" value="[tId]"/>

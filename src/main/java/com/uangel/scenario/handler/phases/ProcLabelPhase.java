@@ -1,6 +1,5 @@
 package com.uangel.scenario.handler.phases;
 
-import com.uangel.rmq.module.RmqClient;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.handler.base.JsonMsgBuilder;
 import com.uangel.scenario.handler.base.MsgBuilder;
@@ -43,16 +42,10 @@ public class ProcLabelPhase {
             byte[] msg = builder.build(labelPhase);
 
             // send
-            RmqClient rmqClient = scenario.getRmqManager().getRmqClient();
-            rmqClient.send(msg);
-
+            scenario.getGenRmqManager().send(msg);
         } catch (Exception e) {
             log.error("ProcLoopPhase.run.Exception ", e);
         }
-
-
-
-
 
     }
 

@@ -75,6 +75,10 @@ public class SessionInfo {
         return fields.get(key);
     }
 
+    public String getAndRemoveField(String key) {
+        return fields.remove(key);
+    }
+
     public void start() {
         this.execPhase(0);
     }

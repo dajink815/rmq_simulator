@@ -2,8 +2,6 @@ package com.uangel.rmq;
 
 import com.uangel.command.CommandInfo;
 import com.uangel.rmq.handler.GenRmqConsumer;
-import com.uangel.rmq.module.RmqClient;
-import com.uangel.rmq.module.RmqServer;
 import com.uangel.rmq.util.PasswdDecryptor;
 import com.uangel.scenario.Scenario;
 import com.uangel.service.ServiceDefine;
@@ -21,10 +19,7 @@ public class GenRmqManager {
     private final Scenario scenario;
     private final CommandInfo config;
     private final RmqManager rmqManager = RmqManager.getInstance();
-    private RmqServer rmqServer;
     private RmqModule serverModule;
-    @Getter
-    private RmqClient rmqClient;
     @Getter
     private RmqModule clientModule;
 
@@ -78,14 +73,6 @@ public class GenRmqManager {
                     () -> log.info("RabbitMQ Client [{}] Connect Success. [{}@{}:{}]", target, user, host, port),
                     () -> log.warn("RabbitMQ Client [{}] DisConnect. [{}@{}:{}]", target, user, host, port),
                     null);
-
-/*            RmqInfo rmqInfo = new RmqInfo(host, user, pass, target, port);
-
-            RmqClient client = new RmqClient(rmqInfo, config.getRmqQueueSize());
-            boolean result = client.start();
-            if (result) rmqClient = client;
-            log.info("RabbitMQ Client Start {}. [{}], [{}], [{}]", StringUtil.getSucFail(result), target, host, user);
-      */
         }
     }
 
@@ -106,14 +93,6 @@ public class GenRmqManager {
                     () -> log.info("RabbitMQ Server [{}] Connect Success. [{}@{}:{}]", target, user, host, port),
                     () -> log.warn("RabbitMQ Server [{}] DisConnect. [{}@{}:{}]", target, user, host, port),
                     genRmqConsumer);
-/*
-            RmqInfo rmqInfo = new RmqInfo(host, user, pass, target, port);
-
-            RmqServer server = new RmqServer(rmqInfo, config.getRmqQueueSize(), scenario);
-            boolean result = server.start();
-            if (result) this.rmqServer = server;
-            log.info("RabbitMQ Server Start {}. [{}], [{}], [{}]", StringUtil.getSucFail(result), target, host, user);
-      */
         }
     }
 

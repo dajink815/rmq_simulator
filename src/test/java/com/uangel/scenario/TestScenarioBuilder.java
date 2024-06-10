@@ -14,6 +14,7 @@ public class TestScenarioBuilder {
     @Test
     public void parseMrfcScenario() throws IOException, SAXException {
         String filePath = fileDir + "mrfc_basic.xml";
+        filePath = fileDir + "awf_inonly.xml";
         Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
         System.out.println(scenario);
     }

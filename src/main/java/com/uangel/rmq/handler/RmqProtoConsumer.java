@@ -77,6 +77,8 @@ public class RmqProtoConsumer {
                 ProcRecvPhase recvPhase = sessionInfo.getProcRecvPhase();
                 recvPhase.handleMessage(json, sessionId, fields);
             } else if (!scenario.isOutScenario()) {
+                if (sessionId == null || sessionId.isEmpty()) return;
+
                 // SessionInfo 없는 경우 세션 생성 후 시나리오 첫번째 부터 시작
                 // SessionManager createSessionInfo 호출 -> sessionId 인자값 전달
                 SessionInfo newSessionInfo = sessionManager.createSessionInfo(sessionId);

@@ -45,6 +45,10 @@ public class XmlParser {
         return XmlUtil.getStrParam(nodeAttr.getNamedItem(AttrName.NAME.getValue()));
     }
 
+    protected String getTargetAttrValue() {
+        return getStrAttrValue(AttrName.TARGET.getValue());
+    }
+
     protected String getStrAttrValue(String name) {
         return XmlUtil.getStrParam(attr.getNamedItem(name));
     }

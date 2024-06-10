@@ -8,9 +8,11 @@ import org.w3c.dom.Node;
  */
 @Getter
 public class SendPhase extends OutgoingPhase {
+    private final String targetQueue;
 
     public SendPhase(Node xmlNode, int idx, boolean isProtoMode) {
         super(xmlNode, idx, isProtoMode);
+        this.targetQueue = getTargetAttrValue();
     }
 
     @Override

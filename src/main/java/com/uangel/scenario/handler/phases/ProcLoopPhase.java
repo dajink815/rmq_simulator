@@ -1,7 +1,6 @@
 package com.uangel.scenario.handler.phases;
 
 import com.uangel.model.SessionManager;
-import com.uangel.rmq.module.RmqClient;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.handler.base.*;
 import com.uangel.scenario.phases.LoopPhase;
@@ -35,8 +34,8 @@ public class ProcLoopPhase {
             System.out.println("Session Count : " + sessionManager.getCurrentSessionCnt() + " (Total:" + sessionManager.getTotalSessionCnt() + ")");
 
             // send
-            RmqClient rmqClient = scenario.getRmqManager().getRmqClient();
-            rmqClient.send(msg);
+            String target = loopPhase.getTargetQueue();
+            scenario.getGenRmqManager().send(target, msg);
 
         } catch (Exception e) {
             log.error("ProcLoopPhase.run.Exception ", e);

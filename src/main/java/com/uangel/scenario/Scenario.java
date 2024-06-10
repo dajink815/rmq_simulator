@@ -7,7 +7,7 @@ import com.uangel.model.MsgInfoManager;
 import com.uangel.model.SessionManager;
 import com.uangel.model.SimType;
 import com.uangel.reflection.JarReflection;
-import com.uangel.rmq.RmqManager;
+import com.uangel.rmq.GenRmqManager;
 import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.scenario.phases.*;
 import com.uangel.util.StringUtil;
@@ -31,7 +31,7 @@ public class Scenario extends MsgInfoManager {
     private final Map<String, String> fields = new HashMap<>();
     private CommandInfo cmdInfo;
     private SessionManager sessionManager;
-    private RmqManager rmqManager;
+    private GenRmqManager genRmqManager;
     private UScheduledExecutorService executorService;
     private JarReflection jarReflection;
     private KeywordMapper keywordMapper;
@@ -140,10 +140,10 @@ public class Scenario extends MsgInfoManager {
         int labelPhaseSize = labelPhaseMap.size();
 
         return "Scenario{" +
-                "NAME='" + name + '\'' +
-                ", PHASES(" + phaseSize + ")=" + phases +
-                ", LOOP(" + loopPhaseSize + ")=" + loopPhases +
-                ", LABEL(" + labelPhaseSize + ")=" + labelPhaseMap +
+                "NAME='" + name + "'\n" +
+                ", PHASES(" + phaseSize + ")=" + phases + "\n" +
+                ", LOOP(" + loopPhaseSize + ")=" + loopPhases + "\n" +
+                ", LABEL(" + labelPhaseSize + ")=" + labelPhaseMap + "\n" +
                 '}';
     }
 }
