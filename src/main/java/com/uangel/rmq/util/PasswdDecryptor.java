@@ -22,10 +22,7 @@ public class PasswdDecryptor {
 
     public static void main(String[] args) throws Exception {
         PasswdDecryptor decryptor = new PasswdDecryptor(ServiceDefine.U_RMQ.getStr(), ServiceDefine.PW_ALG.getStr());
-        String tt = decryptor.encrypt("ccaas.123");
-        System.out.println(tt);
-        System.out.println(decryptor.decrypt0(tt));
-        tt = decryptor.encrypt("mrfp.123");
+        String tt = decryptor.encrypt("pbx.123");
         System.out.println(tt);
         System.out.println(decryptor.decrypt0(tt));
     }
