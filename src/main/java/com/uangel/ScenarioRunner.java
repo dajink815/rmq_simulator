@@ -9,6 +9,7 @@ import com.uangel.model.SimType;
 import com.uangel.rmq.GenRmqManager;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
+import com.uangel.scenario.handler.LongSessionHandler;
 import com.uangel.scenario.handler.LoopMsgHandler;
 import com.uangel.scenario.handler.base.KeywordMapper;
 import com.uangel.util.JsonUtil;
@@ -113,7 +114,7 @@ public class ScenarioRunner {
             scenario.setExecutorService(scheduledExecutorService);
 
             // todo RTP Consumer count
-            nettyChannelManager.openRtpServer((cmdInfo.getLimit() / 5) + 10);
+            //nettyChannelManager.openRtpServer((cmdInfo.getLimit() / 5) + 10);
 
             // Load RMQ
             genRmqManager = new GenRmqManager(scenario);
@@ -131,6 +132,8 @@ public class ScenarioRunner {
             // Loop Message
             LoopMsgHandler loopMsgHandler = new LoopMsgHandler(scenario);
             loopMsgHandler.start();
+
+            new LongSessionHandler(scenario).start();
 
             // Scenario Run
             // Loop 메시지 먼저 처리 후 시나리오 시작

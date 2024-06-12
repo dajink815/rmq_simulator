@@ -7,6 +7,7 @@ import com.uangel.scenario.handler.phases.ProcRecvPhase;
 import com.uangel.util.SleepUtil;
 import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +42,13 @@ public class SessionManager {
             return;
         }
 
-        UScheduledExecutorService executorService = scenario.getExecutorService();
-        if (executorService == null) return;
+        log.info("[{}] Start createSessionByRate", scenario.getName());
+        UScheduledExecutorService executorService = new UScheduledExecutorService(1,
+                new BasicThreadFactory.Builder()
+                        .namingPattern("CreateSessionByRate")
+                        .priority(Thread.MAX_PRIORITY)
+                        .build());
+
         CommandInfo cmdInfo = scenario.getCmdInfo();
 
         // RatePeriod 간격으로 Rate 개수만큼 new Session 생성
@@ -61,7 +67,7 @@ public class SessionManager {
         if (executorService == null) return;
 
 
-        // scheduleWithFixedDelay : 종료 처리 끝난 시간으로 부터 1000ms 후마다 반복
+        // scheduleWithFixedDelay : 세션 Scanning 끝난 시간으로 부터 1000ms 후마다 반복
         executorService.scheduleWithFixedDelay(() -> this.getSessionList().stream()
                         .filter(Objects::nonNull)
                         .filter(SessionInfo::isSessionEnded)
@@ -74,7 +80,6 @@ public class SessionManager {
         return sessionMap.get(sessionId);
     }
 
-    // todo Session 생성하는 스레드 풀과 실행하는 스레드 풀 분리
     private void createSessionInfo() {
         // shutdown 체크?
         CommandInfo cmdInfo = scenario.getCmdInfo();
@@ -83,14 +88,16 @@ public class SessionManager {
             // log
             return;
         }
+        UScheduledExecutorService executorService = scenario.getExecutorService();
+        if (executorService == null) return;
 
         try {
             //SessionInfo sessionInfo = new SessionInfo(getTotalSessionCnt(), scenario);
             SessionInfo sessionInfo = new SessionInfo(getTotalSessionCnt() + 1, scenario);
             if (sessionMap.putIfAbsent(sessionInfo.getSessionId(), sessionInfo) == null) {
-                log.info("Created SessionInfo [{}]", sessionInfo.getSessionId());
-                sessionInfo.start();
+                executorService.execute(sessionInfo::start);
                 totalSessionCnt.getAndIncrement();
+                log.info("Created SessionInfo [{}]", sessionInfo.getSessionId());
             } else {
                 log.warn("Created SessionInfo Fail - Duplicated SessionID [{}]", sessionInfo.getSessionId());
             }
@@ -109,11 +116,11 @@ public class SessionManager {
 
             return sessionMap.computeIfAbsent(sessionId, info -> {
                 SessionInfo sessionInfo = new SessionInfo(sessionId, getTotalSessionCnt() + 1, scenario);
-                log.info("Created SessionInfo [{}]", sessionId);
 
                 // 메시지 받아서 세션 생성되는 경우는 createSessionInfo 에서 start 호출 X, 메시지 수신한 곳에서 처리
                 //sessionInfo.start();
                 totalSessionCnt.getAndIncrement();
+                log.info("Created SessionInfo [{}]", sessionId);
                 return sessionInfo;
             });
         } catch (Exception e) {
@@ -122,7 +129,7 @@ public class SessionManager {
         return null;
     }
 
-    private void deleteSessionInfo(SessionInfo sessionInfo) {
+    public void deleteSessionInfo(SessionInfo sessionInfo) {
         SessionInfo removeInfo = sessionMap.remove(sessionInfo.getSessionId());
         if (removeInfo != null) {
             log.info("Deleted SessionInfo [{}]", sessionInfo.getSessionId());
@@ -142,6 +149,12 @@ public class SessionManager {
     public List<SessionInfo> getSessionList() {
         synchronized (sessionMap) {
             return new ArrayList<>(sessionMap.values());
+        }
+    }
+
+    public List<String> getSessionIds() {
+        synchronized (sessionMap){
+            return new ArrayList<>(sessionMap.keySet());
         }
     }
 

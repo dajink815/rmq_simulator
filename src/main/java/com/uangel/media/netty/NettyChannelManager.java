@@ -94,7 +94,6 @@ public class NettyChannelManager {
         }
     }
 
-    // todo thread size
     public boolean openRtpServer(int consumerCount) {
         try {
             if (rtpServer == null) {

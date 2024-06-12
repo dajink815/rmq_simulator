@@ -27,6 +27,7 @@ public class SessionInfo {
     private static final NettyChannelManager nettyChannelManager = NettyChannelManager.getInstance();
 
     private final UScheduledExecutorService executorService;
+    private final long createTime;
     private String sessionId;
     private final int sessionNum;
     private final Scenario scenario;
@@ -58,10 +59,7 @@ public class SessionInfo {
         this.procPausePhase = new ProcPausePhase(this);
         this.procNopPhase = new ProcNopPhase(this);
         this.mediaInfo = new MediaInfo(sessionId, sessionNum);
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+        this.createTime = System.currentTimeMillis();
     }
 
     public void addFields(Map<String, String> addFields) {
@@ -86,7 +84,6 @@ public class SessionInfo {
     public void stop(String reason) {
         this.isSessionEnded = true;
         mediaInfo.closeRtpChannel();
-        // todo stat
         log.debug("({}) Session Ended [{}]", sessionId, reason);
     }
 

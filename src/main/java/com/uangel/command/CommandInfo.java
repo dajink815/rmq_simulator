@@ -19,6 +19,8 @@ public class CommandInfo {
     private  String scenarioFile;
     private  String fieldKeyword;
     private  SimType type;
+    private int longSession;
+
     // Proto
     private  String protoFile;
     private  String protoPkg;
@@ -79,6 +81,7 @@ public class CommandInfo {
         this.fieldKeyword = cmd.getOptionValue("k", "callId");
         String mode = cmd.getOptionValue("t", "proto");
         this.type = SimType.getTypeEnum(mode);
+        this.longSession = Integer.parseInt(cmd.getOptionValue("long_session", "300"));
 
         this.userCmdFilePath = cmd.getOptionValue("user_cmd");
     }
@@ -128,6 +131,7 @@ public class CommandInfo {
         opts.addOption(new Option("h", "display help text"));
         opts.addOption(Option.builder("sf").argName("file").hasArg().desc("The XML scenario file").build());
         opts.addOption(Option.builder("k").argName("field_keyword").hasArg().desc("Field keyword").build());
+        opts.addOption(Option.builder("long_session").argName("long_session").hasArg().desc("Long Session timer (unit:sec, default:300s)").build());
         opts.addOption(Option.builder("user_cmd").argName("user_cmd_file").hasArg().desc("user exec command file path").build());
 
         // Simulator Type

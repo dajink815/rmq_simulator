@@ -1,6 +1,5 @@
 package com.uangel.scenario.handler.phases;
 
-import com.uangel.model.SessionManager;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.handler.base.*;
 import com.uangel.scenario.phases.LoopPhase;
@@ -28,10 +27,6 @@ public class ProcLoopPhase {
                 builder = new JsonMsgBuilder(scenario, OutMsgType.LOOP);
             }
             byte[] msg = builder.build(loopPhase);
-
-            SessionManager sessionManager = scenario.getSessionManager();
-            log.info("Session Count : [{}] [Total:{}]", sessionManager.getCurrentSessionCnt(), sessionManager.getTotalSessionCnt());
-            System.out.println("Session Count : " + sessionManager.getCurrentSessionCnt() + " (Total:" + sessionManager.getTotalSessionCnt() + ")");
 
             // send
             String target = loopPhase.getTargetQueue();

@@ -1,6 +1,7 @@
 package com.uangel.scenario.handler;
 
 import com.uangel.executor.UScheduledExecutorService;
+import com.uangel.model.SessionManager;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.handler.phases.ProcLoopPhase;
 import com.uangel.scenario.phases.LoopPhase;
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class LoopMsgHandler {
-
+    private static final int INTERVAL = 1000;
     private final Scenario scenario;
     private final UScheduledExecutorService executorService;
     private final ProcLoopPhase procLoopPhase;
@@ -31,6 +32,9 @@ public class LoopMsgHandler {
     public void start() {
         if (executorService == null) return;
 
+        executorService.scheduleAtFixedRate(this::printSession,
+                INTERVAL - System.currentTimeMillis() % INTERVAL, INTERVAL, TimeUnit.MILLISECONDS);
+
         for (LoopPhase loopPhase : loopPhases) {
             int reTrans = loopPhase.getReTrans();
 
@@ -40,7 +44,7 @@ public class LoopMsgHandler {
                 procLoopPhase.run(loopPhase);
             }
             // re-trans 주기로 process 종료 전까지 반복 실행하도록 스케쥴러에 등록
-            else {
+            else if (reTrans > 0) {
                 log.info("Register Loop Message ({}, {}ms)", loopPhase.getMsgName(), loopPhase.getReTrans());
                 executorService.scheduleWithFixedDelay(
                         () -> procLoopPhase.run(loopPhase), 0, reTrans, TimeUnit.MILLISECONDS);
@@ -50,6 +54,12 @@ public class LoopMsgHandler {
             SleepUtil.trySleep(500);
         }
 
+    }
+
+    private void printSession() {
+        SessionManager sessionManager = scenario.getSessionManager();
+        log.info("Session Count : [{}] [Total:{}]", sessionManager.getCurrentSessionCnt(), sessionManager.getTotalSessionCnt());
+        System.out.println("Session Count : " + sessionManager.getCurrentSessionCnt() + " (Total:" + sessionManager.getTotalSessionCnt() + ")");
     }
 
 
