@@ -29,7 +29,7 @@ public class TestScenarioRunner {
 
     @Test
     public void testExternalBasicFlow() throws ExecutionException, InterruptedException {
-        prepareOptions(MRFC_BASIC, MRFP_BASIC, "1");
+        prepareMrfOptions(MRFC_BASIC, MRFP_BASIC, 1);
         // MRFP
         CompletableFuture<String> f = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUasArgs()));
         SleepUtil.trySleep(1000);
@@ -42,7 +42,7 @@ public class TestScenarioRunner {
 
     @Test
     public void testMultipleExternalBasicFlow() throws ExecutionException, InterruptedException {
-        prepareOptions(MRFC_BASIC, MRFP_BASIC, "5");
+        prepareMrfOptions(MRFC_BASIC, MRFP_BASIC, 5);
         // MRFP
         CompletableFuture<String> f = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUasArgs()));
         SleepUtil.trySleep(1000);
@@ -55,11 +55,25 @@ public class TestScenarioRunner {
 
     @Test
     public void testExternalHBFlow() throws ExecutionException, InterruptedException {
-        prepareOptions(MRFC_HB, MRFP_HB, "1");
+        prepareMrfOptions(MRFC_HB, MRFP_HB, 1);
         // MRFP
         CompletableFuture<String> f = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUasArgs()));
         SleepUtil.trySleep(1000);
         // MRFC
+        CompletableFuture<String> f2 = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUacArgs()));
+
+        log.debug("f : [{}]", f.get());
+        log.debug("f2 : [{}]", f2.get());
+    }
+
+    @Test
+    public void pbxInOnly() throws ExecutionException, InterruptedException {
+        preparePbxOptions("a2s_inonly.xml", "awf_inonly.xml", 1);
+        // AWF
+        CompletableFuture<String> f = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUasArgs()));
+        SleepUtil.trySleep(1000);
+
+        // A2S
         CompletableFuture<String> f2 = CompletableFuture.supplyAsync(() -> new ScenarioRunner().run(getUacArgs()));
 
         log.debug("f : [{}]", f.get());
@@ -73,7 +87,7 @@ public class TestScenarioRunner {
         return  uas.toArray(new String[0]);
     }
 
-    public void prepareOptions(String mrfc, String mrfp, String callNum) {
+    public void prepareMrfOptions(String mrfc, String mrfp, int callNum) {
         String uacQueue = "T_MRFC";
         String uasQueue = "T_MRFP";
         String host = "192.168.7.34";
@@ -104,7 +118,41 @@ public class TestScenarioRunner {
         addCommonArgs("rtpw", pass);
         addCommonArgs("rqs", "5");
         addCommonArgs("ts", "5");
-        addCommonArgs( "m", callNum);
+        addCommonArgs( "m", Integer.toString(callNum));
+    }
+
+    public void preparePbxOptions(String uacFile, String uasFile, int callNum) {
+        String uacQueue = "T_A2S";
+        String uasQueue = "T_AWF";
+        String host = "192.168.7.34";
+        String user = "acs";
+        String port = "5672";
+        String pass = "/0Un3ig1ynr9ZHdEPM/22w==";
+
+        // Uac
+        addUacArgs("sf", "./src/main/resources/scenario/pbx/" + uacFile);
+        addUacArgs("rl", uacQueue);
+        addUacArgs("rt", uasQueue);
+        // Uas
+        addUasArgs("sf", "./src/main/resources/scenario/pbx/" + uasFile);
+        addUasArgs("rl", uasQueue);
+        addUasArgs("rt", uacQueue);
+        // Common
+        //addCommonArgs("long_session", "5");       // LongSession Test
+        addCommonArgs("test_mode", "true");
+        addCommonArgs("k", "callId");
+        addCommonArgs("t", "json");
+        addCommonArgs("rh", host);
+        addCommonArgs("ru", user);
+        addCommonArgs("rp", port);
+        addCommonArgs("rpw", pass);
+        addCommonArgs("rth", host);
+        addCommonArgs("rtu", user);
+        addCommonArgs("rtp", port);
+        addCommonArgs("rtpw", pass);
+        addCommonArgs("rqs", "5");
+        addCommonArgs("ts", "5");
+        addCommonArgs( "m", Integer.toString(callNum));
     }
 
     public void addCommonArgs(String option, String value) {

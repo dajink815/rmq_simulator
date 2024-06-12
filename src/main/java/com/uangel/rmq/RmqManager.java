@@ -21,7 +21,7 @@ public class RmqManager {
     private final ConcurrentHashMap<String, RmqInfo> rmqInfos = new ConcurrentHashMap<>();
     private final AtomicBoolean isRunning = new AtomicBoolean();
 
-    private RmqManager() {
+    public RmqManager() {
     }
 
     public static RmqManager getInstance() {

@@ -83,6 +83,7 @@ public class ProtoMsgBuilder extends MsgBuilder {
                 // Parse Keyword Field
                 Map<String, String> fields = jarReflection.getAllFieldsMap(msgResult);
                 String sessionId = fields.get(scenario.getCmdInfo().getFieldKeyword());
+                // todo 첫 메시지 일 때만 Id 변경
                 scenario.getSessionManager().changeSessionId(sessionInfo.getSessionId(), sessionId);
             } else {
                 log.trace("Build LoopMsg [{}]", outgoingPhase.getMsgName());

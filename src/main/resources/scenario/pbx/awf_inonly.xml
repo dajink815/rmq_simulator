@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenario name="awf_inonly">
+
+    <!-- Loop Message -->
+    <loop class="Message" retrans="1000" target="T_A2S">
+        <header class="header">
+            <field name="type" type="str" value="HB_REQ"/>
+            <field name="transactionId" type="str" value="[tId]"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
+            <field name="reason" type="str" value="SUCCESS"/>
+            <field name="reasonCode" type="int" value="0"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+        </header>
+        <body class="hbReq">
+            <field name="svcStatus" type="int" value="1"/>
+        </body>
+    </loop>
+
+    <recv class="Message">
+        <body class="incoming_call_req"/>
+    </recv>
+
+    <send class="Message"  target="T_A2S">
+        <header class="header">
+            <field name="type" type="str" value="INCOMING_CALL_RES"/>
+            <field name="transactionId" type="str" value="[last_transactionId]"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
+            <field name="reason" type="str" value="SUCCESS"/>
+            <field name="reasonCode" type="int" value="0"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+        </header>
+        <body class="body">
+            <field name="taskId" type="str" value="[tId]"/>
+            <field name="callId" type="str" value="[last_callId]"/>
+            <field name="callType" type="str" value="AI"/>
+        </body>
+    </send>
+
+    <recv class="Message">
+        <body class="call_start_req"/>
+    </recv>
+
+
+    <send class="Message" target="T_A2S">
+        <header class="header">
+            <field name="type" type="str" value="CALL_START_RES"/>
+            <field name="transactionId" type="str" value="[last_transactionId]"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
+            <field name="reason" type="str" value="SUCCESS"/>
+            <field name="reasonCode" type="int" value="0"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+        </header>
+        <body class="body">
+            <field name="taskId" type="str" value="[last_taskId]"/>
+            <field name="callId" type="str" value="[last_callId]"/>
+        </body>
+    </send>
+
+    <recv class="Message">
+        <body class="call_stop_req"/>
+    </recv>
+
+
+    <send class="Message" target="T_A2S">
+        <header class="header">
+            <field name="type" type="str" value="CALL_STOP_RES"/>
+            <field name="transactionId" type="str" value="[last_transactionId]"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
+            <field name="reason" type="str" value="SUCCESS"/>
+            <field name="reasonCode" type="int" value="0"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+        </header>
+        <body class="body">
+            <field name="taskId" type="str" value="[last_taskId]"/>
+            <field name="callId" type="str" value="[last_callId]"/>
+        </body>
+    </send>
+
+
+    <pause milliseconds="4000"/>
+
+</scenario>

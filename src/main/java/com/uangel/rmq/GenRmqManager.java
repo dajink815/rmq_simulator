@@ -18,7 +18,7 @@ import java.util.Objects;
 public class GenRmqManager {
     private final Scenario scenario;
     private final CommandInfo config;
-    private final RmqManager rmqManager = RmqManager.getInstance();
+    private final RmqManager rmqManager;
     private RmqModule serverModule;
     @Getter
     private RmqModule clientModule;
@@ -26,11 +26,14 @@ public class GenRmqManager {
     public GenRmqManager(Scenario scenario) {
         this.scenario = scenario;
         this.config = scenario.getCmdInfo();
+        if (config.isTestMode())
+            rmqManager = new RmqManager();
+        else rmqManager = RmqManager.getInstance();
     }
 
     public boolean start() {
         try {
-            log.info("[{}] GenRmqManager Start", scenario.getName());
+            log.info("[{}] GenRmqManager Start (TestMode:{})", scenario.getName(), config.isTestMode());
             prepClient();
             prepServer();
             rmqManager.start(null);
