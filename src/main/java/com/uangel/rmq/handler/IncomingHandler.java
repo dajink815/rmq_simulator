@@ -20,13 +20,9 @@ public class IncomingHandler {
     }
 
     public void handle(String sessionId, String json, Map<String, String> fields) {
-        if (sessionManager == null) {
-            log.warn("RmqJsonConsumer Fail - SessionManager is Null");
-            return;
-        }
-
-        if (fields.isEmpty()) {
-            log.warn("RmqJsonConsumer Fail - Msg Fields Map is Empty");
+        if (sessionManager == null || fields.isEmpty()
+                || sessionId == null || sessionId.isEmpty()) {
+            log.warn("Cannot handle message (Id:{})", sessionId);
             return;
         }
 
@@ -36,16 +32,15 @@ public class IncomingHandler {
             ProcRecvPhase recvPhase = sessionInfo.getProcRecvPhase();
             recvPhase.handleMessage(json, sessionId, fields);
         } else if (!scenario.isOutScenario()) {
-            if (sessionId == null || sessionId.isEmpty()) return;
-
             int firstRcvIdx = scenario.getFirstRecvPhaseIdx();
             RecvPhase firstRcvPhase = (RecvPhase) scenario.getPhase(firstRcvIdx);
             String msgName = firstRcvPhase.getMsgName();
 
-            if (!json.contains(msgName.toLowerCase()) && !json.contains(msgName.toUpperCase())) {
+            // todo 메시지 타입 체크? - json 도 소문자 대문자 변형 후 체크
+/*            if (!json.contains(msgName.toLowerCase()) && !json.contains(msgName.toUpperCase())) {
                 log.warn("[{}] Fail to Create New Session - check msg type [MSG:{}]", sessionId, json);
                 return;
-            }
+            }*/
 
             // SessionInfo 없는 경우 세션 생성 후 시나리오 첫번째 부터 시작
             // SessionManager createSessionInfo 호출 -> sessionId 인자값 전달
@@ -59,18 +54,5 @@ public class IncomingHandler {
                 log.warn("[{}] Fail to handle msg - new session created fail [MSG:{}]", sessionId, json);
             }
         }
-/*        // SessionInfo 조회 실패시 ProcRecvPhase 조회
-        else {
-            List<ProcRecvPhase> procRecvPhaseList = sessionManager.getRecvPhaseList();
-            if (procRecvPhaseList.isEmpty()) return;
-
-            scenario.getExecutorService().submit(() -> {
-                for (ProcRecvPhase procRecvPhase : procRecvPhaseList) {
-                    if (procRecvPhase.handleMessage(json, sessionId, fields)) {
-                        break;
-                    }
-                }
-            });
-        }*/
     }
 }
