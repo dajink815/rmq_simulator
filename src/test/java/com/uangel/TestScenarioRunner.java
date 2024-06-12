@@ -87,7 +87,7 @@ public class TestScenarioRunner {
         return  uas.toArray(new String[0]);
     }
 
-    public void prepareMrfOptions(String mrfc, String mrfp, int callNum) {
+    public void prepareMrfOptions(String uacFile, String uasFile, int callNum) {
         String uacQueue = "T_MRFC";
         String uasQueue = "T_MRFP";
         String host = "192.168.7.34";
@@ -96,18 +96,20 @@ public class TestScenarioRunner {
         String pass = "/0Un3ig1ynr9ZHdEPM/22w==";
 
         // Uac
-        addUacArgs("sf", "./src/main/resources/scenario/" + mrfc);
+        addUacArgs("sf", "./src/test/resources/scenario/mrf/" + uacFile);
         addUacArgs("rl", uacQueue);
         addUacArgs("rt", uasQueue);
         // Uas
-        addUasArgs("sf", "./src/main/resources/scenario/" + mrfp);
+        addUasArgs("sf", "./src/test/resources/scenario/mrf/" + uasFile);
         addUasArgs("rl", uasQueue);
         addUasArgs("rt", uacQueue);
         // Common
+        addCommonArgs("test_mode", "true");
         addCommonArgs("k", "dialogId");
         addCommonArgs("t", "proto");
         addCommonArgs("pf", "./src/main/resources/proto/mrfp-external-msg-1.0.3.jar");
         addCommonArgs("pkg", "com.uangel.protobuf.mrfp.external");
+        addCommonArgs("user_cmd", "./src/test/resources/json/user_cmd.json");
         addCommonArgs("rh", host);
         addCommonArgs("ru", user);
         addCommonArgs("rp", port);
@@ -130,11 +132,11 @@ public class TestScenarioRunner {
         String pass = "/0Un3ig1ynr9ZHdEPM/22w==";
 
         // Uac
-        addUacArgs("sf", "./src/main/resources/scenario/pbx/" + uacFile);
+        addUacArgs("sf", "./src/test/resources/scenario/pbx/" + uacFile);
         addUacArgs("rl", uacQueue);
         addUacArgs("rt", uasQueue);
         // Uas
-        addUasArgs("sf", "./src/main/resources/scenario/pbx/" + uasFile);
+        addUasArgs("sf", "./src/test/resources/scenario/pbx/" + uasFile);
         addUasArgs("rl", uasQueue);
         addUasArgs("rt", uacQueue);
         // Common

@@ -3,11 +3,14 @@ package com.uangel.scenario.handler.base;
 import com.uangel.model.SessionInfo;
 import com.uangel.reflection.ReflectionUtil;
 import com.uangel.scenario.Scenario;
+import com.uangel.util.DateFormatUtil;
 import com.uangel.util.StringUtil;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +21,7 @@ import java.util.regex.Pattern;
 public class KeywordMapper {
     private static final Pattern keyPattern = Pattern.compile("\\[(.*?)\\]");
     private static final String LAST = "last_";
+    @Getter
     private final Map<String, String> execCmdMap = new HashMap<>();
 
     private final Scenario scenario;
@@ -32,15 +36,11 @@ public class KeywordMapper {
     public String getExecByCmd(String cmd) {
         return execCmdMap.get(cmd);
     }
-    public Map<String, String> getExecCmdMap() {
-        return execCmdMap;
-    }
     public int getExecCmdMapSize() {
         return execCmdMap.size();
     }
 
     public String replaceKeyword(String keyword, SessionInfo sessionInfo) {
-        String before = keyword;
         Matcher m = keyPattern.matcher(keyword);
 
         // [] 포함돼 있는 모든 단어 처리
@@ -48,7 +48,6 @@ public class KeywordMapper {
             String result = getValue(m.group(1), sessionInfo);   // 중괄호 제외한 값
             if (result != null) keyword = keyword.replace(m.group(0), result);
         }
-        //if (!before.equals(keyword)) log.debug("ReplaceKeyword ({} -> {})", before, keyword);
         return keyword;
     }
 
@@ -60,11 +59,15 @@ public class KeywordMapper {
                 return ReflectionUtil.getExecResult(cmd);
             }
 
-            switch (keyword) {
+            switch (keyword.toLowerCase()) {
                 case "call_id" :
                     if (sessionInfo != null) return sessionInfo.getSessionId();
-                    break;
-                case "call_number" :
+                    else return UUID.randomUUID().toString();
+                case "tid" :
+                    return UUID.randomUUID().toString();
+                case "timestamp":
+                    return DateFormatUtil.formatYmdHmsS(System.currentTimeMillis());
+                case "call_number", "call_num" :
                     if (sessionInfo != null) return Integer.toString(sessionInfo.getSessionNum());
                     break;
                 case "rmq_local" :

@@ -39,7 +39,7 @@
     </recv>
 
 
-    <pause milliseconds="10000"/>
+    <pause milliseconds="5000"/>
 
     <send class="Message" target="T_AWF">
         <header class="header">

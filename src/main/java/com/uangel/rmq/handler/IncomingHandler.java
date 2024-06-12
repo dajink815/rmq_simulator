@@ -22,7 +22,6 @@ public class IncomingHandler {
     public void handle(String sessionId, String json, Map<String, String> fields) {
         if (sessionManager == null || fields.isEmpty()
                 || sessionId == null || sessionId.isEmpty()) {
-            log.warn("Cannot handle message (Id:{})", sessionId);
             return;
         }
 

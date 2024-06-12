@@ -45,7 +45,7 @@ public class SessionManager {
         log.info("[{}] Start createSessionByRate", scenario.getName());
         UScheduledExecutorService executorService = new UScheduledExecutorService(1,
                 new BasicThreadFactory.Builder()
-                        .namingPattern("CreateSessionByRate")
+                        .namingPattern(scenario.getName() + "-CreateSessionByRate")
                         .priority(Thread.MAX_PRIORITY)
                         .build());
 

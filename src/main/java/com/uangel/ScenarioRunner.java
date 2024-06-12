@@ -35,9 +35,6 @@ public class ScenarioRunner {
     private CommandInfo cmdInfo;
     private final NettyChannelManager nettyChannelManager = NettyChannelManager.getInstance();
 
-    //private boolean isShutdown = false;
-
-
     public ScenarioRunner() {
         // nothing
     }
@@ -86,17 +83,12 @@ public class ScenarioRunner {
             scenario.setKeywordMapper(keywordMapper);
 
             // User Defined Command (ReflectionUtil)
-            keywordMapper.addUserCmd("tId", "java.util.UUID.randomUUID().toString()");
-            keywordMapper.addUserCmd("timestamp", "java.lang.System.currentTimeMillis()");
             if (StringUtil.notNull(cmdInfo.getUserCmdFilePath())) {
                 // parse & add UserCmd
                 Map<String, String> userCmdFields = JsonUtil.getAllFileFields(cmdInfo.getUserCmdFilePath());
                 userCmdFields.forEach(keywordMapper::addUserCmd);
+                log.debug("[{}] User Defined Command (Size:{})\r\n{}", scenarioName, keywordMapper.getExecCmdMapSize(), keywordMapper.getExecCmdMap());
             }
-            log.debug("[{}] User Defined Command (Size:{})\r\n{}", scenarioName, keywordMapper.getExecCmdMapSize(), keywordMapper.getExecCmdMap());
-
-            // Statistics
-
 
             String threadName = scenarioName + "@" + hashCode();
             Thread.currentThread().setName(threadName);
@@ -113,7 +105,6 @@ public class ScenarioRunner {
             log.info("[{}] Scenario Runner Start (CorePool:{})", scenarioName, threadSize);
             scenario.setExecutorService(scheduledExecutorService);
 
-            // todo RTP Consumer count
             //nettyChannelManager.openRtpServer((cmdInfo.getLimit() / 5) + 10);
 
             // Load RMQ
@@ -184,9 +175,4 @@ public class ScenarioRunner {
         log.info("Stop Scenario Runner ({})", reason);
 
     }
-
-    // shutdownGracefully
-
-    // handleCommand
-
 }
