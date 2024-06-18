@@ -1,5 +1,6 @@
 package com.uangel.rmq.handler;
 
+import com.uangel.command.CommandInfo;
 import com.uangel.model.SessionInfo;
 import com.uangel.model.SessionManager;
 import com.uangel.scenario.Scenario;
@@ -12,16 +13,27 @@ import java.util.Map;
 @Slf4j
 public class IncomingHandler {
     private final Scenario scenario;
+    private final CommandInfo config;
     private final SessionManager sessionManager;
 
     public IncomingHandler(Scenario scenario) {
         this.scenario = scenario;
+        this.config = scenario.getCmdInfo();
         this.sessionManager = scenario.getSessionManager();
     }
 
-    public void handle(String sessionId, String json, Map<String, String> fields) {
-        if (sessionManager == null || fields.isEmpty()
-                || sessionId == null || sessionId.isEmpty()) {
+    public void handle(String json, Map<String, String> fields) {
+        String jsonUpper = json.toUpperCase();
+        if (!jsonUpper.contains("HB") && !jsonUpper.contains("HEARTBEAT"))
+            log.debug("RcvMsg [{}]", json);
+
+        if (sessionManager == null || fields.isEmpty()) {
+            log.warn("IncomingHandler Fail - Check SessionManager or Fields Map");
+            return;
+        }
+
+        String sessionId = fields.get(config.getFieldKeyword());
+        if (sessionId == null || sessionId.isEmpty()) {
             return;
         }
 
@@ -35,8 +47,10 @@ public class IncomingHandler {
             RecvPhase firstRcvPhase = (RecvPhase) scenario.getPhase(firstRcvIdx);
             String msgName = firstRcvPhase.getMsgName();
 
-            // todo 메시지 타입 체크? - json 도 소문자 대문자 변형 후 체크
-/*            if (!json.contains(msgName.toLowerCase()) && !json.contains(msgName.toUpperCase())) {
+            log.info("SessionInfo is not exist (msgName:{}, id:{})", msgName, sessionId);
+
+            // todo 메시지 타입 체크 - json 도 소문자 대문자 변형 후 체크
+/*            if (!json.contains(msgName.toUpperCase()) && !json.contains(msgName.toUpperCase())) {
                 log.warn("[{}] Fail to Create New Session - check msg type [MSG:{}]", sessionId, json);
                 return;
             }*/

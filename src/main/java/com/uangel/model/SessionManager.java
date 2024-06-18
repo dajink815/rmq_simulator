@@ -113,6 +113,11 @@ public class SessionManager {
 
         try {
             if (sessionId == null) return null;
+            // 중복 세션인 경우 return null
+            if (sessionMap.containsKey(sessionId)) {
+                log.error("SessionInfo [{}] already exist", sessionId);
+                return null;
+            }
 
             return sessionMap.computeIfAbsent(sessionId, info -> {
                 SessionInfo sessionInfo = new SessionInfo(sessionId, getTotalSessionCnt() + 1, scenario);
