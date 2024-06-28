@@ -6,7 +6,7 @@ import com.uangel.executor.UScheduledExecutorService;
 import com.uangel.media.netty.NettyChannelManager;
 import com.uangel.model.SessionManager;
 import com.uangel.model.SimType;
-import com.uangel.rmq.GenRmqManager;
+import com.uangel.rmq.RmqManager;
 import com.uangel.scenario.Scenario;
 import com.uangel.scenario.ScenarioBuilder;
 import com.uangel.scenario.handler.LongSessionHandler;
@@ -31,7 +31,7 @@ public class ScenarioRunner {
 
     private Scenario scenario;
     private UScheduledExecutorService scheduledExecutorService;
-    private GenRmqManager genRmqManager;
+    private RmqManager rmqManager;
     private CommandInfo cmdInfo;
     private final NettyChannelManager nettyChannelManager = NettyChannelManager.getInstance();
 
@@ -108,13 +108,13 @@ public class ScenarioRunner {
             //nettyChannelManager.openRtpServer((cmdInfo.getLimit() / 5) + 10);
 
             // Load RMQ
-            genRmqManager = new GenRmqManager(scenario);
-            boolean rmqResult = genRmqManager.start();
+            rmqManager = new RmqManager(scenario);
+            boolean rmqResult = rmqManager.start();
             if (!rmqResult) {
-                log.error("ScenarioRunner Stop. Fail to GenRmqManager.start");
+                log.error("ScenarioRunner Stop. Fail to RmqManager.start");
                 return null;
             }
-            scenario.setGenRmqManager(genRmqManager);
+            scenario.setRmqManager(rmqManager);
 
             // SessionManager
             SessionManager sessionManager = new SessionManager(scenario);
@@ -162,7 +162,7 @@ public class ScenarioRunner {
         if (scenario == null || scenario.isTestEnded()) return;
         scenario.setTestEnded(true);
 
-        if (genRmqManager != null) genRmqManager.stop();
+        if (rmqManager != null) rmqManager.stop();
 
         if (this.scheduledExecutorService != null) {
             List<Runnable> interruptedTask = this.scheduledExecutorService.shutdownNow();

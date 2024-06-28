@@ -30,7 +30,7 @@ public class ProcLoopPhase {
 
             // send
             String target = loopPhase.getTargetQueue();
-            scenario.getGenRmqManager().send(target, msg);
+            scenario.getRmqManager().send(target, msg);
 
         } catch (Exception e) {
             log.error("ProcLoopPhase.run.Exception ", e);

@@ -36,7 +36,7 @@ public class ProcSendPhase extends ProcMsgPhase {
             // send
             if (msg.length > 0) {
                 String msgTarget = sendPhase.getTargetQueue();
-                scenario.getGenRmqManager().send(msgTarget, msg);
+                scenario.getRmqManager().send(msgTarget, msg);
             } else {
                 log.warn("ProcSendPhase Fail - {} Idx Msg Build Fail (ProtoMode:{})", sessionInfo.getCurIdx(), scenario.isProtoType());
             }

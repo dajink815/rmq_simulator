@@ -43,7 +43,7 @@ public class ProcLabelPhase {
 
             // send
             String target = labelPhase.getTargetQueue();
-            scenario.getGenRmqManager().send(target, msg);
+            scenario.getRmqManager().send(target, msg);
 
         } catch (Exception e) {
             log.error("ProcLoopPhase.run.Exception ", e);
