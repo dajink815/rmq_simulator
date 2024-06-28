@@ -60,6 +60,24 @@
         <body class="call_stop_res"/>
     </recv>
 
+    <recv class="Message">
+        <body class="task_end_req"/>
+    </recv>
+
+    <send class="Message" target="T_AWF">
+        <header class="header">
+            <field name="type" type="str" value="TASK_END_RES"/>
+            <field name="transactionId" type="str" value="[last_transactionId]"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
+            <field name="reason" type="str" value="SUCCESS"/>
+            <field name="reasonCode" type="int" value="0"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+        </header>
+        <body class="body">
+            <field name="taskId" type="str" value="[last_taskId]"/>
+        </body>
+    </send>
+
     <pause milliseconds="4000"/>
 
 </scenario>

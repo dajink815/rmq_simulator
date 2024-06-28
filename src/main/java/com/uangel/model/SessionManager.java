@@ -166,7 +166,7 @@ public class SessionManager {
     public List<ProcRecvPhase> getRecvPhaseList() {
         //return getSessionList().stream().map(SessionInfo::getProcRecvPhase).toList();
         return getSessionList().stream()
-                .filter(sessionInfo -> sessionInfo.getCurIdx() == scenario.getFirstRecvPhaseIdx())
+                .filter(sessionInfo -> sessionInfo.getCurIdx() == scenario.getFirstRcvIdx())
                 .map(SessionInfo::getProcRecvPhase).toList();
     }
 

@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 
 /**
@@ -22,7 +24,7 @@ public class TestKeywordMapper {
     @Before
     public void prepareUserCmd() throws IOException, SAXException {
 
-        String filePath = "./src/main/resources/scenario/mrfc_basic.xml";
+        String filePath = "./src/test/resources/scenario/mrf/mrfc_basic.xml";
         Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
 
         keywordMapper = new KeywordMapper(scenario);
@@ -80,4 +82,34 @@ public class TestKeywordMapper {
         log.debug("3. {} => {}", keyword, result);
     }
 
+    @Test
+    public void parseSimLog() throws IOException {
+        int prevTotal = -1;
+        BufferedReader reader = new BufferedReader(new FileReader("/Users/kimdajin/Downloads/urmqgen/0619/sessionCnt.txt"));
+        String line = reader.readLine();
+
+        System.out.println(line);
+        String totalStr = "Total:";
+        int totalLen = totalStr.length();
+        int idx = line.indexOf(totalStr);
+        int startIdx = idx + totalLen;
+        System.out.println(startIdx);
+        System.out.println(line.substring(startIdx, startIdx + totalLen - 1));
+        System.out.println(line.substring(1, 24));
+
+        while (line != null) {
+            //System.out.println(line);
+            idx = line.indexOf(totalStr);
+            startIdx = idx + totalLen;
+            int total = Integer.parseInt(line.substring(startIdx, startIdx + totalLen - 1));
+            String date = line.substring(1, 24);
+            if (prevTotal > 0 && (total - prevTotal) > 5) {
+                System.err.println(date + " - total : " + total + ", diff : " + (total - prevTotal));
+            }
+            prevTotal = total;
+
+            line = reader.readLine();
+        }
+        reader.close();
+    }
 }

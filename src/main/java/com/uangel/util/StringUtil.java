@@ -59,6 +59,7 @@ public class StringUtil {
     }
 
     public static String camelToSnake(String str) {
+        if (isNull(str)) return "";
         StringBuilder result = new StringBuilder();
         char c = str.charAt(0);
         result.append(Character.toLowerCase(c));
@@ -76,6 +77,7 @@ public class StringUtil {
     }
 
     public static String snakeToCamel(String str) {
+        if (isNull(str)) return "";
         str = str.substring(0, 1).toUpperCase() + str.substring(1);
         StringBuilder builder = new StringBuilder(str);
 

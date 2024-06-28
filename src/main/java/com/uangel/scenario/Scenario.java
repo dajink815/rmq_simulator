@@ -26,6 +26,7 @@ public class Scenario extends MsgInfoManager {
 
     private final String name;
     private final List<MsgPhase> phases;
+    private final int firstRcvIdx;
     private List<LoopPhase> loopPhases;
     private Map<String, LabelPhase> labelPhaseMap;
     private final Map<String, String> fields = new HashMap<>();
@@ -44,6 +45,7 @@ public class Scenario extends MsgInfoManager {
         this.name = name;
         this.phases = phases;
         super.initList(phases);
+        this.firstRcvIdx = getFirstRecvPhaseIdx();
 
         for (MsgPhase msgPhase : phases) {
             if (msgPhase instanceof SendPhase) {
@@ -55,6 +57,9 @@ public class Scenario extends MsgInfoManager {
                 break;
             }
         }
+
+        log.info("[{}] Started Scenario (size:{}, outbound:{}, firstRcvIdx:{})",
+                name, phases.size(), outScenario, firstRcvIdx);
     }
 
     public List<MsgPhase> phases() {
@@ -146,4 +151,26 @@ public class Scenario extends MsgInfoManager {
                 ", LABEL(" + labelPhaseSize + ")=" + labelPhaseMap + "\n" +
                 '}';
     }
+
+    public boolean checkFirstMsg(String json) {
+        String msgName = getFirstRcvPhaseName();
+        if (msgName == null) return false;
+
+        String msgCamel = StringUtil.snakeToCamel(msgName).toUpperCase();
+        String msgSnake = StringUtil.camelToSnake(msgName).toUpperCase();
+        if (StringUtil.isNull(msgCamel) && StringUtil.isNull(msgSnake)) return false;
+
+        json = json.toUpperCase();
+        return json.contains(msgCamel) || json.contains(msgSnake);
+    }
+
+    public String getFirstRcvPhaseName() {
+        if (this.firstRcvIdx < 0) return null;
+        RecvPhase firstRcvPhase = (RecvPhase) phases.get(firstRcvIdx);
+        return firstRcvPhase.getMsgName();
+    }
+
+/*    public boolean checkMsgType(String json) {
+
+    }*/
 }

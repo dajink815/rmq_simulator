@@ -43,29 +43,27 @@ public class IncomingHandler {
             ProcRecvPhase recvPhase = sessionInfo.getProcRecvPhase();
             recvPhase.handleMessage(json, sessionId, fields);
         } else if (!scenario.isOutScenario()) {
-            int firstRcvIdx = scenario.getFirstRecvPhaseIdx();
-            RecvPhase firstRcvPhase = (RecvPhase) scenario.getPhase(firstRcvIdx);
-            String msgName = firstRcvPhase.getMsgName();
-
-            log.info("SessionInfo is not exist (msgName:{}, id:{})", msgName, sessionId);
-
-            // todo 메시지 타입 체크 - json 도 소문자 대문자 변형 후 체크
-/*            if (!json.contains(msgName.toUpperCase()) && !json.contains(msgName.toUpperCase())) {
-                log.warn("[{}] Fail to Create New Session - check msg type [MSG:{}]", sessionId, json);
+            if (!scenario.checkFirstMsg(json)) {
+                log.warn("[{}] Fail to start new session - check msg type", sessionId);
                 return;
-            }*/
+            }
+
+            String msgName = scenario.getFirstRcvPhaseName();
+            log.info("Start new session (msgName:{}, id:{})", msgName, sessionId);
 
             // SessionInfo 없는 경우 세션 생성 후 시나리오 첫번째 부터 시작
             // SessionManager createSessionInfo 호출 -> sessionId 인자값 전달
             SessionInfo newSessionInfo = sessionManager.createSessionInfo(sessionId);
-
             if (newSessionInfo != null) {
-                newSessionInfo.getCurrentIdx().set(firstRcvIdx);
+                // 첫번째 RecvPhase 인덱스로 설정
+                newSessionInfo.getCurrentIdx().set(scenario.getFirstRcvIdx());
                 if (!newSessionInfo.getProcRecvPhase().handleMessage(json, sessionId, fields))
                     log.warn("[{}] Fail to handle msg - recvPhase.handleMessage fail [MSG:{}]", sessionId, json);
             } else {
                 log.warn("[{}] Fail to handle msg - new session created fail [MSG:{}]", sessionId, json);
             }
+        } else {
+            log.debug("Skip Message - Outbound scenario (id:{})", sessionId);
         }
     }
 }

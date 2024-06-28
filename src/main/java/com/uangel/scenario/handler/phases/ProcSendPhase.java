@@ -44,6 +44,7 @@ public class ProcSendPhase extends ProcMsgPhase {
             sessionInfo.execPhase(sessionInfo.increaseCurIdx());
         } catch (Exception e) {
             log.error("ProcSendPhase.run.Exception ", e);
+            sessionInfo.stop("SendPhase Exception");
         }
 
     }
