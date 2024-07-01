@@ -154,14 +154,7 @@ public class Scenario extends MsgInfoManager {
 
     public boolean checkFirstMsg(String json) {
         String msgName = getFirstRcvPhaseName();
-        if (msgName == null) return false;
-
-        String msgCamel = StringUtil.snakeToCamel(msgName).toUpperCase();
-        String msgSnake = StringUtil.camelToSnake(msgName).toUpperCase();
-        if (StringUtil.isNull(msgCamel) && StringUtil.isNull(msgSnake)) return false;
-
-        json = json.toUpperCase();
-        return json.contains(msgCamel) || json.contains(msgSnake);
+        return checkMsgType(json, msgName);
     }
 
     public String getFirstRcvPhaseName() {
@@ -170,7 +163,15 @@ public class Scenario extends MsgInfoManager {
         return firstRcvPhase.getMsgName();
     }
 
-/*    public boolean checkMsgType(String json) {
+    // todo 모든 수신한 메시지 메시지 타입 체크
+    public boolean checkMsgType(String json, String msgName) {
+        if (msgName == null || msgName.isEmpty()) return false;
 
-    }*/
+        String msgCamel = StringUtil.snakeToCamel(msgName).toUpperCase();
+        String msgSnake = StringUtil.camelToSnake(msgName).toUpperCase();
+        if (StringUtil.isNull(msgCamel) && StringUtil.isNull(msgSnake)) return false;
+
+        json = json.toUpperCase();
+        return json.contains(msgCamel) || json.contains(msgSnake);
+    }
 }

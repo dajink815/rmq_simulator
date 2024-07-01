@@ -109,8 +109,6 @@ public class SessionManager {
 
     // sessionId 인자 값 받아 SessionInfo 생성하는 함수
     public SessionInfo createSessionInfo(String sessionId) {
-        // todo Inbound 시나리오도 세션 생성 조건 추가? or 메시지 받는대로 생성?
-
         try {
             if (sessionId == null) return null;
             // 중복 세션인 경우 return null
@@ -142,7 +140,8 @@ public class SessionManager {
     }
 
     public synchronized void changeSessionId(String curId, String changeId) {
-        if (sessionMap.containsKey(curId) && !curId.equals(changeId)) {
+        if (sessionMap.containsKey(curId)
+                && StringUtil.notNull(changeId) && !curId.equals(changeId)) {
             log.info("Changed Session ID [{} -> {}]", curId, changeId);
             SessionInfo sessionInfo = sessionMap.get(curId);
             sessionMap.remove(curId);

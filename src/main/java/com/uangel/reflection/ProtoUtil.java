@@ -1,8 +1,6 @@
 package com.uangel.reflection;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 import com.google.protobuf.*;
 import com.google.protobuf.util.JsonFormat;
 import org.slf4j.Logger;
@@ -10,12 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
 
-/**
- * @author dajin kim
- */
 public class ProtoUtil {
     static final Logger log = LoggerFactory.getLogger(ProtoUtil.class);
 

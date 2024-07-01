@@ -20,9 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author dajin kim
- */
 @Slf4j
 public class JsonMsgBuilder extends MsgBuilder {
 
@@ -44,16 +41,12 @@ public class JsonMsgBuilder extends MsgBuilder {
             JSONObject jsonObject = new JSONObject();
             buildJsonMsg(jsonObject, outgoingPhase.getHeaderBodyInfos());
 
-            //log.debug("Pretty Json \r\n[{}]", JsonUtil.buildPretty(jsonObject));
-
             // Send Bytes
             String json = jsonObject.toJSONString();
             byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
 
             // Type 별 로그
             if (isSendType()) {
-                log.debug("Build SendMsg \r\n[{}]", JsonUtil.buildPretty(new String(bytes)));
-
                 /* 2023.09.06
                 * Send 시나리오 (Send Phase 로 시작하는 시나리오) 경우
                 * SessionInfo 의 ID가 지정 되어 테스트 갯수 만큼 미리 생성됨
@@ -73,14 +66,11 @@ public class JsonMsgBuilder extends MsgBuilder {
                 Map<String, String> fields = JsonUtil.getAllJsonFields(json);
                 String sessionId = fields.get(scenario.getCmdInfo().getFieldKeyword());
                 scenario.getSessionManager().changeSessionId(sessionInfo.getSessionId(), sessionId);
-            } else {
-                log.trace("Build LoopMsg [{}]", outgoingPhase.getMsgName());
-                //System.out.println(JsonUtil.buildPretty(new String(bytes)));
             }
 
             return bytes;
         } catch (Exception e) {
-            log.error("JsonMsgBuilder.build.Exception ", e);
+            log.error("JsonMsgBuilder.build.Exception ({})", outgoingPhase.getMsgName(), e);
         }
 
         return new byte[0];

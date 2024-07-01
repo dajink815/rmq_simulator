@@ -78,7 +78,7 @@
 
     <pause milliseconds="500"/>
 
-    <send class="Message" target="PBX_A2S">
+    <send class="Message" target="T_A2S">
         <header class="header">
             <field name="type" type="str" value="TASK_END_REQ"/>
             <field name="transactionId" type="str" value="[tId]"/>

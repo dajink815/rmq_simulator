@@ -38,7 +38,6 @@
         <body class="call_start_res"/>
     </recv>
 
-
     <pause milliseconds="5000"/>
 
     <send class="Message" target="T_AWF">
@@ -75,6 +74,7 @@
         </header>
         <body class="body">
             <field name="taskId" type="str" value="[last_taskId]"/>
+            <field name="callId" type="str" value="[last_callId]"/>
         </body>
     </send>
 

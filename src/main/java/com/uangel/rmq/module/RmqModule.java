@@ -31,7 +31,8 @@ import java.util.function.Consumer;
 @Slf4j
 @Getter
 public class RmqModule {
-    private static final BasicThreadFactory THREAD_FACTORY = new BasicThreadFactory.Builder().namingPattern("RMQ_SENDER_%d").daemon(true).build();
+    private static final BasicThreadFactory SENDER_THREAD_FACTORY = new BasicThreadFactory.Builder().namingPattern("RMQ_SENDER_%d").daemon(true).build();
+    private static final BasicThreadFactory RCVER_THREAD_FACTORY = new BasicThreadFactory.Builder().namingPattern("RMQ_RCVER_%d").daemon(true).build();
 
     // RabbitMQ 서버와의 연결을 재시도하는 간격(단위:ms)
     private static final int RECOVERY_INTERVAL = 1000;
@@ -44,6 +45,7 @@ public class RmqModule {
     private final String userName;
     private final String password;
     private final Integer port;
+    private final Integer consumerCount;
 
     private final ArrayBlockingQueue<Runnable> sendQueue;
     private final ArrayBlockingQueue<Runnable> recvQueue;
@@ -65,17 +67,18 @@ public class RmqModule {
      * @param port        RabbitMQ 서버 포트
      * @param bufferCount RMQ Send/Recv Buffer 크기
      */
-    public RmqModule(String host, String userName, String password, Integer port, int bufferCount) {
+    public RmqModule(String host, String userName, String password, Integer port, int consumerCount, int bufferCount) {
         this.host = host;
         this.userName = userName;
         this.password = password;
         this.port = port;
+        this.consumerCount = (consumerCount <= 0)? 1 : consumerCount;
         this.sendQueue = new ArrayBlockingQueue<>(bufferCount);
         this.recvQueue = new ArrayBlockingQueue<>(bufferCount);
     }
 
-    public RmqModule(String host, String userName, String password, int bufferCount) {
-        this(host, userName, password, null, bufferCount);
+    public RmqModule(String host, String userName, String password, int consumerCount, int bufferCount) {
+        this(host, userName, password, null, consumerCount, bufferCount);
     }
 
     /**
@@ -144,8 +147,9 @@ public class RmqModule {
             } catch (Exception e) {
                 log.warn("Error while shutdown Scheduler.", e);
             }
-            this.rmqSender = Executors.newSingleThreadScheduledExecutor(THREAD_FACTORY);
-            this.rmqReceiver = Executors.newSingleThreadScheduledExecutor(THREAD_FACTORY);
+            this.rmqSender = Executors.newSingleThreadScheduledExecutor(SENDER_THREAD_FACTORY);
+            // todo server 역할 하는 RmqModule 일 때만 실행
+            this.rmqReceiver = Executors.newScheduledThreadPool(consumerCount, RCVER_THREAD_FACTORY);
 
             this.rmqSender.scheduleWithFixedDelay(() -> {
                 while (true) {

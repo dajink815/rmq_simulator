@@ -6,9 +6,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 
-/**
- * @author dajin kim
- */
 @Slf4j
 public class CommandLineManager {
 
@@ -26,7 +23,6 @@ public class CommandLineManager {
                 new HelpFormatter().printHelp("urmqgen.jar [OPTIONS] (see -h options)", CommandInfo.createOptions());
                 return null;
             }
-            // todo CommandLine 기능 추가
 
             // mode, proto jar file
 

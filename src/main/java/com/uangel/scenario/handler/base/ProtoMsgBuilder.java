@@ -22,9 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author dajin kim
- */
 @Slf4j
 public class ProtoMsgBuilder extends MsgBuilder {
 
@@ -63,8 +60,6 @@ public class ProtoMsgBuilder extends MsgBuilder {
 
             // Type 별 로그
             if (isSendType()) {
-                log.debug("Build SendMsg \r\n[{}]", msgResult);
-
                 /* 2023.09.06
                  * Send 시나리오 (Send Phase 로 시작하는 시나리오) 경우
                  * SessionInfo 의 ID가 지정 되어 테스트 갯수 만큼 미리 생성됨
@@ -85,14 +80,11 @@ public class ProtoMsgBuilder extends MsgBuilder {
                 String sessionId = fields.get(scenario.getCmdInfo().getFieldKeyword());
                 // todo 첫 메시지 일 때만 Id 변경
                 scenario.getSessionManager().changeSessionId(sessionInfo.getSessionId(), sessionId);
-            } else {
-                log.trace("Build LoopMsg [{}]", outgoingPhase.getMsgName());
-                //System.out.println(msgResult);
             }
 
             return jarReflection.toByteArray(msgResult);
         } catch (Exception e) {
-            log.error("ProtoMsgBuilder.build.Exception ", e);
+            log.error("ProtoMsgBuilder.build.Exception ({})", outgoingPhase.getMsgName(), e);
         }
 
         return new byte[0];

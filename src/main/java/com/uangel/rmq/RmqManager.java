@@ -5,8 +5,10 @@ import com.uangel.rmq.handler.RmqJsonConsumer;
 import com.uangel.rmq.handler.RmqProtoConsumer;
 import com.uangel.rmq.module.RmqModule;
 import com.uangel.rmq.util.PasswdDecryptor;
+import com.uangel.rmq.util.RmqMsgPrinter;
 import com.uangel.scenario.Scenario;
 import com.uangel.service.ServiceDefine;
+import com.uangel.util.StringUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,13 +64,7 @@ public class RmqManager {
             String user = config.getRmqTargetUser();
             String pass = config.getRmqTargetPass();
             int port = config.getRmqTargetPort();
-
-            PasswdDecryptor decryptor = new PasswdDecryptor(ServiceDefine.U_RMQ.getStr(), ServiceDefine.PW_ALG.getStr());
-            String decPass = decryptor.decrypt0(pass);
-
-            clientModule = new RmqModule(host, user, decPass, port, config.getRmqQueueSize())
-                    .connect(() -> log.info("RabbitMQ Client [{}] Connect Success. [{}@{}:{}]", target, user, host, port),
-                            () -> log.warn("RabbitMQ Client [{}] DisConnect. [{}@{}:{}]", target, user, host, port));
+            clientModule = addRmqModule(target, host, user, pass, port);
         }
     }
 
@@ -80,15 +76,18 @@ public class RmqManager {
             String pass = config.getRmqPass();
             int port = config.getRmqPort();
 
-            PasswdDecryptor decryptor = new PasswdDecryptor(ServiceDefine.U_RMQ.getStr(), ServiceDefine.PW_ALG.getStr());
-            String decPass = decryptor.decrypt0(pass);
-
-            serverModule = new RmqModule(host, user, decPass, port, config.getRmqQueueSize())
-                    .connect(() -> log.info("RabbitMQ Server [{}] Connect Success. [{}@{}:{}]", target, user, host, port),
-                            () -> log.warn("RabbitMQ Server [{}] DisConnect. [{}@{}:{}]", target, user, host, port));
+            serverModule = addRmqModule(target, host, user, pass, port);
             serverModule.queueDeclare(target);
             serverModule.registerConsumer(target, this::handleRmqMessage);
         }
+    }
+
+    private RmqModule addRmqModule(String target, String host, String user, String pass, int port) throws IOException, TimeoutException {
+        PasswdDecryptor decryptor = new PasswdDecryptor(ServiceDefine.U_RMQ.getStr(), ServiceDefine.PW_ALG.getStr());
+        String decPass = decryptor.decrypt0(pass);
+        return new RmqModule(host, user, decPass, port, config.getThreadSize(), config.getRmqQueueSize())
+                .connect(() -> log.info("RabbitMQ [{}] Connect Success. [{}@{}:{}]", target, user, host, port),
+                        () -> log.warn("RabbitMQ [{}] DisConnect. [{}@{}:{}]", target, user, host, port));
     }
 
     private void handleRmqMessage(byte[] msg) {
@@ -103,20 +102,18 @@ public class RmqManager {
         }
     }
 
-    public boolean send(byte[] msg) {
-        return send(null, msg);
-    }
-
     public boolean send(String target, byte[] msg) {
+        if (msg.length == 0) return false;
         if (serverModule == null) {
             log.warn("RMQ Module is null. Fail to send message. (target:{})", target);
             return false;
         }
 
         // default target queue name
-        if (target == null || target.isEmpty())
-            target = config.getRmqTarget();
+        if (StringUtil.isNull(target)) target = config.getRmqTarget();
         Objects.requireNonNullElseGet(clientModule, () -> serverModule).sendMessage(target, msg);
+
+        RmqMsgPrinter.printSendMsg(target, msg);
         return true;
     }
 

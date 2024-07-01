@@ -9,9 +9,6 @@ import com.uangel.scenario.phases.SendPhase;
 import com.uangel.scenario.type.OutMsgType;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author dajin kim
- */
 @Slf4j
 public class ProcSendPhase extends ProcMsgPhase {
 
@@ -38,7 +35,7 @@ public class ProcSendPhase extends ProcMsgPhase {
                 String msgTarget = sendPhase.getTargetQueue();
                 scenario.getRmqManager().send(msgTarget, msg);
             } else {
-                log.warn("ProcSendPhase Fail - {} Idx Msg Build Fail (ProtoMode:{})", sessionInfo.getCurIdx(), scenario.isProtoType());
+                log.warn("ProcSendPhase Fail - {} Idx Msg Build Fail", sessionInfo.getCurIdx());
             }
 
             sessionInfo.execPhase(sessionInfo.increaseCurIdx());

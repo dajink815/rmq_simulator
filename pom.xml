@@ -152,12 +152,6 @@
             <artifactId>kaitai-struct-runtime</artifactId>
             <version>0.9</version>
         </dependency>
-
-        <dependency>
-            <groupId>stack.java.uangel.media</groupId>
-            <artifactId>umedia-rmq</artifactId>
-            <version>2024.03.11</version>
-        </dependency>
     </dependencies>
 
     <build>
