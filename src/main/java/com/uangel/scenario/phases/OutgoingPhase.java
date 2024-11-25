@@ -4,6 +4,7 @@ import com.uangel.scenario.model.FieldInfo;
 import com.uangel.scenario.model.HeaderBodyInfo;
 import com.uangel.util.StringUtil;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * @author dajin kim
  */
+@Slf4j
 @Getter
 public class OutgoingPhase extends MsgPhase {
     protected String msgName;
@@ -49,5 +51,7 @@ public class OutgoingPhase extends MsgPhase {
                 headerBodyInfos.add(headerBodyInfo);
             }
         }
+
+        log.debug("OutgoingPhase : [{}]", headerBodyInfos);
     }
 }

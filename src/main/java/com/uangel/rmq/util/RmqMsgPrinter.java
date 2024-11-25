@@ -12,22 +12,39 @@ public class RmqMsgPrinter {
         // nothing
     }
 
+    public static void printSendMsg(String target, Object msg) {
+        String json = String.valueOf(msg);
+        if (isHBMsg(json)) {
+            log.trace("SendTo --> [{}]\r\n[{}]", target, json);
+        } else {
+            log.debug("SendTo --> [{}]\r\n[{}]", target, json);
+        }
+    }
     public static void printSendMsg(String target, byte[] msg) {
         String json = new String(msg, StandardCharsets.UTF_8);
-        json = JsonUtil.buildPretty(json);
+        try {
+            json = JsonUtil.buildPretty(json);
+        } catch (Exception e) {
+            // ignore - ProtoBuffer 메시지 buildPretty 실패
+        }
 
-        String jsonUpper = json.toUpperCase();
-        if (!jsonUpper.contains("HB") && !jsonUpper.contains("HEARTBEAT"))
-            log.debug("SendTo --> [{}]\r\n[{}]", target, json);
-        else
+        if (isHBMsg(json)) {
             log.trace("SendTo --> [{}]\r\n[{}]", target, json);
+        } else {
+            log.debug("SendTo --> [{}]\r\n[{}]", target, json);
+        }
     }
 
     public static void printRcvMsg(String json) {
-        String jsonUpper = json.toUpperCase();
-        if (!jsonUpper.contains("HB") && !jsonUpper.contains("HEARTBEAT"))
-            log.debug("RcvMsg [{}]", json);
-        else
+        if (isHBMsg(json)) {
             log.trace("RcvMsg [{}]", json);
+        } else {
+            log.debug("RcvMsg [{}]", json);
+        }
+    }
+
+    private static boolean isHBMsg(String json) {
+        String jsonUpper = json.toUpperCase();
+        return jsonUpper.contains("HB") || jsonUpper.contains("HEARTBEAT");
     }
 }

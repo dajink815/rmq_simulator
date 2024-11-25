@@ -100,9 +100,6 @@ public class JsonUtil {
             // jackson objectMapper 객체 생성
             ObjectMapper mapper = new ObjectMapper();
 
- /*           MyDto readValue = mapper.readValue(json, MyDto.class);
-            log.debug("MyDto : [{}]", readValue);*/
-
             // JsonNode 생성 (readTree, readValue)
             JsonNode jsonNode = mapper.readTree(json);
             getAllFieldsMap("", jsonNode, map);
@@ -129,25 +126,6 @@ public class JsonUtil {
         } else if (jsonNode.isValueNode()) {
             ValueNode valueNode = (ValueNode) jsonNode;
             map.put(currentPath, valueNode.asText());
-        }
-    }
-
-    public class MyDto {
-
-        private String stringValue;
-        private int intValue;
-        private boolean booleanValue;
-
-        // standard constructor, getters and setters
-
-
-        @Override
-        public String toString() {
-            return "MyDto{" +
-                    "stringValue='" + stringValue + '\'' +
-                    ", intValue=" + intValue +
-                    ", booleanValue=" + booleanValue +
-                    '}';
         }
     }
 }

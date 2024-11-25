@@ -29,7 +29,6 @@ public class MediaInfo {
         this.sessionNum = sessionNum;
     }
 
-    // todo
     public Channel openRtpChannel(){
         if(this.channel != null) return null;
         this.channel = nettyChannelManager.allocPort();

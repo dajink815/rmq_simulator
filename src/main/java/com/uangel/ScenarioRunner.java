@@ -94,7 +94,6 @@ public class ScenarioRunner {
             Thread.currentThread().setName(threadName);
 
             // Create Thread Pool
-            // todo 기본으로 필요한 스레드 최저 개수 체크
             int threadSize = cmdInfo.getThreadSize() <= 0 ?
                     Runtime.getRuntime().availableProcessors() : cmdInfo.getThreadSize();
             this.scheduledExecutorService = new UScheduledExecutorService(threadSize,

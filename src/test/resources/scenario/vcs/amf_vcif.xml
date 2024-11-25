@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenario name="amf_testvcs_basic_flow">
+
+    <loop class="Message" retrans="1000">
+        <header class="Header">
+            <field name="type" type="str" value="HB_REQ"/>
+            <field name="tId" type="str" value="[tId]"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+        </header>
+        <body class="HBReq" name="hbReq">
+        </body>
+    </loop>
+
+    <recv class="Message" optional="true">
+        <body class="HBRes"/>
+    </recv>
+
+    <send class="Message">
+        <header class="Header">
+            <field name="type" type="str" value="REC_START_REQ"/>
+            <field name="msgFrom" type="str" value="[rmq_local]"/>
+            <field name="tId" type="str" value="[tId]"/>
+            <field name="timestamp" type="str" value="[timestamp]"/>
+            <field name="callId" type="str" value="[call_id]"/>
+        </header>
+        <body class="RecStartReq">
+            <field name="taskId" type="str" value="taskId_[call_number]"/>
+            <field name="rxSid" type="str" value="[call_id]_1"/>
+            <field name="txSid" type="str" value="[call_id]_2"/>
+            <field name="cNonce" type="str" value="16c2f12e-baa1-49"/>
+            <field name="callType" type="int" value="1"/>
+            <field name="expiryDate" type="str" value="20240725"/>
+            <field name="doSectionStart" type="int" value="1"/>
+            <field name="serviceInfo" type="str" value="IMSCellTest"/>
+        </body>
+    </send>
+
+    <pause milliseconds="4000"/>
+</scenario>

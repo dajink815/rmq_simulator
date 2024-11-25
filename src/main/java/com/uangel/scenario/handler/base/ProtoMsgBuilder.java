@@ -80,6 +80,9 @@ public class ProtoMsgBuilder extends MsgBuilder {
                 String sessionId = fields.get(scenario.getCmdInfo().getFieldKeyword());
                 // todo 첫 메시지 일 때만 Id 변경
                 scenario.getSessionManager().changeSessionId(sessionInfo.getSessionId(), sessionId);
+                log.debug("Build SendMsg \r\n[{}]", msgResult);
+            } else {
+                log.trace("Build LoopMsg [{}]", outgoingPhase.getMsgName());
             }
 
             return jarReflection.toByteArray(msgResult);

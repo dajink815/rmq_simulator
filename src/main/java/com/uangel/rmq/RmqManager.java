@@ -5,7 +5,6 @@ import com.uangel.rmq.handler.RmqJsonConsumer;
 import com.uangel.rmq.handler.RmqProtoConsumer;
 import com.uangel.rmq.module.RmqModule;
 import com.uangel.rmq.util.PasswdDecryptor;
-import com.uangel.rmq.util.RmqMsgPrinter;
 import com.uangel.scenario.Scenario;
 import com.uangel.service.ServiceDefine;
 import com.uangel.util.StringUtil;
@@ -112,10 +111,7 @@ public class RmqManager {
         // default target queue name
         if (StringUtil.isNull(target)) target = config.getRmqTarget();
         Objects.requireNonNullElseGet(clientModule, () -> serverModule).sendMessage(target, msg);
-
-        RmqMsgPrinter.printSendMsg(target, msg);
         return true;
     }
-
 
 }

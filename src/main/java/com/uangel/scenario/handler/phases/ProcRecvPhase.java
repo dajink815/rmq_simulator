@@ -74,7 +74,7 @@ public class ProcRecvPhase extends ProcMsgPhase {
         // check SessionId
         synchronized (sessionInfo) {
             if (!sessionId.equals(sessionInfo.getSessionId())) {
-                // SessionId가 동일하지 않지만 조건 맞는 경우 SessionId 갱신        // todo 그 외 조건?
+                // SessionId가 동일하지 않지만 조건 맞는 경우 SessionId 갱신
                 // 조건 1. RmqGen Receiver, RecvPhase 로 시작
                 //       (처리 중인 Index == optional 아닌 첫번째 RecvPhase Index)
                 if (sessionInfo.getCurIdx() == scenario.getFirstRcvIdx()) {

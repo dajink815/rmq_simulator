@@ -66,6 +66,9 @@ public class JsonMsgBuilder extends MsgBuilder {
                 Map<String, String> fields = JsonUtil.getAllJsonFields(json);
                 String sessionId = fields.get(scenario.getCmdInfo().getFieldKeyword());
                 scenario.getSessionManager().changeSessionId(sessionInfo.getSessionId(), sessionId);
+                log.debug("Build SendMsg \r\n[{}]", JsonUtil.buildPretty(new String(bytes)));
+            } else {
+                log.trace("Build LoopMsg [{}]", outgoingPhase.getMsgName());
             }
 
             return bytes;

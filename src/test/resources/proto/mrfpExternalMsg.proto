@@ -1,0 +1,206 @@
+syntax = "proto3";
+
+option java_package = "com.uangel.protobuf.mrfp.external";
+option java_outer_classname = "MrfpExternalMsg";
+option java_multiple_files = true;
+
+// Header
+
+message Header{
+  string type = 1;
+  string tId = 2;
+  string msgFrom = 3;
+  int64 timestamp = 4;
+  optional string dialogId = 5;
+}
+
+// Body
+
+message LoginReq{
+  string ip = 1;
+}
+message LoginRes{
+  string reason = 1;
+  int32 reasonCode = 2;
+}
+message HbReq{
+  string ip = 1;
+}
+message HbRes{
+  int32 status = 1;
+}
+message DialogStartReq{
+  optional string sdp = 1;
+  string fromNo = 2;
+  string toNo = 3;
+}
+message DialogStartRes{
+  string sdp = 1;
+  string reason = 2;
+  int32 reasonCode = 3;
+}
+message DialogSetupReq{
+  optional string sdp = 1;
+}
+message DialogSetupRes{
+  string reason = 1;
+  int32 reasonCode = 2;
+}
+message DialogReStartReq{
+  optional string sdp = 1;
+}
+message DialogReStartRes{
+  string sdp = 1;
+  string reason = 2;
+  int32 reasonCode = 3;
+}
+message DialogReSetupReq{
+  optional string sdp = 1;
+}
+message DialogReSetupRes{
+  string reason = 1;
+  int32 reasonCode = 2;
+}
+message DialogStopReq{
+  int32 record = 1;
+  optional string reason = 2;
+  optional int32 reasonCode = 3;
+}
+message DialogStopRes{
+  optional int32 recordResult = 1;
+  optional string recordFile = 2;
+  string reason = 3;
+  int32 reasonCode = 4;
+}
+message SttStartReq{
+  string sttId = 1;
+  string lang = 2;
+}
+message SttStartRes{
+  string sttId = 1;
+  string reason = 2;
+  int32 reasonCode = 3;
+}
+message SttResultNoti{
+  string sttId = 1;
+  string sttResult = 2;
+  string reason = 3;
+  int32 reasonCode = 4;
+}
+message MediaStartReq{
+  string mediaId = 1;
+  int32 mediaType = 2;
+  string contents = 3;
+  optional string lang = 4;
+}
+message MediaStartRes{
+  string mediaId = 1;
+  int64 mediaTime = 2;
+  string reason = 3;
+  int32 reasonCode = 4;
+}
+message MediaStopReq{
+  string mediaId = 1;
+}
+message MediaStopRes{
+  string mediaId = 1;
+  string reason = 2;
+  int32 reasonCode = 3;
+}
+message MediaResultNoti{
+  string mediaId = 1;
+  string reason = 2;
+  int32 reasonCode = 3;
+}
+message RecordStartReq{
+  string filePath = 1;
+}
+message RecordStartRes{
+  string reason = 1;
+  int32 reasonCode = 2;
+}
+message RecordStopReq{
+}
+message RecordStopRes{
+  string reason = 1;
+  int32 reasonCode = 2;
+}
+message DtmfStartReq{
+  string dtmfId = 1;
+  int32 mediaType = 2;
+  optional string contents = 3;
+  optional string lang = 4;
+  int32 digitCount = 5;
+  optional string endDigit = 6;
+  optional string cancelDigit = 7;
+  int32 firstDigitTimeout = 8;
+  int32 digitInterval = 9;
+  optional int32 mediaBargein = 10;
+  optional int32 cleanDb = 11;
+  int32 beepOn = 12;
+}
+message DtmfStartRes{
+  string dtmfId = 1;
+  optional int32 playTime = 2;
+  string reason = 3;
+  int32 reasonCode = 4;
+}
+message DtmfResultNoti{
+  string dtmfId = 1;
+  optional string collectDigit = 2;
+  string reason = 3;
+  int32 reasonCode = 4;
+}
+message ConvertReq{
+  string type = 1;
+  string lang = 2;
+  string filePath = 3;
+  optional string contents = 4;
+}
+message ConvertRes{
+  string reason = 1;
+  int32 reasonCode = 2;
+}
+message ConvertResultNoti{
+  optional string convertResult = 1;
+  string reason = 2;
+  int32 reasonCode = 3;
+}
+
+message Message{
+  Header header = 1;
+  oneof body{
+    LoginReq loginReq = 2;
+    LoginRes loginRes = 3;
+    HbReq hbReq = 4;
+    HbRes hbRes = 5;
+    DialogStartReq dialogStartReq = 6;
+    DialogStartRes dialogStartRes = 7;
+    DialogReStartReq dialogReStartReq = 8;
+    DialogReStartRes dialogReStartRes = 9;
+    DialogSetupReq dialogSetupReq = 10;
+    DialogSetupRes dialogSetupRes = 11;
+    DialogStopReq dialogStopReq = 12;
+    DialogStopRes dialogStopRes = 13;
+    SttStartReq sttStartReq = 14;
+    SttStartRes sttStartRes = 15;
+    SttResultNoti sttResultNoti = 16;
+    MediaStartReq mediaStartReq = 17;
+    MediaStartRes mediaStartRes = 18;
+    MediaStopReq mediaStopReq = 19;
+    MediaStopRes mediaStopRes = 20;
+    MediaResultNoti mediaResultNoti = 21;
+    RecordStartReq recordStartReq = 22;
+    RecordStartRes recordStartRes = 23;
+    RecordStopReq recordStopReq = 24;
+    RecordStopRes recordStopRes = 25;
+    DtmfStartReq dtmfStartReq = 26;
+    DtmfStartRes dtmfStartRes = 27;
+    DtmfResultNoti dtmfResultNoti = 28;
+    ConvertReq convertReq = 29;
+    ConvertRes convertRes = 30;
+    ConvertResultNoti convertResultNoti = 31;
+    DialogReSetupReq dialogReSetupReq = 32;
+    DialogReSetupRes dialogReSetupRes = 33;
+  }
+}

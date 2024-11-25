@@ -21,13 +21,15 @@ public class ProcSendPhase extends ProcMsgPhase {
         SendPhase sendPhase = (SendPhase) msgPhase;
 
         try {
-            // create
+            // 타입 별 Builder
             MsgBuilder builder;
             if (scenario.isProtoType()) {
                 builder = new ProtoMsgBuilder(sessionInfo, OutMsgType.SEND);
             } else {
                 builder = new JsonMsgBuilder(sessionInfo, OutMsgType.SEND);
             }
+
+            // build
             byte[] msg = builder.build(sendPhase);
 
             // send

@@ -73,7 +73,6 @@ public class ScenarioBuilder {
         Node nameAttr = attr.getNamedItem(AttrName.NAME.getValue());
         String name = "Unnamed Scenario";
         if (nameAttr != null) {
-            // TODO - verify that the name doesn't contain special characters
             name = nameAttr.getTextContent();
         }
         List<MsgPhase> msgPhases = new ArrayList<>();
@@ -86,7 +85,6 @@ public class ScenarioBuilder {
                 case "send" -> msgPhases.add(new SendPhase(m, idx++, isProtoMode));
                 case "pause" -> msgPhases.add(new PausePhase(m, idx++));
                 case "nop" -> msgPhases.add(new NopPhase(m, idx++));
-                // todo index?
                 case "loop" -> loopPhases.add(new LoopPhase(m, 0, isProtoMode));
                 case "label" -> {
                     LabelPhase labelPhase = new LabelPhase(m, 0, isProtoMode);
