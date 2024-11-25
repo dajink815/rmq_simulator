@@ -27,6 +27,7 @@ public class Scenario extends MsgInfoManager {
     private final String name;
     private final List<MsgPhase> phases;
     private final int firstRcvIdx;
+    private final int firstSendIdx;
     private List<LoopPhase> loopPhases;
     private Map<String, LabelPhase> labelPhaseMap;
     private final Map<String, String> fields = new HashMap<>();
@@ -46,6 +47,7 @@ public class Scenario extends MsgInfoManager {
         this.phases = phases;
         super.initList(phases);
         this.firstRcvIdx = getFirstRecvPhaseIdx();
+        this.firstSendIdx = getFirstSendPhaseIdx();
 
         for (MsgPhase msgPhase : phases) {
             if (msgPhase instanceof SendPhase) {
@@ -60,6 +62,9 @@ public class Scenario extends MsgInfoManager {
 
         log.info("[{}] Started Scenario (size:{}, outbound:{}, firstRcvIdx:{})",
                 name, phases.size(), outScenario, firstRcvIdx);
+        RecvPhase firstRcvPhase = (RecvPhase) phases.get(firstRcvIdx);
+
+        log.info("[{}]", firstRcvPhase.getMsgName());
     }
 
     public List<MsgPhase> phases() {
@@ -79,6 +84,20 @@ public class Scenario extends MsgInfoManager {
             }
         }
         return null;
+    }
+
+    public int getFirstSendPhaseIdx() {
+        int index = 0;
+        for (MsgPhase msgPhase : phases) {
+            if (msgPhase instanceof RecvPhase r && !r.getOptional()) {
+                return -1;
+            }
+            if (msgPhase instanceof SendPhase) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
     }
 
     public int getFirstRecvPhaseIdx() {
@@ -171,7 +190,10 @@ public class Scenario extends MsgInfoManager {
         String msgSnake = StringUtil.camelToSnake(msgName).toUpperCase();
         if (StringUtil.isNull(msgCamel) && StringUtil.isNull(msgSnake)) return false;
 
+        log.debug("msgName [{}] msgCamel [{}] msgSnake [{}]", msgName, msgCamel, msgSnake);
+
         json = json.toUpperCase();
-        return json.contains(msgCamel) || json.contains(msgSnake);
+        msgName = msgName.toUpperCase();
+        return json.contains(msgName) || json.contains(msgCamel) || json.contains(msgSnake);
     }
 }
