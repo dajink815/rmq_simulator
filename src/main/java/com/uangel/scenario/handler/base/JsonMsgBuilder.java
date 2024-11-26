@@ -1,5 +1,9 @@
 package com.uangel.scenario.handler.base;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.javaparser.utils.StringEscapeUtils;
 import com.uangel.model.SessionInfo;
 import com.uangel.reflection.ReflectionUtil;
 import com.uangel.scenario.Scenario;
@@ -13,6 +17,7 @@ import com.uangel.util.JsonUtil;
 import com.uangel.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -43,6 +48,8 @@ public class JsonMsgBuilder extends MsgBuilder {
 
             // Send Bytes
             String json = jsonObject.toJSONString();
+            // UnEscape
+            json = unescapeJsonFields(json);
             byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
 
             // Type 별 로그
@@ -153,5 +160,38 @@ public class JsonMsgBuilder extends MsgBuilder {
         }
 
         return new JSONObject();
+    }
+
+    private String unescapeJsonFields(String jsonString) {
+        try {
+            if (StringUtils.isEmpty(jsonString)) {
+                log.warn("unescapeJsonFields: Input JSON string is empty");
+                return jsonString;
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(jsonString);
+
+            // body 노드 찾기
+            JsonNode bodyNode = rootNode.get("body");
+            if (bodyNode != null && bodyNode.isObject()) {
+                ObjectNode bodyObject = (ObjectNode) bodyNode;
+
+                // body의 모든 필드를 순회하며 String 타입 필드 unescape 처리
+                bodyObject.fields().forEachRemaining(entry -> {
+                    if (entry.getValue().isTextual()) {
+                        String value = entry.getValue().asText();
+                        String unescaped = StringEscapeUtils.unescapeJava(value);
+                        bodyObject.put(entry.getKey(), unescaped);
+                    }
+                });
+            }
+
+            // 변경된 JSON 문자열 반환
+            return mapper.writeValueAsString(rootNode);
+        } catch (Exception e) {
+            log.error("unescapeJsonFields Exception: ", e);
+            return jsonString;
+        }
     }
 }
