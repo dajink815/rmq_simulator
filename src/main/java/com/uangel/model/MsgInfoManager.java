@@ -27,10 +27,6 @@ public class MsgInfoManager {
         // nothing
     }
 
-    public List<MsgInfo> getMsgInfoList() {
-        return msgInfoList;
-    }
-
     protected void initList(List<MsgPhase> phases) {
         if (phases == null || phases.isEmpty()) {
             return;

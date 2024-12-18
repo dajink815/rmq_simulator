@@ -48,23 +48,26 @@ public class Scenario extends MsgInfoManager {
         super.initList(phases);
         this.firstRcvIdx = getFirstRecvPhaseIdx();
         this.firstSendIdx = getFirstSendPhaseIdx();
+        this.outScenario = determineScenarioType(phases);
 
-        for (MsgPhase msgPhase : phases) {
-            if (msgPhase instanceof SendPhase) {
-                this.outScenario = true;
-                break;
-            } else if (msgPhase instanceof RecvPhase phase) {
-                if (phase.getOptional()) continue;
-                this.outScenario = false;
-                break;
-            }
-        }
-
-        log.info("[{}] Started Scenario (size:{}, outbound:{}, firstRcvIdx:{})",
-                name, phases.size(), outScenario, firstRcvIdx);
+        log.info("[{}] Started Scenario (size:{}, isOutbound:{}, firstRcv:{}, firstSend:{})",
+                name, phases.size(), outScenario, firstRcvIdx, firstSendIdx);
         RecvPhase firstRcvPhase = (RecvPhase) phases.get(firstRcvIdx);
 
         log.info("[{}]", firstRcvPhase.getMsgName());
+    }
+
+    private boolean determineScenarioType(List<MsgPhase> phases) {
+        return phases.stream()
+                .filter(phase -> {
+                    if (phase instanceof RecvPhase recvPhase) {
+                        return !recvPhase.getOptional();
+                    }
+                    return true;
+                })
+                .findFirst()
+                .map(SendPhase.class::isInstance)
+                .orElse(false);
     }
 
     public List<MsgPhase> phases() {
@@ -89,9 +92,6 @@ public class Scenario extends MsgInfoManager {
     public int getFirstSendPhaseIdx() {
         int index = 0;
         for (MsgPhase msgPhase : phases) {
-            if (msgPhase instanceof RecvPhase r && !r.getOptional()) {
-                return -1;
-            }
             if (msgPhase instanceof SendPhase) {
                 return index;
             }
@@ -105,9 +105,6 @@ public class Scenario extends MsgInfoManager {
         for (MsgPhase msgPhase : phases) {
             if (msgPhase instanceof RecvPhase r && !r.getOptional()) {
                 return index;
-            }
-            if (msgPhase instanceof SendPhase) {
-                return -1;
             }
             index++;
         }

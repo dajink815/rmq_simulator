@@ -1,6 +1,7 @@
 package com.uangel.scenario;
 
 import com.uangel.scenario.phases.RecvPhase;
+import com.uangel.scenario.phases.SendPhase;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -19,12 +20,21 @@ public class TestScenarioBuilder {
         Scenario scenario = ScenarioBuilder.fromXMLFileName(filePath);
         System.out.println(scenario);
 
-        int firstRcvIdx = scenario.getFirstRecvPhaseIdx();
+        int firstRcvIdx = scenario.getFirstRcvIdx();
         System.out.println("First RcvIdx : " + firstRcvIdx);
+        int firstSendIdx = scenario.getFirstSendIdx();
+        System.out.println("First SendIdx : " + firstSendIdx);
+
         if (firstRcvIdx >= 0) {
             RecvPhase firstRcv = (RecvPhase) scenario.getPhase(firstRcvIdx);
             System.out.println(firstRcv);
             System.out.println(firstRcv.getMsgName());
+        }
+
+        if (firstSendIdx >= 0) {
+            SendPhase firstSend = (SendPhase) scenario.getPhase(firstSendIdx);
+            System.out.println(firstSend);
+            System.out.println(firstSend.getMsgName());
         }
     }
 
